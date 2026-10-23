@@ -27,12 +27,14 @@ generated:
 9. **Atendente** é função, não papel. **Agente** é reservado para IA.
 10. Permissão nunca vem do cliente; a autorização é sempre no servidor.
 11. **Segurança desde a Fatia 0** (2026-10-23, substitui o "sem segundo fator"):
-    - **Segundo fator TOTP** (plugin `twoFactor`), compatível com Google Authenticator, Microsoft Authenticator, 1Password e semelhantes. **Obrigatório para Admin**, opcional para Membro e Viewer. 10 códigos de recuperação, guardados **cifrados** (o padrão do plugin é texto puro). Perdeu o celular e os códigos: `bosun admin unlock` reseta o segundo fator, auditado.
+    - **Segundo fator TOTP** (plugin `twoFactor`), compatível com Google Authenticator, Microsoft Authenticator, 1Password e semelhantes. **Obrigatório para todos os papéis** (ASVS 6.3.3; decidido em 2026-10-23). 10 códigos de recuperação, guardados **cifrados** (o padrão do plugin é texto puro). Perdeu o celular e os códigos: `bosun admin unlock` reseta o segundo fator, auditado.
     - **Sessão recente** para ações sensíveis (trocar senha, ligar ou mudar integração, remover membro, mudar papel, ver códigos de recuperação): `freshAge` de 10 minutos; fora disso, a BOSUN pede senha e código de novo.
     - **Limite de tentativas** no login e no código (`rateLimit` do Better Auth, guardado no banco).
     - **Argon2id** por `@node-rs/argon2` no `password.hash`/`verify` (o padrão do Better Auth é scrypt).
     - Alvo: **OWASP ASVS 5.0 nível 2** na autenticação e na sessão; os itens exatos entram na spec da Fatia 0.
 12. **Workspace, membro e convite usam o plugin `organization` do Better Auth** (organização = workspace, `member` = Membership, `invitation` = Invite, `activeOrganizationId` = `active_workspace_id`). Os três papéis são os papéis do plugin. Contas, criação pela CLI, revogação de sessões e bloqueio usam o plugin `admin`. Decidido em 2026-10-23.
+14. **Sessão opaca no banco**, sem JWT e com o `cookieCache` do Better Auth desligado: revogar vale na requisição seguinte. Cookie `__Host-`, `HttpOnly`, `Secure`, `SameSite=Lax`.
+15. **Sem checagem de senha vazada** (exceção registrada ao ASVS 6.2.12, nível 2): fica só a lista de senhas comuns e palavras do contexto. Decidido em 2026-10-23.
 13. **Isolamento por `workspace_id`:** extensão de query do Prisma ligada ao workspace da requisição, mais o teste de repositório; sem RLS no Postgres no piloto (uma VPS por cliente). Decidido em 2026-10-23.
 
 ## Relations
