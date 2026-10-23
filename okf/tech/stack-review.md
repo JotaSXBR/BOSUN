@@ -4,7 +4,7 @@ title: Revisão da stack e do deploy
 description: Pesquisa de 2026-10-23 comparando a stack da BOSUN com o mercado, com recomendações para Coolify, configuração pela UI e integrações.
 tags: [bosun, stack, coolify, pesquisa, deploy]
 status: draft
-stale_after: 2027-04-23T00:00:00Z
+stale_after: 2027-04-23
 generated:
   by: claude-opus/5.5
   at: 2026-10-23T00:00:00Z
