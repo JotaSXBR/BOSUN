@@ -26,6 +26,18 @@ generated:
 - Cifra AES-256-GCM para segredos (`Integration.encrypted_credentials`).
 - VPS com Coolify, Cloudflare Tunnel, Tailscale, disco cifrado e o checklist CIS; backup diário e **uma restauração testada** ([Deploy](../tech/deployment.md)).
 
+## Spec
+
+- Entidades: `Environment`, `Workspace`, `User`, `Membership`, `Invite`, `Session`, `PasswordResetRequest`, `AuditLog`, `Integration`.
+- Rotas: login, logout, sair de todos, aceite de convite, troca de senha, pedido de reset; CLI `bosun admin create|unlock`.
+- Telas: login, troca forçada, membros e convites, seletor de workspace.
+- Transições: `must_change_password` → senha nova; `Session` ativa → revogada ou expirada.
+- Fora: setup com checklist (Fatia 10), qualquer canal.
+
+## Dependências
+
+Nenhuma fatia. Bloqueio externo: VPS e domínio da piloto.
+
 ## Critério de aceite
 
 1. O Admin criado pela CLI entra, troca a senha e convida um Membro, que entra pelo link.

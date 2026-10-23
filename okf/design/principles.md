@@ -3,7 +3,7 @@ type: Design Principles
 title: Princípios de design
 description: Personalidade, direção visual, UX, acessibilidade e tom.
 tags: [bosun, design, ux, brand, accessibility]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 ---
 

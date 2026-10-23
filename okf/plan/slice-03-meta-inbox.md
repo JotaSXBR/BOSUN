@@ -22,6 +22,18 @@ generated:
 - Responder DM e comentário (resposta pública) pela caixa, dentro da janela da Meta; a tela avisa quando a janela fechou.
 - Filtro por canal na caixa.
 
+## Spec
+
+- Entidades: `Integration` (meta), identidades `instagram` e `facebook`, `ExternalPost` criado ao receber comentário.
+- Webhook: `POST /api/webhooks/meta` (comentários, mensagens, story, menções), com verificação do desafio e da assinatura.
+- Telas: conexão da Meta, filtro por canal, resposta a comentário, aviso de janela fechada.
+- Notificação in-app: conexão expirada ou com erro.
+- Fora: fluxos (Fatia 4), publicação (Fatia 8).
+
+## Dependências
+
+Fatia 1. Bloqueio externo: app da Meta (modo de desenvolvimento com a conta da piloto como testadora; App Review para ir a produção).
+
 ## Critério de aceite
 
 1. Uma DM no Instagram da piloto aparece na fila e a resposta chega no app.

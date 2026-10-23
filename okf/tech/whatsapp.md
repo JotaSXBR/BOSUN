@@ -3,7 +3,7 @@ type: Integration Spec
 title: WhatsApp via WAHA/GOWS
 description: Sessões, endpoints, webhooks, idempotência, mídia e limites do GOWS.
 tags: [bosun, whatsapp, waha, gows, integration]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
   - resource: https://waha.devlike.pro/docs/engines/gows/

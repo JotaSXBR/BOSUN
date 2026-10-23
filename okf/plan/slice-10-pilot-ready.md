@@ -22,6 +22,17 @@ generated:
 - E2E do golden path inteiro, de ponta a ponta.
 - Segunda restauração de backup testada.
 
+## Spec
+
+- Telas: setup com checklist, busca global, exportar e excluir contato.
+- Job: expurgo dos logs de execução de fluxo com mais de 90 dias.
+- Revisão: auditoria do ADR-111 contra o código; E2E do golden path.
+- Fora: tudo do `later.md`.
+
+## Dependências
+
+Fatias 8 e 9.
+
 ## Critério de aceite
 
 1. O E2E do golden path passa: post → comentário → automação → ticket → negócio → venda → tarefa → calendário → Meu dia.

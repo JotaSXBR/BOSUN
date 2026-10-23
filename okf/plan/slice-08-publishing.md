@@ -22,6 +22,19 @@ generated:
 - Formatos: Instagram feed, carrossel e reel; Facebook feed e reel; YouTube Shorts.
 - Posts no calendário e na campanha; o fluxo pode escolher um post da BOSUN; a campanha passa a usar o post da BOSUN.
 
+## Spec
+
+- Entidades: `Post`, `PostMedia`, `PostTarget`; `Document` completo; `PostTarget` publicado cria o `ExternalPost`.
+- Jobs: um por target, no horário agendado.
+- Telas: biblioteca de documentos, compositor, lista de posts, posts no calendário e na campanha.
+- Transições: `draft` → `scheduled` → `publishing` → `published`, `partial` ou `failed`.
+- Notificação in-app e push: falha de publicação.
+- Fora: aprovação, reciclagem, analytics de alcance.
+
+## Dependências
+
+Fatia 7. Bloqueio externo: App Review da Meta (publicação de conteúdo) e verificação do escopo de upload do YouTube.
+
 ## Critério de aceite
 
 Os três critérios de [Post](../product/post.md), mais:

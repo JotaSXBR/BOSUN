@@ -3,7 +3,7 @@ type: Infrastructure Spec
 title: Mídia e RustFS
 description: Storage S3-compatível, buckets, URLs assinadas, backup e expurgo.
 tags: [bosun, media, rustfs, s3, storage]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
   - resource: https://rustfs.com/

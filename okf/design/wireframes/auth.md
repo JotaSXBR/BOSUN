@@ -3,7 +3,7 @@ type: Wireframe
 title: Wireframes de autenticação
 description: Login, alerta de senha do Admin e troca forçada.
 tags: [bosun, wireframe, auth, login, password]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 ---
 

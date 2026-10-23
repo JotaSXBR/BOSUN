@@ -18,7 +18,7 @@ generated:
 
 1. Objetivo: a piloto cria, agenda e publica **na BOSUN**, em vez de usar o app do Instagram.
 2. Plataformas do piloto, todas por **API oficial**: **Instagram** (feed, carrossel, reel), **Facebook** (feed, reel) e **YouTube Shorts**. Sem automação de navegador nem modo assistido.
-3. Modelo: `Post` (campanha opcional, texto base, mídia) → `PostTarget` (uma conta conectada, com texto ou título próprio, status, `external_id`, `published_at` e erro). O YouTube exige título e descrição no próprio target.
+3. Todo post publicado numa rede, nativo ou da BOSUN, é um `ExternalPost`; a automação e a atribuição usam ele. Modelo da BOSUN: `Post` (campanha opcional, texto base, mídia) → `PostTarget` (uma conta conectada, com texto ou título próprio, status, `external_id`, `published_at` e erro). O YouTube exige título e descrição no próprio target.
 4. Ciclo: `draft` → `scheduled` → `publishing` → `published`, `partial` ou `failed`. Todo post tem horário explícito, no fuso do workspace.
 5. Cada target publica de forma independente, com retry limitado e idempotência por target. Uma falha não derruba os outros e gera notificação.
 6. A mídia vem de [Documentos](../product/document.md). Cotas de 100 MB por arquivo e 1 GB por vídeo ([ADR-111](adr-111-architecture.md)).

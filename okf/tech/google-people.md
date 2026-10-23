@@ -3,7 +3,7 @@ type: Integration Spec
 title: Google People API
 description: OAuth, etiqueta BOSUN, sync incremental, etag, lotes e tratamento de erros.
 tags: [bosun, google, people-api, oauth, sync]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
   - resource: https://developers.google.com/people/v1/contacts

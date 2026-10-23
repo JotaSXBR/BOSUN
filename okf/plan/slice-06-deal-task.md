@@ -23,6 +23,18 @@ generated:
 - Notificação de tarefa atribuída.
 - Busca em negócios, tarefas e projetos.
 
+## Spec
+
+- Entidades: `Deal`, `Task`, `Project`.
+- Telas: quadro de negócios, tarefa (lista e detalhe), projeto em lista e quadro, botões no ticket e no negócio.
+- Transições: negócio Novo → Em conversa → Ganho ou Perdido (com motivo); tarefa `a_fazer` → `feita`.
+- Notificação in-app: tarefa atribuída a mim.
+- Fora: calendário (Fatia 7).
+
+## Dependências
+
+Fatia 5.
+
 ## Critério de aceite
 
 1. Do ticket, um clique cria um negócio e uma tarefa já ligados ao contato.

@@ -23,6 +23,18 @@ generated:
 - Documentos mínimos: upload de arquivo e cadastro de link para a entrega ([Documento](../product/document.md)).
 - Estado `automation` no ticket; handoff para `waiting_human` por resposta fora do fluxo, palavra de handoff ou promoção manual; filtro Automação na caixa.
 
+## Spec
+
+- Entidades: `Flow`, `FlowRun`, `TrackedLink`, `LinkClick`, `Document` (mínimo).
+- Rotas: `GET /l/<código>` (redireciona e registra o clique).
+- Telas: lista e formulário do fluxo, aviso de disputa, filtro Automação, upload de entrega.
+- Transições: comentário que casa → `automation`; resposta fora do fluxo, palavra de handoff ou promoção → `waiting_human`.
+- Fora: campanha e Kiwify (Fatia 5), post da BOSUN (Fatia 8).
+
+## Dependências
+
+Fatia 3. Bloqueio externo: App Review da Meta para usar com o público (antes disso, só testadores).
+
 ## Critério de aceite
 
 Os três critérios de [Automação](../product/automation.md), mais:

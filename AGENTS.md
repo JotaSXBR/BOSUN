@@ -65,12 +65,6 @@ Quando o scaffold existir, a fatia que o criar acrescenta aqui os comandos exato
 
 ## Definição de pronto
 
-Uma mudança só está pronta quando:
-
-1. O critério de aceite da fatia passa, com evidência (comando e saída).
-2. Lint, typecheck e testes passam (quando existirem).
-3. `./scripts/validate.sh ./okf` sai com 0 erro.
-4. Conceito, ADR e `okf/log.md` estão atualizados, se algo mudou.
-5. Commit pequeno, com mensagem que diz o que mudou e por quê.
+Está no [guia de trabalho com IA](okf/howto/ai-workflow.md), seção "Definição de pronto". Não declare nada pronto sem cumprir todos os itens e mostrar a evidência.
 
 No Windows, rode os scripts pelo Git Bash.

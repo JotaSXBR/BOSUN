@@ -20,6 +20,17 @@ generated:
 - Conexão do Google Contatos, etiqueta BOSUN, importação, envio ao salvar, sync incremental com `syncToken`, escrita sequencial com `etag`, pergunta ao remover a etiqueta ([Google Contatos](../product/google-contacts.md), [Google People API](../tech/google-people.md)).
 - Busca de contato por nome, telefone e e-mail ([Busca](../product/search.md)).
 
+## Spec
+
+- Entidades: `GoogleContactLink`, `GoogleSyncState`; edição de `Contact` e `ContactIdentity`.
+- Jobs: importação inicial, sync incremental, envio ao salvar.
+- Telas: lista e ficha do contato, mesclagem, conexão do Google Contatos, pergunta da etiqueta removida.
+- Fora: identidades de Instagram e Facebook (Fatia 3), possível duplicado (Fatia 9).
+
+## Dependências
+
+Fatia 1. Bloqueio externo: projeto no Google Cloud (usuária de teste até a verificação dos escopos).
+
 ## Critério de aceite
 
 Os cinco critérios de [Google Contatos](../product/google-contacts.md), mais:

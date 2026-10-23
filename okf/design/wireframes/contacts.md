@@ -3,7 +3,7 @@ type: Wireframe
 title: Wireframe de contatos
 description: Lista, detalhe, sync e conflitos.
 tags: [bosun, wireframe, contacts, google]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 ---
 
@@ -14,7 +14,6 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 | Contatos > Ana Souza                                         |
 +--------------------------------------------------------------+
 | [Foto]  Ana Souza                                            |
-|         Organização: Acme                                    |
 |         Telefone: +55 11 99999-0000  (principal)             |
 |         E-mail: ana@acme.com                                 |
 |         Origem: Google People API / etiqueta BOSUN           |
@@ -23,7 +22,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 | [Editar] [Sincronizar] [Exportar] [Excluir]                  |
 +--------------------------------------------------------------+
 | Histórico de atendimentos                                    |
-| - 21/10 14:20  WhatsApp Principal  Em andamento              |
+| - 21/10 14:20  WhatsApp Principal  Em atendimento            |
 | - 20/10 09:10  WhatsApp Vendas     Resolvido                 |
 +--------------------------------------------------------------+
 | Conflito de identidade? [Revisar]                            |
@@ -40,9 +39,9 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 | Contatos                              [ + Novo contato ]     |
 | [ Buscar nome, telefone ou e-mail... ]                       |
 +--------------------------------------------------------------+
-| Ana Souza        Acme        +55 11 99999-0000   Sincronizado|
-| Carlos Lima      Beta        +55 21 98888-1111   Pendente    |
-| Mariana Alves    Gama        +55 31 97777-2222   Conflito    |
+| Ana Souza        @anasouza    +55 11 99999-0000   Sincronizado|
+| Carlos Lima      —            +55 21 98888-1111   Pendente    |
+| Mariana Alves    @mari.alves  +55 31 97777-2222   Conflito    |
 +--------------------------------------------------------------+
 ```
 

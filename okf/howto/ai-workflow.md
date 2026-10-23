@@ -15,7 +15,7 @@ Vale para qualquer ferramenta. Uma pessoa conduz; o agente executa uma fatia por
 
 ## Ciclo de uma fatia
 
-1. **Spec.** Leia a fatia em `okf/plan/` e os conceitos e ADRs ligados nela. Escreva no início da sessão, em até 15 linhas: o que entra, o que não entra, as dúvidas. Dúvida que muda escopo, dados, segurança ou custo vai para o usuário antes do código.
+1. **Spec.** Leia a fatia em `okf/plan/` e os conceitos e ADRs ligados nela. Complete a seção `## Spec` da fatia com o que a sessão descobriu (rotas, campos, dúvidas resolvidas) e faça o commit antes do código; spec só no chat se perde. Dúvida que muda escopo, dados, segurança ou custo vai para o usuário antes.
 2. **Teste.** Escreva primeiro os testes do critério de aceite e veja falhar. Use fixtures com payloads reais gravados para Meta, WAHA, Kiwify e Google; nunca chame a API real nos testes.
 3. **Código.** Implemente o mínimo que passa nos testes, no módulo dono do assunto ([Arquitetura](../tech/architecture.md)). Antes de usar uma biblioteca ou API externa, confira a documentação oficial da versão em uso (Context7, se disponível).
 4. **Verificação.** Rode lint, typecheck, testes e `./scripts/validate.sh ./okf`. Mostre a saída. Para tela, abra o app e confira à mão o fluxo da fatia.
@@ -34,6 +34,8 @@ Trabalhe em passos pequenos, com um commit por passo que funciona. Uma fatia gra
 Os comandos da aplicação (instalar, lint, typecheck, testes, migrations, ambiente local) entram no `AGENTS.md` ao fim da Fatia 0.
 
 ## Definição de pronto
+
+Fonte única; o `AGENTS.md` aponta para cá.
 
 1. O critério de aceite da fatia passa, com evidência.
 2. Lint, typecheck e testes verdes; validador do bundle com 0 erro.

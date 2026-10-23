@@ -19,12 +19,24 @@ Confirmar na documentação oficial da Kiwify qual parâmetro de rastreio do lin
 
 ## Escopo
 
-- `Campaign` com posts (por `external_id` ainda; o post da BOSUN chega na fatia 8), fluxos e link de checkout ([Campanha](../product/campaign.md)).
+- `Campaign` com posts (`ExternalPost`, nativos até a fatia 8), fluxos e link de checkout ([Campanha](../product/campaign.md)).
 - Link rastreável com campanha, fluxo e contato; redirecionamento ao checkout com UTM e o parâmetro de rastreio.
 - Webhook da Kiwify com segredo validado e idempotência pela transação; `Sale` com status aprovada e reembolsada ([Venda](../product/sale.md)).
 - Atribuição pelo link; sem link, pelo e-mail ou telefone; contato novo com identidade declarada quando não acha.
 - Painel da campanha: comentários → DMs → cliques → tickets → vendas e receita.
 - Notificação in-app de venda confirmada ([Notificação](../product/notification.md)).
+
+## Spec
+
+- Entidades: `Campaign`, `Sale`; `ExternalPost.campaign_id`; `TrackedLink` com campanha.
+- Webhook: `POST /api/webhooks/kiwify`.
+- Telas: campanha (posts, fluxos, link de checkout), painel do funil, venda na ficha do contato.
+- Notificação in-app: venda confirmada.
+- Fora: negócio (Fatia 6), post da BOSUN (Fatia 8).
+
+## Dependências
+
+Fatia 4. Bloqueio externo: documentação da Kiwify (parâmetro de rastreio e formato do webhook) e acesso ao painel de webhooks da conta da piloto.
 
 ## Critério de aceite
 

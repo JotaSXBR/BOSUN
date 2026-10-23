@@ -21,6 +21,17 @@ generated:
 - Ticket em `waiting_human`; aviso de possível duplicado no ticket ([Contato](../product/contact.md)).
 - Limite de mensagens por sessão e por IP.
 
+## Spec
+
+- Entidades: `SiteChatVisitor`; identidade `site_visitor`; identidades declaradas `email` e `phone`.
+- Rotas: script do widget, início de sessão com o formulário, envio e recebimento em tempo real.
+- Telas: widget na landing page, snippet em Configurações, aviso de possível duplicado no ticket.
+- Fora: automação no chat, agente de IA.
+
+## Dependências
+
+Fatia 3 (caixa com vários canais). Bloqueio externo: acesso para colar o snippet na landing page da piloto.
+
 ## Critério de aceite
 
 Os dois critérios de [Chat do site](../product/site-chat.md), mais:

@@ -18,7 +18,18 @@ generated:
 - `Event` com participantes, fuso e lembrete; visões dia, semana e mês; tarefas com prazo no calendário ([Calendário](../product/calendar.md)).
 - Google Agenda do próprio membro, só leitura, com sync incremental e escolha de agendas.
 - Meu dia completo, com os três blocos ([Meu dia](../product/my-day.md)).
-- Web push (VAPID) e preferências por evento em Perfil ([Notificação](../product/notification.md)).
+- Web push (VAPID) para as notificações que já existem no sino, e preferências por evento em Perfil ([Notificação](../product/notification.md)).
+
+## Spec
+
+- Entidades: `Event`, `EventAttendee`, `ExternalCalendarEvent`, `PushSubscription`, `NotificationPreference`.
+- Jobs: sync incremental do Google Agenda por membro.
+- Telas: calendário (dia, semana, mês), Meu dia completo, preferências de notificação em Perfil.
+- Fora: posts no calendário (Fatia 8).
+
+## Dependências
+
+Fatia 6. Bloqueio externo: verificação do escopo de leitura do Google Agenda (usuária de teste até lá).
 
 ## Critério de aceite
 

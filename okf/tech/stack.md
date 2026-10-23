@@ -3,7 +3,7 @@ type: Technology Decision
 title: Stack da aplicação
 description: Opção A aprovada, justificativa, alternativas e pontos em aberto.
 tags: [bosun, stack, nextjs, prisma, authjs, postgres]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
   - resource: https://nextjs.org/docs
@@ -30,7 +30,7 @@ sources:
 - **Tailwind CSS + shadcn/ui**.
 - **pg-boss** para jobs no PostgreSQL.
 - **RustFS** para storage S3-compatível (Apache 2.0).
-- **Resend** para e-mail transacional.
+- **Resend** para e-mail transacional, fora do piloto (o piloto não envia e-mail; ver [Para depois](../product/later.md)).
 - **Docker + Coolify + VPS CIS Level 1 + Tailscale + Cloudflare Tunnel**.
 - **Vitest + Playwright** para testes.
 

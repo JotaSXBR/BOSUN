@@ -22,6 +22,20 @@ generated:
 - Caixa em três colunas, filtros Fila, Minhas e Resolvidas, ordenação por espera, assumir, responder, resolver, nota interna, drawer do contato.
 - Mídia recebida e enviada no RustFS ([Mídia](../tech/media.md)).
 - Meu dia com o bloco "conversas que esperam por mim" ([Meu dia](../product/my-day.md)).
+- Sino de notificações in-app (`Notification`) com conversa nova na fila e conversa atribuída a mim ([Notificação](../product/notification.md)).
+
+## Spec
+
+- Entidades: `WhatsAppSession`, `Contact`, `ContactIdentity`, `Ticket`, `Message`, `InternalNote`, `Notification`.
+- Webhook: `POST /api/webhooks/waha` (evento `message` e status da sessão).
+- Telas: caixa em três colunas, conexão do WhatsApp (QR), Meu dia mínimo, sino de notificações.
+- Transições do ticket: nova entrada → `waiting_human`; assumir → `human`; resolver → `resolved`; mensagem nova em `resolved` → `waiting_human`.
+- Notificações in-app: conversa nova na fila, conversa atribuída a mim.
+- Fora: Instagram, Facebook, automação, push.
+
+## Dependências
+
+Fatia 0. Bloqueio externo: número de WhatsApp da piloto para parear.
 
 ## Critério de aceite
 

@@ -3,7 +3,7 @@ type: Operations Guide
 title: Deploy e operação
 description: Coolify, VPS CIS, Tailscale, Cloudflare Tunnel, containers, backup e rollback.
 tags: [bosun, deploy, coolify, vps, operations]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
   - resource: https://coolify.io/docs/
@@ -50,7 +50,6 @@ sources:
 - `AUTH_SECRET`
 - `WAHA_BASE_URL`, `WAHA_API_KEY`
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-- `RESEND_API_KEY`
 - `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_BUCKET`
 - `APP_URL`
 - Chaves de IA do cliente (**BYOK**) por instalação, no cofre.
@@ -111,9 +110,8 @@ sources:
 
 ## Decisões de 2026-10-23
 
-- **Imagem Docker versionada** com canais estável e beta; implantação pelo Coolify por cliente.
+- **Imagem Docker** com tag por versão; implantação pelo Coolify por cliente (sem canal beta no piloto).
 - Migrations Prisma em **expandir/contrair**.
-- Heartbeat opt-in (versão, saúde, último backup); nenhum dado de cliente sai da VPS.
 - Backup diário criptografado para storage externo, restauração testada todo mês.
 - **Cota padrão 50 GB** por instalação, configurável; **100 MB por arquivo** e **1 GB para vídeo** de Publicações; alertas em 80% e 100%; OCR depois.
 

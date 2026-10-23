@@ -24,7 +24,7 @@ generated:
 6. **Senha com Argon2id. Disco da VPS criptografado. Tokens e segredos de integração** (Meta, Google, YouTube, Kiwify, WAHA) **cifrados com AES-256-GCM**, com a chave numa variável de ambiente fora do banco. Decidido em 2026-10-23.
 7. Toda consulta filtra `workspace_id`; webhooks e jobs são idempotentes.
 8. **Auditoria** de: login, mudança de papel, convite e remoção, conexão de canal ou integração, ativação de fluxo, mesclagem, exportação, exclusão e troca de senha.
-9. Mudança estrutural no modelo de dados exige atualizar este ADR e o [modelo de dados](../tech/data-model.md).
+9. Mudança estrutural no modelo de dados exige atualizar este ADR e o [modelo de dados](../tech/data-model.md). Em 2026-10-23: `ExternalPost` representa todo post publicado numa rede (nativo ou da BOSUN); fluxos, links rastreáveis, vendas e o painel apontam para ele, para que a automação funcione antes da fatia de Publicações.
 10. Testes unitários, de integração e E2E dos fluxos críticos: auth, autorização, webhooks (Meta, WAHA, Kiwify), sync Google, roteamento do ticket, fluxo e publicação.
 11. **LGPD:** a BOSUN é **operadora**; o workspace é **controlador**. O piloto entrega exportação e exclusão de um contato com todos os dados dele, retenção fixa documentada e a lista de suboperadores ([LGPD](../product/lgpd.md)).
 12. Conteúdo de mensagens é dado não confiável.

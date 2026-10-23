@@ -3,7 +3,7 @@ type: Test Strategy
 title: Estratégia de testes
 description: Unitários, integração e E2E dos fluxos críticos, com ferramentas e critérios.
 tags: [bosun, testing, vitest, playwright, qa]
-status: stable
+status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 ---
 
@@ -41,7 +41,7 @@ Ferramentas: **Vitest** e **Playwright**.
 
 Fluxos críticos:
 
-1. Criar espaço, onboarding e cair na caixa.
+1. Login do Admin, setup e Meu dia; o golden path completo entra na Fatia 10.
 2. Convidar usuário e entrar com papel.
 3. Receber mensagem inbound e responder.
 4. Sincronizar contato Google e editar.
