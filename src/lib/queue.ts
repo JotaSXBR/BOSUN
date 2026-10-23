@@ -2,17 +2,40 @@ import { PgBoss } from "pg-boss";
 
 export const EXAMPLE_QUEUE = "example";
 
-let boss: PgBoss | undefined;
+/**
+ * "sender": só envia (web). Sem manutenção nem DDL, para rodar com o papel mínimo do banco.
+ * "worker": processa, mantém a fila e migra o schema do pg-boss.
+ */
+export type QueueRole = "sender" | "worker";
 
-/** Uma instância por processo; o web só envia, o worker também processa. */
-export async function getQueue(): Promise<PgBoss> {
-  if (boss) return boss;
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL não definida");
-  const instance = new PgBoss(url);
-  instance.on("error", (err) => console.error("[queue]", err));
-  await instance.start();
-  await instance.createQueue(EXAMPLE_QUEUE);
-  boss = instance;
-  return instance;
+// Em globalThis para o HMR do next dev não abrir um pool novo a cada recarga.
+const cache = globalThis as typeof globalThis & {
+  bosunQueue?: Partial<Record<QueueRole, Promise<PgBoss>>>;
+};
+
+async function connect(role: QueueRole): Promise<PgBoss> {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) throw new Error("DATABASE_URL não definida");
+  const full = role === "worker";
+  const boss = new PgBoss({ connectionString, supervise: full, schedule: full, migrate: full });
+  boss.on("error", (err) => console.error("[queue]", err));
+  try {
+    await boss.start();
+    if (full) await boss.createQueue(EXAMPLE_QUEUE);
+    return boss;
+  } catch (err) {
+    await boss.stop().catch(() => undefined);
+    throw err;
+  }
+}
+
+/** Uma instância por papel e processo; a promessa em cache evita corrida entre chamadas simultâneas. */
+export function getQueue(role: QueueRole): Promise<PgBoss> {
+  const store = (cache.bosunQueue ??= {});
+  const pending = store[role] ?? connect(role);
+  store[role] = pending;
+  pending.catch(() => {
+    if (store[role] === pending) delete store[role];
+  });
+  return pending;
 }
