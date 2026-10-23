@@ -35,7 +35,7 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 
 - **Better Auth** com sessão no banco; uma linha em `Session` por login (conferir na Fatia 0 como mapear os campos do ADR-102 no modelo de sessão do Better Auth).
 - Toda rota autenticada resolve a sessão no banco e verifica revogada e expirada.
-- **Expiração fixa de 12 h**, sem renovação deslizante. `last_seen_at` atualizado no máximo a cada 5 min.
+- **12 h sem atividade** derrubam a sessão, com teto absoluto de 7 dias; segundo fator TOTP obrigatório para Admin; sessão recente (10 min) para ações sensíveis ([ADR-102](../decisions/adr-102-identity.md) itens 6 e 11). `last_seen_at` atualizado no máximo a cada 5 min.
 - Sair de todos, trocar a senha e remover do workspace revogam as sessões. Mudança de papel não revoga.
 - Trocar de workspace atualiza `active_workspace_id`.
 - Cookies `HttpOnly`, `Secure` e `SameSite=Lax`; proteção CSRF nas mutações.

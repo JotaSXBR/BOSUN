@@ -22,7 +22,7 @@ generated:
 - Oxlint, typecheck (TS 7), Vitest e Playwright configurados; CI na ordem do [padrão de qualidade](../tech/quality-gate.md).
 - Docker Compose para o Coolify (`web`, `worker`, `postgres`, `waha`, `rustfs`) com variáveis geradas; tela de integrações com credenciais cifradas.
 - Entidades `Environment`, `Workspace`, `User`, `Membership`, `Invite`, `Session`, `PasswordResetRequest`, `AuditLog`, `Integration` ([Modelo de dados](../tech/data-model.md)).
-- Login, sessão de 12 h, logout, sair de todos, senha temporária, troca forçada, `bosun admin create` e `bosun admin unlock` ([Autenticação](../tech/auth.md)).
+- Login com segundo fator TOTP (obrigatório para Admin) e códigos de recuperação cifrados, sessão de 12 h de inatividade com teto de 7 dias, sessão recente para ações sensíveis, rate limit, Argon2id, logout, sair de todos, senha temporária, troca forçada, `bosun admin create` e `bosun admin unlock` ([Autenticação](../tech/auth.md)).
 - Papéis fixos e o guarda de autorização no servidor; convite por link ([Papéis](../product/role.md)).
 - Criar e trocar de workspace.
 - Cifra AES-256-GCM para segredos (`Integration.encrypted_credentials`).

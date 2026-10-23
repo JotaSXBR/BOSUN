@@ -28,6 +28,7 @@ generated:
 
 ## Próximo passo
 
+- Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
 - Decidir a licença do repositório público (ADR-111 item 14).
 0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).
 1. O usuário revisa e aprova o [plano em fatias](../plan/index.md).
