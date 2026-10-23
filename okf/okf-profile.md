@@ -82,6 +82,7 @@ Um ADR por domínio em `decisions/`. Decisão nova ou alterada edita o ADR do do
 | E009 | erro | verbo fora do vocabulário ou linha de relação mal formada |
 | E010 | erro | título duplicado |
 | E011 | erro | mais de um ADR para o mesmo domínio |
+| E012 | erro | pasta `tasks/` ou `SPEC.md` com conteúdo na raiz do repositório (spec e tarefas ficam nas fatias) |
 | W001 | aviso | nó sem relação de entrada |
 | W002 | aviso | `stale_after` vencido |
 | W003 | aviso | `verified` sem `by`/`at` |

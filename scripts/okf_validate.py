@@ -334,6 +334,15 @@ def validate(root, today=None):
         elif out == 0:
             rep.err("E008", rel, rel_line, "seção Relations sem relação de saída válida")
 
+    repo = os.path.dirname(os.path.abspath(root))
+    if os.path.isdir(os.path.join(repo, "tasks")):
+        rep.err("E012", "tasks/", 1, "pasta tasks/ fora do OKF; mova as tarefas para a seção Tarefas da fatia")
+    spec = os.path.join(repo, "SPEC.md")
+    if os.path.isfile(spec):
+        with open(spec, encoding="utf-8") as f:
+            n_lines = sum(1 for l in f if l.strip())
+        if n_lines > 6:  # shortcut: limite de linhas como sinal de spec escrita fora do OKF
+            rep.err("E012", "SPEC.md", 1, "SPEC.md deve ser só um ponteiro para a fatia ativa")
     for rel in files:
         if rel != "index.md" and rel not in indexed:
             rep.err("E007", rel, 1, "arquivo não aparece em nenhum index.md")

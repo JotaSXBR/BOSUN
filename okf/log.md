@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Integração com agent-skills:** spec e tarefas ficam nas fatias do OKF (mapa no `AGENTS.md`), `SPEC.md` na raiz é só ponteiro, `tech/engineering.md` com estrutura, estilo e fronteiras, e erro E012 no validador para `tasks/` ou `SPEC.md` com conteúdo. Revisão da stack e do deploy marcada como pendência antes da Fatia 0.
 - **Revisão de conteúdo do plano:** `ExternalPost` no modelo de dados (ADR-111, ADR-108) para a automação funcionar antes de Publicações; seções Spec e Dependências em cada fatia; definição de pronto só no guia; docs de design e tecnologia alinhados ao corte; os 11 docs que estavam `stable` voltaram a `draft` porque foram editados e aguardam nova aprovação.
 - **Plano** em 11 fatias verticais (`plan/`) e **guia de trabalho com IA** (`howto/ai-workflow.md`), em draft até a aprovação. `method.md` removido (substituído pelo guia). Perfil ganhou a regra de `resource` e o aviso W005.
 - **Skill do projeto** `.claude/skills/okf-bosun` (fina, aponta para o perfil e o validador), escrita depois de estudar a skill oficial OKF. MCP como memória adiado. Validador passa a aceitar `verified` como lista (spec §5.2).

@@ -21,6 +21,7 @@ generated:
 
 ## Em aberto
 
+- **Revisão da stack e do deploy antes da Fatia 0**, com pesquisa de mercado: stack comparada com o que produtos parecidos usam, e Coolify com ambientes stable e beta. Bloqueia a Fatia 0.
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
 

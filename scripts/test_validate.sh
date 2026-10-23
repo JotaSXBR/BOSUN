@@ -101,7 +101,9 @@ printf -- '---\ntype: Concept\ntitle: Velho\ndescription: d.\nstatus: draft\nsta
 # E007: fora de qualquer index
 printf -- '---\ntype: Concept\ntitle: Orfao\ndescription: d.\nstatus: draft\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/orphan.md"
 
+mkdir -p "$tmp/tasks"
 out="$("$here/validate.sh" "$b")"; code=$?
+rmdir "$tmp/tasks"
 [ $code -ne 0 ] && echo "ok  bundle inválido: código $code" || { echo "FALHOU: bundle inválido saiu 0"; fail=1; }
 expect() { # código, arquivo, trecho
   if grep -F "$1 $2" <<<"$out" | grep -qF "$3"; then echo "ok  $1 $2 ($3)"
@@ -129,6 +131,7 @@ expect W002 product/old.md "vencido"
 expect W003 product/old.md "by/at"
 expect W004 product/adr2.md "170"
 expect W005 product/old.md "src/nope.ts"
+expect E012 tasks/ "tasks/"
 
 [ $fail -eq 0 ] && echo "SELF-TEST OK" || { echo "SELF-TEST FALHOU"; echo "--- saída ---"; echo "$out"; }
 exit $fail
