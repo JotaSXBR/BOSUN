@@ -1,6 +1,7 @@
 # Tecnologia
 
 - [Arquitetura](architecture.md) - Contexto, módulos, fluxos, NFRs e riscos.
+- [Revisão da stack e do deploy](stack-review.md) - Pesquisa de mercado de 2026-10-23 e recomendações a decidir.
 - [Stack](stack.md) - Next.js, Prisma, Auth.js, pg-boss e RustFS.
 - [Modelo de dados](data-model.md) - Entidades, índices e restrições.
 - [Autenticação e sessão](auth.md) - Senha temporária, unlock pela CLI e sessão revogável.
