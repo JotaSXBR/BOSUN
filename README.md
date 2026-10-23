@@ -1,30 +1,36 @@
 # BOSUN
 
-Sistema operacional pessoal, web-first e multiusuário. O trabalho atual é definir o **produto completo**; o MVP é um recorte com **Onboarding**, **Contatos/Google People API** e **Atendimento por WhatsApp**.
+Central de operação do infoprodutor: o post nasce, o comentário vira conversa, a conversa vira venda e a venda vira trabalho entregue, no mesmo fio. Web-first, multiusuário, uma VPS dedicada por cliente.
+
+## Status
+
+- Produto cortado ao **piloto** com uma founder de infoprodutos: [golden path](okf/product/pilot.md).
+- Documentação no formato OKF v0.2, com o [Perfil OKF BOSUN](okf/okf-profile.md). Tudo em draft até a aprovação.
+- Ainda não há código de produto.
 
 ## Comece aqui
 
-- [`okf/method.md`](okf/method.md) — método durável: fontes de verdade, fluxo de rodada e regras de decisão.
-- [`okf/index.md`](okf/index.md) — entrada do bundle **OKF v0.2**.
-- [`okf/memory/handoff.md`](okf/memory/handoff.md) — ponto de retomada e prompt para a nova janela.
-- [`AGENTS.md`](AGENTS.md) — instruções do workspace para OpenCode V2, OKF e Superpowers.
-- [`okf/memory/current-state.md`](okf/memory/current-state.md) — estado atual e próximos passos.
-- [`okf/plan/plan.md`](okf/plan/plan.md) — plano do MVP; não executar antes do design do produto completo.
+- [AGENTS.md](AGENTS.md) - Instruções para quem trabalha no projeto, humano ou agente de IA.
+- [okf/index.md](okf/index.md) - Entrada do bundle.
+- [okf/memory/current-state.md](okf/memory/current-state.md) - Estado atual e próximo passo.
 
 ## Estrutura
 
 ```text
 okf/
-  method.md     método durável do projeto
-  product/      visão, escopo, onboarding, papéis, contatos, inbox, LGPD
-  tech/         arquitetura, stack, dados, auth, integrações, testes, deploy
-  decisions/    ADRs
-  design/       princípios, telas e wireframes
-  plan/         plano e backlog
-  memory/       estado, decisões históricas, pesquisa e log
-archive/        documentos legados preservados
+  okf-profile.md  regra de escrita do bundle
+  product/        conceitos do piloto e later.md (adiados)
+  decisions/      um ADR por domínio
+  tech/           arquitetura, dados, auth, integrações, testes e deploy
+  design/         princípios, mapa de telas e wireframes
+  plan/           plano em fatias
+  memory/         estado atual
+scripts/          validador do bundle e self-test
+archive/          histórico; não é estado atual
 ```
 
-## Status
+## Validar a documentação
 
-Bundle OKF v0.2 **conformante** (`@mfdaves/okf-mcp@0.9.1`), sem erros ou avisos. A documentação está em expansão para o produto completo; as rodadas 7C e 8 estão pendentes e a implementação está pausada. O MVP é um recorte preservado. Ainda não há código de produto.
+```bash
+./scripts/validate.sh ./okf
+```
