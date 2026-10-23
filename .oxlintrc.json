@@ -1,0 +1,35 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "import", "oxc", "react", "nextjs"],
+  "jsPlugins": ["oxlint-plugin-complexity"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn"
+  },
+  "options": {
+    "typeAware": true,
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error"
+  },
+  "ignorePatterns": [".next/**", "node_modules/**", "prisma/migrations/**", "src/generated/**", "next-env.d.ts"],
+  "rules": {
+    "complexity": ["error", { "max": 10 }],
+    "complexity/complexity": ["error", { "cognitive": 15, "minLines": 0 }],
+    "max-lines": ["error", { "max": 300, "skipBlankLines": true, "skipComments": true }],
+    "max-lines-per-function": ["error", { "max": 60, "skipBlankLines": true, "skipComments": true }],
+    "max-depth": ["error", 4],
+    "max-params": ["error", 4],
+    "max-nested-callbacks": ["error", 3],
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
+    "import/no-cycle": "error",
+    "no-console": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "eqeqeq": "error",
+    "react/react-in-jsx-scope": "off"
+  }
+}

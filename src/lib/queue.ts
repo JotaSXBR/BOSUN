@@ -1,4 +1,5 @@
 import { PgBoss } from "pg-boss";
+import { logger } from "./logger.ts";
 
 export const EXAMPLE_QUEUE = "example";
 
@@ -18,7 +19,7 @@ async function connect(role: QueueRole): Promise<PgBoss> {
   if (!connectionString) throw new Error("DATABASE_URL não definida");
   const full = role === "worker";
   const boss = new PgBoss({ connectionString, supervise: full, schedule: full, migrate: full });
-  boss.on("error", (err) => console.error("[queue]", err));
+  boss.on("error", (err) => logger.error("queue", "erro do pg-boss", err));
   try {
     await boss.start();
     if (full) await boss.createQueue(EXAMPLE_QUEUE);

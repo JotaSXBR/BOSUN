@@ -117,6 +117,7 @@ Conferido na T1 (2026-10-23):
 - `max-lines` e `max-lines-per-function` aceitam `skipBlankLines` e `skipComments`; testado.
 - O `oxlint-plugin-complexity` 4.0.0 roda como `jsPlugin` com a regra `complexity/complexity`, mas precisa de `"minLines": 0`: o padrão (10) ignora funções curtas. A ciclomática usa a regra nativa `complexity`.
 - Prisma 7.10.1 e Next.js 16.4.2 com TS 7.0.2 passam juntos; sem volta ao TS 6.
+- Conferido na T4: o oxlint não exige o `-- motivo` nas exceções nem as conta; o CI da T6 faz isso. A ciclomática fica só na regra nativa `complexity`, porque o plugin também a reporta e duplicaria o erro.
 
 [^oxlint-rules]: Oxlint rules
 [^oxlint-config]: Oxlint configuration

@@ -13,7 +13,8 @@
     "worker": "node --env-file-if-exists=.env.local worker/index.ts",
     "services:up": "docker compose --env-file .env.local -f compose.dev.yml up -d --wait",
     "services:down": "docker compose --env-file .env.local -f compose.dev.yml down",
-    "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env.local worker/migrate.ts"
+    "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env.local worker/migrate.ts",
+    "lint": "oxlint --deny-warnings"
   },
   "dependencies": {
     "next": "16.4.2",
@@ -26,6 +27,9 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "concurrently": "10.0.6",
+    "oxlint": "1.89.0",
+    "oxlint-plugin-complexity": "4.0.0",
+    "oxlint-tsgolint": "7.0.2004",
     "prisma": "7.10.1",
     "typescript": "7.0.2"
   },

@@ -149,16 +149,16 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: `compose.dev.yml` sobe Postgres, RustFS e WAHA; `pnpm db:migrate` cria o schema e o do pg-boss; o `worker` processa um job de exemplo enfileirado pelo `web`.
   - Verificar: `docker compose -f compose.dev.yml up -d`, `pnpm db:migrate`, log do worker com o job concluído.
   - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma.config.ts`, `worker/index.ts`, `worker/migrate.ts`, `src/lib/queue.ts`, `src/app/api/dev/example-job/route.ts`. `prisma/migrations/` nasce com o primeiro modelo, no `identity`.
-- [ ] **T4 — Lint e typecheck no padrão de qualidade**
+- [x] **T4 — Lint e typecheck no padrão de qualidade**
   - Aceite: `.oxlintrc.json` com todas as regras e limites do [padrão de qualidade](../tech/quality-gate.md); `pnpm typecheck` e `pnpm lint` saem 0; um arquivo de teste com `any` e outro com função de 61 linhas falham.
   - Verificar: os dois comandos verdes; os dois casos ruins vermelhos (e removidos depois).
-  - Arquivos: `.oxlintrc.json`, `package.json`.
+  - Arquivos: `.oxlintrc.json`, `package.json`, `src/lib/logger.ts` (único ponto com `console`).
 - [ ] **T5 — Testes, cobertura e duplicação**
   - Aceite: Vitest com projetos `unit` e `integration` e limites de cobertura; Playwright com um teste da página inicial; jscpd com limite de 3%; `pnpm verify` sai 0.
   - Verificar: `pnpm test`, `pnpm test:int` (contra o compose), `pnpm test:e2e`, `pnpm dup`, `pnpm verify`.
   - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`.
 - [ ] **T6 — CI e cadeia de suprimentos**
-  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
+  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
   - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
   - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.pre-commit-config.yaml` ou hook equivalente.
 - [ ] **T7 — Fechamento do módulo**
