@@ -27,7 +27,7 @@ Validar: `./scripts/validate.sh ./okf` (sai 0 sem erro). Grafo para consulta: `.
 
 - Obrigatórios: `type`, `title`, `description` (uma frase, até 160 caracteres), `status` (`draft` | `stable` | `deprecated`).
 - ADR (`type: ADR`) também exige `domain`; um ADR por domínio.
-- Opcionais: `tags`, `sources` (lista de `{resource, title}`), `generated` (`{by, at}`; `by` como na spec: `<produtor>/<versão>` para agente, ex. `claude-opus/5.5`, `human:<id>` para pessoa, `process:<id>` para processo; `at` em ISO 8601 UTC), `stale_after` (data; só onde o conteúdo envelhece), `verified` (`{by, at}`; só com revisão humana real, nunca inventada).
+- Opcionais: `tags`, `sources` (lista de `{resource, title}`), `generated` (`{by, at}`; `by` como na spec: `<produtor>/<versão>` para agente, ex. `claude-opus/5.5`, `human:<id>` para pessoa, `process:<id>` para processo; `at` em ISO 8601 UTC), `stale_after` (data; só onde o conteúdo envelhece), `verified` (lista de `{by, at}`, ou um mapa solto para um só verificador; só com revisão humana real, nunca inventada).
 - `okf_version` não se repete por arquivo.
 - YAML aceito: `chave: valor`, listas `[a, b]`, mapas `{a: b}`, blocos de um nível e listas de mapas (`sources: - resource: url` + `title:`, como na spec).
 - `status: stable` só com aprovação explícita do usuário.

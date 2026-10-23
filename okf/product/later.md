@@ -63,6 +63,7 @@ Adiado em 2026-10-23. Para voltar, o item ganha decisão no ADR do domínio e um
 
 - Offline, PWA e apps (Capacitor).
 - Notificação por e-mail.
+- Servir o bundle `okf/` por MCP como memória dos agentes (avaliar a segurança do servidor antes).
 - Canal beta de release e heartbeat para o operador.
 - Retenção configurável por tipo de dado.
 - Modelo comercial: instalação + mensalidade, Asaas, NFS-e e contrato (antes do primeiro cliente pagante).

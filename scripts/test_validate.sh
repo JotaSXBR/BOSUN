@@ -38,7 +38,9 @@ tags: [crm]
 generated:
   by: "agent:claude"
   at: 2026-10-23T00:00:00Z
-verified: { by: "human:ana", at: 2026-10-23T00:00:00Z }
+verified:
+  - { by: "human:ana", at: 2026-10-23T00:00:00Z }
+  - { by: "process:ci", at: 2026-10-23T01:00:00Z }
 stale_after: 2027-01-01
 ---
 # Contato

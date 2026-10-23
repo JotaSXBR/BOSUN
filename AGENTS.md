@@ -25,6 +25,7 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 - Uma fatia por vez. Não comece código fora de uma fatia aprovada.
 - Ambiguidade que muda escopo, dados, segurança ou custo: pergunte antes de decidir.
 - Skills (brainstorming, TDD, revisão etc.) são opcionais; use se a sua ferramenta tiver.
+- Para mexer em `okf/`, siga a skill do projeto [`.claude/skills/okf-bosun/SKILL.md`](.claude/skills/okf-bosun/SKILL.md). Ferramentas sem suporte a skills: leia o arquivo e siga do mesmo jeito.
 
 ## Regras de escrita do bundle
 

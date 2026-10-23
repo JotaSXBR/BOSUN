@@ -280,7 +280,8 @@ def validate(root, today=None):
                 rep.warn("W002", rel, 1, f"stale_after vencido em {stale}")
         if "verified" in fm:
             v = fm["verified"]
-            if not (isinstance(v, dict) and v.get("by") and v.get("at")):
+            events = v if isinstance(v, list) else [v]  # spec §5.2: mapa solto = lista de um item
+            if not events or not all(isinstance(e, dict) and e.get("by") and e.get("at") for e in events):
                 rep.warn("W003", rel, 1, "verified sem by/at")
         title = fm.get("title")
         if isinstance(title, str) and title.strip():
