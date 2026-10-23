@@ -6,12 +6,12 @@
     "node": "24.21.0"
   },
   "scripts": {
-    "dev": "concurrently -n web,worker \"next dev\" \"node --env-file=.env --watch worker/index.ts\"",
+    "dev": "concurrently -n web,worker \"next dev\" \"node --env-file-if-exists=.env --env-file-if-exists=.env.local --watch worker/index.ts\"",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "worker": "node --env-file=.env worker/index.ts",
-    "db:migrate": "prisma migrate dev && node --env-file=.env worker/migrate.ts"
+    "worker": "node --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
+    "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env --env-file-if-exists=.env.local worker/migrate.ts"
   },
   "dependencies": {
     "next": "16.4.2",
