@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Plano** em 11 fatias verticais (`plan/`) e **guia de trabalho com IA** (`howto/ai-workflow.md`), em draft até a aprovação. `method.md` removido (substituído pelo guia). Perfil ganhou a regra de `resource` e o aviso W005.
 - **Skill do projeto** `.claude/skills/okf-bosun` (fina, aponta para o perfil e o validador), escrita depois de estudar a skill oficial OKF. MCP como memória adiado. Validador passa a aceitar `verified` como lista (spec §5.2).
 - **Migração para o perfil:** verbos de relação e seção `## Relations` em inglês; todos os concepts com relações; renomeados `tech/whatsapp.md`, `tech/media.md`, `tech/deployment.md`, `tech/test-strategy.md` e `design/screen-map.md`. `validate.sh` com 0 erros.
 - **Corte do piloto** (vereditos do usuário em 64 cartões): o produto virou o golden path post → comentário → automação → atendimento → CRM → venda → tarefa → calendário → Meu dia. Adiados em `product/later.md`.

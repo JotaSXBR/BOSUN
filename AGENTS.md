@@ -21,7 +21,7 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 
 ## Como trabalhar
 
-- O trabalho segue o plano em fatias de [okf/plan/](okf/plan/index.md) e o guia de trabalho com IA indicado lá: spec → teste → código → verificação → revisão.
+- O trabalho segue o plano em fatias de [okf/plan/](okf/plan/index.md) e o [guia de trabalho com IA](okf/howto/ai-workflow.md): spec → teste → código → verificação → revisão. Para retomar uma sessão, siga a seção "Retomar" do guia.
 - Uma fatia por vez. Não comece código fora de uma fatia aprovada.
 - Ambiguidade que muda escopo, dados, segurança ou custo: pergunte antes de decidir.
 - Skills (brainstorming, TDD, revisão etc.) são opcionais; use se a sua ferramenta tiver.

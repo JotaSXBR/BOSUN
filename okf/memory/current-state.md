@@ -26,9 +26,8 @@ generated:
 
 ## Próximo passo
 
-1. Migrar o bundle para o [Perfil OKF BOSUN](../okf-profile.md) (Etapa 5).
-2. Reescrever AGENTS.md e README.md (Etapa 6).
-3. Escrever o plano em fatias e o guia de trabalho com IA (Etapa 7).
+1. O usuário revisa e aprova o [plano em fatias](../plan/index.md).
+2. Começar a [Fatia 0](../plan/slice-00-foundation.md) e, no mesmo dia, o App Review da Meta e a verificação do Google.
 
 ## Relations
 
