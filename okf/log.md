@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Análise do CRMv2** (`tech/crmv2-review.md`, só leitura, commit f2a338d): fatias 0, 1, 2 e 9 já feitas lá, metade da 6 também; conflitos com a stack decidida hoje listados, sem resolver.
 - **Stack decidida** (ADR-111, ADR-102, ADR-107): Better Auth, TS 7 + Oxlint, Prisma 7, worker separado, compose no Coolify com beta e stable no mesmo servidor, integrações pela UI, Instagram e Facebook separados, regra da camada de serviço para o futuro MCP. **Padrão de qualidade** proposto em `tech/quality-gate.md`.
 - **Pesquisa:** `tech/stack-review.md` compara a stack com Chatwoot, Postiz e Mixpost e recomenda Better Auth, worker separado, beta no servidor do operador, compose com variáveis geradas pelo Coolify e integrações pela UI. Aguarda decisão.
 - **Integração com agent-skills:** spec e tarefas ficam nas fatias do OKF (mapa no `AGENTS.md`), `SPEC.md` na raiz é só ponteiro, `tech/engineering.md` com estrutura, estilo e fronteiras, e erro E012 no validador para `tasks/` ou `SPEC.md` com conteúdo. Revisão da stack e do deploy marcada como pendência antes da Fatia 0.
