@@ -25,21 +25,19 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 - O trabalho segue o plano em fatias de [okf/plan/](okf/plan/index.md) e o [guia de trabalho com IA](okf/howto/ai-workflow.md): spec → teste → código → verificação → revisão. Para retomar uma sessão, siga a seção "Retomar" do guia.
 - Uma fatia por vez. Não comece código fora de uma fatia aprovada.
 - Ambiguidade que muda escopo, dados, segurança ou custo: pergunte antes de decidir.
-- Ferramenta com o plugin agent-skills (Claude Code, inclusive o app desktop no Windows): as skills são fluxos obrigatórios, não sugestões. Antes de cada etapa, escolha a skill pela árvore de `/agent-skills:using-agent-skills` e siga os passos dela em ordem, inclusive a verificação. Ferramenta sem skills: siga o mesmo fluxo pelo guia de trabalho com IA.
+- Ferramenta com o plugin agent-skills (Claude Code, inclusive o app desktop no Windows): as 8 skills abaixo são fluxos obrigatórios, não sugestões. Siga os passos de cada uma em ordem, inclusive a verificação; as subskills que elas chamam não precisam ser listadas aqui. Ferramenta sem skills: siga o mesmo fluxo pelo guia de trabalho com IA.
 - Para mexer em `okf/`, siga a skill do projeto [`.claude/skills/okf-bosun/SKILL.md`](.claude/skills/okf-bosun/SKILL.md). Ferramentas sem suporte a skills: leia o arquivo e siga do mesmo jeito.
 
 ## Integração com agent-skills
 
-Invoque sempre pelo nome completo. Toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` + `/agent-skills:code-simplify` (e `/agent-skills:webperf` em tela pesada) → `/agent-skills:ship`.
-
-Dentro do build, aplique também as skills de apoio que a tarefa pedir: `source-driven-development` antes de usar API de biblioteca (confere a doc da versão instalada), `incremental-implementation` em tarefa com mais de um arquivo, `doubt-driven-development` em auth, cifra, dados ou decisão difícil de desfazer, `debugging-and-error-recovery` quando algo quebrar, `git-workflow-and-versioning` ao commitar, `documentation-and-adrs` ao registrar decisão.
+Invoque sempre pelo nome completo. São 8: toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` → `/agent-skills:code-simplify` (logo após cada review) → `/agent-skills:ship`. `/agent-skills:webperf` entra depois do review só em fatia com tela pesada.
 
 O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprovações; o lugar é este:
 
 - Spec da fatia (objetivo, critérios de sucesso, perguntas abertas): `okf/plan/slice-XX.md`, seções Objetivo, Spec, Critério de aceite e Perguntas abertas.
 - Stack e comandos: [okf/tech/stack.md](okf/tech/stack.md) e a seção Comandos abaixo.
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
-- Padrão de qualidade (`CONSTRAINTS.md` do `/agent-skills:constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
+- Padrão de qualidade (o `CONSTRAINTS.md` do agent-skills): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
 - **Modelos dos agentes:** a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes rodam no Sonnet por padrão (`.claude/settings.json`). Agentes do projeto em `.claude/agents/`: `bosun-explorer` (Haiku, busca), `bosun-implementer` (Sonnet, tarefa em paralelo), `bosun-reviewer` (Sonnet, esforço alto).
 - **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
