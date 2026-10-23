@@ -145,10 +145,10 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: `pnpm install --frozen-lockfile` + `pnpm dev` abre a página inicial; versões exatas; `.nvmrc`; `.env.example` sem valor real.
   - Verificar: clone limpo em pasta temporária, os dois comandos, página responde 200.
   - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `src/app/page.tsx`, `src/app/layout.tsx`, `pnpm-workspace.yaml`, `.env.example`.
-- [ ] **T3 — Banco e worker locais**
+- [x] **T3 — Banco e worker locais**
   - Aceite: `compose.dev.yml` sobe Postgres, RustFS e WAHA; `pnpm db:migrate` cria o schema e o do pg-boss; o `worker` processa um job de exemplo enfileirado pelo `web`.
   - Verificar: `docker compose -f compose.dev.yml up -d`, `pnpm db:migrate`, log do worker com o job concluído.
-  - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma/migrations/`, `worker/index.ts`, `lib/queue.ts`.
+  - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma.config.ts`, `worker/index.ts`, `worker/migrate.ts`, `src/lib/queue.ts`, `src/app/api/dev/example-job/route.ts`. `prisma/migrations/` nasce com o primeiro modelo, no `identity`.
 - [ ] **T4 — Lint e typecheck no padrão de qualidade**
   - Aceite: `.oxlintrc.json` com todas as regras e limites do [padrão de qualidade](../tech/quality-gate.md); `pnpm typecheck` e `pnpm lint` saem 0; um arquivo de teste com `any` e outro com função de 61 linhas falham.
   - Verificar: os dois comandos verdes; os dois casos ruins vermelhos (e removidos depois).

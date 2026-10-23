@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+// agentRules: o AGENTS.md é do projeto; o next dev não deve reescrevê-lo.
+const nextConfig: NextConfig = { agentRules: false };
 
 export default nextConfig;

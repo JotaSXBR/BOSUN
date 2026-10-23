@@ -1,0 +1,4 @@
+// Modelos entram a partir do módulo identity; aqui só a conexão.
+datasource db {
+  provider = "postgresql"
+}

@@ -66,7 +66,7 @@ O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprov
 
 ## Bibliotecas
 
-Antes de escrever código que usa uma biblioteca, framework, SDK ou API externa, confira a documentação oficial **da versão em uso** (veja o `package.json`). Use o Context7 quando a sua ferramenta tiver (recomendado, não obrigatório). Não confie em memória para APIs que mudam (Next.js, Auth.js, Prisma, Meta Graph API, YouTube Data API, Kiwify).
+Antes de escrever código que usa uma biblioteca, framework, SDK ou API externa, confira a documentação oficial **da versão em uso** (veja o `package.json`). Use o Context7 quando a sua ferramenta tiver (recomendado, não obrigatório). O Next.js traz a doc da versão instalada em `node_modules/next/dist/docs/`. Não confie em memória para APIs que mudam (Next.js, Auth.js, Prisma, Meta Graph API, YouTube Data API, Kiwify).
 
 ## Comandos
 
