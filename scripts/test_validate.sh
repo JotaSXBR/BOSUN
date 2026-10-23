@@ -7,7 +7,7 @@ export OKF_TODAY=2026-10-23
 fail=0
 
 # ---------- bundle válido ----------
-v="$tmp/valid"; mkdir -p "$v/product"
+v="$tmp/valid"; mkdir -p "$v/product" "$tmp/src"; touch "$tmp/src/inbox.ts"
 cat > "$v/index.md" <<'EOF'
 ---
 okf_version: "0.2"
@@ -58,6 +58,7 @@ title: Ticket
 description: Conversa de atendimento.
 status: stable
 domain: service
+resource: src/inbox.ts
 ---
 # Ticket
 ## Relations
@@ -95,8 +96,8 @@ long="$(printf 'x%.0s' $(seq 1 170))"
 printf -- '---\ntype: ADR\ntitle: Outro ADR\ndescription: %s\nstatus: draft\ndomain: service\n---\n# A\n## Relations\n- details: [Ticket](ticket.md)\n' "$long" > "$b/product/adr2.md"
 # E009: verbo fora do vocabulário e linha mal formada; E008: sem saída válida
 printf -- '---\ntype: Concept\ntitle: Verbo\ndescription: d.\nstatus: draft\n---\n# V\n## Relations\n- inventa: [Ticket](ticket.md)\n- solto sem link\n' > "$b/product/verb.md"
-# W002 + W003 + E007 (não está no index? está) -> órfão separado abaixo
-printf -- '---\ntype: Concept\ntitle: Velho\ndescription: d.\nstatus: draft\nstale_after: 2020-01-01\nverified: sim\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/old.md"
+# W002 + W003 + W005
+printf -- '---\ntype: Concept\ntitle: Velho\ndescription: d.\nstatus: draft\nstale_after: 2020-01-01\nverified: sim\nresource: src/nope.ts\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/old.md"
 # E007: fora de qualquer index
 printf -- '---\ntype: Concept\ntitle: Orfao\ndescription: d.\nstatus: draft\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/orphan.md"
 
@@ -127,6 +128,7 @@ expect W001 product/adr2.md "entrada"
 expect W002 product/old.md "vencido"
 expect W003 product/old.md "by/at"
 expect W004 product/adr2.md "170"
+expect W005 product/old.md "src/nope.ts"
 
 [ $fail -eq 0 ] && echo "SELF-TEST OK" || { echo "SELF-TEST FALHOU"; echo "--- saída ---"; echo "$out"; }
 exit $fail

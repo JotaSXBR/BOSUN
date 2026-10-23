@@ -283,6 +283,11 @@ def validate(root, today=None):
             events = v if isinstance(v, list) else [v]  # spec §5.2: mapa solto = lista de um item
             if not events or not all(isinstance(e, dict) and e.get("by") and e.get("at") for e in events):
                 rep.warn("W003", rel, 1, "verified sem by/at")
+        res = fm.get("resource")
+        if isinstance(res, str) and res.strip() and not re.match(r"^[a-z][a-z0-9+.-]*:", res, re.I):
+            repo = os.path.dirname(os.path.abspath(root))  # resource local é relativo à raiz do repositório
+            if not os.path.exists(os.path.join(repo, res.strip().lstrip("/"))):
+                rep.warn("W005", rel, 1, f"resource aponta para caminho inexistente: {res}")
         title = fm.get("title")
         if isinstance(title, str) and title.strip():
             key = title.strip().lower()
