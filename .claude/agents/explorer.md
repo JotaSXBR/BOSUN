@@ -1,5 +1,5 @@
 ---
-name: bosun-explorer
+name: explorer
 description: Use proactively para busca rápida e só leitura no repositório, no okf/ ou no CRMv2 (só os caminhos do mapa de porte). Use para localizar arquivos, conferir nomes e levantar trechos.
 tools: Read, Grep, Glob
 model: haiku

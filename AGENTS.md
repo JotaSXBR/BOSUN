@@ -39,7 +39,7 @@ O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprov
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
 - Padrão de qualidade (o `CONSTRAINTS.md` do agent-skills): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
-- **Agentes do projeto** (`.claude/agents/`): a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes no Sonnet por padrão (`.claude/settings.json`). `bosun-explorer` (Haiku, busca), `bosun-implementer` (Sonnet, tarefa em paralelo numa worktree da branch atual, começa por `/agent-skills:build`), `code-reviewer` (revisão de cada tarefa, começa por `/agent-skills:review`), `security-auditor` e `test-engineer`. Os três últimos substituem as personas genéricas do plugin no `/agent-skills:ship`. Agentes só de leitura não editam arquivos.
+- **Agentes do projeto** (`.claude/agents/`): a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes no Sonnet por padrão (`.claude/settings.json`). `explorer` (Haiku, busca), `implementer` (Sonnet, tarefa em paralelo numa worktree da branch atual, começa por `/agent-skills:build`), `code-reviewer` (revisão de cada tarefa, começa por `/agent-skills:review`), `security-auditor` e `test-engineer`. Os três últimos substituem as personas genéricas do plugin no `/agent-skills:ship`. Agentes só de leitura não editam arquivos.
 - **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
 
 

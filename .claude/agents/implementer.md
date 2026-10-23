@@ -1,5 +1,5 @@
 ---
-name: bosun-implementer
+name: implementer
 description: Implementa uma tarefa já especificada de uma fatia (okf/plan/slice-XX.md, seção Tarefas), com teste primeiro. Use proactively para tarefas independentes em paralelo.
 model: sonnet
 effort: medium
