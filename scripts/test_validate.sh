@@ -74,6 +74,12 @@ grep -q "product/contact.md --produz--> product/ticket.md" <<<"$graph" \
 b="$tmp/bad"; cp -r "$v" "$b"
 # E004: frontmatter em index de subpasta + item sem descrição
 printf -- '---\ntype: x\n---\n# P\n- [Contato](contact.md)\n- [Ticket](ticket.md) - t\n- [Sem FM](nofm.md) - x\n- [Ruim](badyaml.md) - x\n- [Dup](dup.md) - x\n- [ADR2](adr2.md) - x\n- [Verbo](verb.md) - x\n- [Velho](old.md) - x\n' > "$b/product/index.md"
+# E004: índice sem nenhum link
+mkdir -p "$b/empty"; printf '# Vazio
+Nada aqui.
+' > "$b/empty/index.md"
+printf -- '- [Vazio](empty/index.md) - pasta vazia.
+' >> "$b/index.md"
 # E005: data fora de ordem + heading inválido
 printf '# Log\n## 2026-10-01\n## 2026-10-23\n## Outubro\n' > "$b/log.md"
 # E001: sem frontmatter
@@ -104,6 +110,7 @@ expect E002 product/dup.md "description"
 expect E003 product/dup.md "pronto"
 expect E004 product/index.md "não tem frontmatter"
 expect E004 product/index.md "sem descrição"
+expect E004 empty/index.md "sem nenhum item"
 expect E005 log.md "fora de ordem"
 expect E005 log.md "Outubro"
 expect E006 product/dup.md "nao-existe.md"

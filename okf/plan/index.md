@@ -1,6 +1,5 @@
-# Plano e backlog
+# Plano
 
-O plano abaixo cobre apenas o MVP e está pausado até a definição do produto completo.
+O plano em fatias verticais será escrito na Etapa 7.
 
-- [Plano de execução](plan.md) - Pré-condições, fases, aceite e riscos.
-- [Backlog](backlog.md) - Checklist do MVP e ondas futuras.
+- [Piloto](../product/pilot.md) - O que o plano precisa entregar.

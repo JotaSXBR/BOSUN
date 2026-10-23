@@ -2,6 +2,12 @@
 
 ## 2026-10-23
 
+- **Corte do piloto** (vereditos do usuário em 64 cartões): o produto virou o golden path post → comentário → automação → atendimento → CRM → venda → tarefa → calendário → Meu dia. Adiados em `product/later.md`.
+- **Removidos:** templates, hábitos, OKR, gamificação, Observer, scorecard de prontidão, Item como supertype, links favoritos como módulo, revisão por quatro olhos, pacote de encerramento de mídia, escopo do MVP antigo, roadmap, backlog e plano antigo, memória derivada (handoff, decision-log, session-log, research) e o wireframe de onboarding.
+- **ADRs:** 13 viraram 9 (103 entrou no 101; 110 no 105; 112 no 111; 113 foi para later.md); todos ganharam `domain`.
+- **Decidido:** Argon2id, disco cifrado e AES-256-GCM nos tokens (ADR-111); publicar pela BOSUN no Instagram, Facebook e YouTube Shorts (ADR-108); estado `pending_agent` existe e fica desligado (ADR-107); projeto com lista e quadro (ADR-105); sync Google Contatos em duas vias e chat do site mantidos.
+- **Perfil OKF BOSUN** e validador `scripts/validate.sh` criados.
+
 - **Consolidação dos ADRs** (pedido do usuário): os 69 ADRs cronológicos viraram **13 ADRs por domínio** (ADR-101 a ADR-113), com conflitos resolvidos pela decisão mais nova. Os antigos foram para `archive/adrs-2026-10-23/`, com tabela de correspondência; as referências no bundle foram remapeadas. As menções a números antigos neste log são históricas.
 - **Regra nova**: decisão nova edita o ADR do domínio; `method.md` e `AGENTS.md` atualizados.
 - **Atualização**: `memory/current-state.md` e `memory/handoff.md` reduzidos a status, pendências e próximo passo.

@@ -26,7 +26,7 @@ sources:
 
 - **Next.js full-stack (App Router) + TypeScript**.
 - **PostgreSQL + Prisma**.
-- **Auth.js** com **JWT + tabela `Session`** para sessões revogáveis e expiração curta ([ADR-102](../decisions/adr-102-identity-access.md)).
+- **Auth.js** com **JWT + tabela `Session`** para sessões revogáveis e expiração curta ([ADR-102](../decisions/adr-102-identity.md)).
 - **Tailwind CSS + shadcn/ui**.
 - **pg-boss** para jobs no PostgreSQL.
 - **RustFS** para storage S3-compatível (Apache 2.0).
@@ -66,6 +66,6 @@ sources:
 
 ## Links
 
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
+- [ADR-111](../decisions/adr-111-architecture.md)
 - [Arquitetura](architecture.md)
 - [Deploy](deploy.md)

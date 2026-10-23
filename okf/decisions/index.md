@@ -1,17 +1,13 @@
 # Decisões
 
-Um ADR por domínio, sem conflito entre si. Decisão nova ou alterada **edita o ADR do domínio** e o conceito correspondente. O histórico cronológico (ADR-001 a ADR-069) está em `archive/adrs-2026-10-23/`, com a tabela de correspondência.
+Um ADR por domínio (campo `domain`). Decisão nova ou alterada **edita o ADR do domínio** e o conceito correspondente. A numeração é estável; números vagos foram fundidos em outro ADR.
 
-- [ADR-101 — Produto, estrutura e escopo](adr-101-product-structure.md) - Instalação dedicada, ambiente, workspaces, templates, área pessoal, produto completo e anti-goals.
-- [ADR-102 — Identidade, acesso e permissões](adr-102-identity-access.md) - Login, recuperação, sessão, senha e papéis com permissões granulares.
-- [ADR-103 — Onboarding e primeiro acesso](adr-103-onboarding.md) - Wizard adaptativo por trilhas de ativação e setup curto do convidado.
-- [ADR-104 — Conteúdo, conhecimento e busca](adr-104-content-knowledge-search.md) - Item como supertype, documentos, Base de Conhecimento, links, arquivamento de mídia e busca.
-- [ADR-105 — Trabalho e tempo](adr-105-work-time.md) - Tarefas, projetos, calendário, Meu dia, hábitos e objetivos.
-- [ADR-106 — Contatos e CRM](adr-106-contacts-crm.md) - Identidade multicanal, mesclagem, chat identificado, sync Google e CRM leve.
-- [ADR-107 — Atendimento e Social](adr-107-service-social.md) - Canais, ticket por conversa, fila, SLA, CSAT, e-mail IMAP e caixa de atendimento.
-- [ADR-108 — Publicações](adr-108-publications.md) - Área de Publicações: plataformas, modelo do post, aprovação, campanha, OAuth e analytics.
-- [ADR-109 — Automação e IA](adr-109-automation-ai.md) - Motor de fluxos, automação social, Copiloto, Observer, agentes, autonomia, prontidão e provedor.
-- [ADR-110 — Notificações, gamificação e apps](adr-110-notifications-gamification-apps.md) - Níveis de interrupção, gamificação para adoção e offline/apps como capacidade futura.
-- [ADR-111 — Arquitetura e operação](adr-111-architecture-operations.md) - Stack, infraestrutura, deploy por instalação, backup, armazenamento, testes e modelo de dados.
-- [ADR-112 — LGPD e retenção](adr-112-lgpd-retention.md) - Papéis na LGPD e retenção configurável.
-- [ADR-113 — Comercial](adr-113-commercial.md) - Modelo de cobrança, preço, suporte, contrato e pagamento.
+- [ADR-101 — Produto, piloto e escopo](adr-101-product.md) - Instalação, workspaces, golden path, setup, invariantes e o que foi adiado ou removido.
+- [ADR-102 — Identidade, acesso e papéis](adr-102-identity.md) - Login, sessão, recuperação pelo Admin e três papéis fixos.
+- [ADR-104 — Documentos e busca](adr-104-content.md) - Biblioteca de arquivos e links e busca por palavra-chave.
+- [ADR-105 — Trabalho, tempo e notificações](adr-105-work.md) - Tarefa, projeto, calendário, Meu dia e notificações.
+- [ADR-106 — Contatos, CRM e venda](adr-106-contacts.md) - Identidades, mesclagem, sync Google, negócio e venda pela Kiwify.
+- [ADR-107 — Canais e atendimento](adr-107-service.md) - Canais, ticket, roteamento, caixa e chat do site.
+- [ADR-108 — Publicações e campanha](adr-108-publications.md) - Post, publicação por API, campanha e link rastreável.
+- [ADR-109 — Automação](adr-109-automation.md) - Fluxo comentário → DM em formulário; IA adiada.
+- [ADR-111 — Arquitetura, operação e privacidade](adr-111-architecture.md) - Stack, deploy, backup, criptografia, auditoria e LGPD.

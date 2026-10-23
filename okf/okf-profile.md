@@ -19,7 +19,7 @@ Validar: `./scripts/validate.sh ./okf` (sai 0 sem erro). Grafo para consulta: `.
 
 ## Arquivos reservados (spec, sem mudança)
 
-- `index.md`: sem frontmatter. Exceção: o `index.md` raiz declara só `okf_version: "0.2"`. Cada item é `- [Título](arquivo.md) - descrição curta`.
+- `index.md`: sem frontmatter. Exceção: o `index.md` raiz declara só `okf_version: "0.2"`. Cada item é `- [Título](arquivo.md) - descrição curta`; todo índice tem pelo menos um item.
 - `log.md`: sem frontmatter; headings `## YYYY-MM-DD`, mais recente primeiro, sem data repetida.
 - Todo outro `.md` é um **concept** (nó do grafo).
 

@@ -1,51 +1,39 @@
 # Produto
 
-Os documentos abaixo cobrem a visão do produto completo e o recorte do MVP. A definição do produto inteiro está em andamento; consulte o [handoff](../memory/handoff.md).
+O produto do piloto, na ordem do golden path. O que foi adiado está em [Para depois](later.md).
 
-## Fundamentos
+## Visão e piloto
 
-- [Visão e personalidade](vision.md) - Posicionamento, tom e direção visual.
-- [Ambiente, workspaces e áreas](product-model.md) - Hierarquia, templates e área pessoal.
-- [Papéis e permissões](roles-permissions.md) - Quatro presets, times por módulo e matriz do produto completo.
-- [LGPD](lgpd.md) - Operadora/controlador e direitos dos titulares.
+- [Visão](vision.md) - Posicionamento, princípios, tom e direção visual.
+- [Piloto](pilot.md) - Golden path de nove passos, ciclo de 30 dias e evidência.
+- [Para depois](later.md) - O que foi adiado, uma linha por item.
 
-## Conhecimento e inteligência
+## Fundação
 
-- [Itens, notas, documentos e conhecimento](content-model.md) - Item como supertype, biblioteca de arquivos e Base de Conhecimento.
-- [Busca global](search.md) - Busca híbrida, filtros e permissões.
-- [Copiloto, Observer e agentes de IA](copilot-ai.md) - Sugestão, execução, autonomia e prontidão.
-- [Automações e fluxos](automations.md) - Funis determinísticos, botões e handoff.
-- [Notificações](notifications.md) - In-app e push por padrão; e-mail opt-in.
-- [Resumos inteligentes](summaries.md) - Capacidade adiada para fase futura.
+- [Workspace](workspace.md) - Unidade de isolamento; um por infoproduto ou cliente.
+- [Papéis](role.md) - Admin, Membro e Viewer, com a matriz do piloto.
+- [Onboarding](onboarding.md) - Setup com checklist de conexões e aceite de convite.
+- [Canal](channel.md) - Contas conectadas e limites de cada plataforma.
 
-## Trabalho
+## Golden path
 
-- [Tarefas e projetos](tasks-projects.md) - Recursos de tarefa, visões e dependências com caminho crítico.
-- [Agenda e calendário](calendar.md) - Calendário próprio, calendário externo por workspace e time blocking.
-- [Meu dia](my-day.md) - Página inicial com cinco blocos e prioridade calculada.
-- [Hábitos](habits.md) - Cinco tipos de hábito e score flexível.
-- [Objetivos](goals.md) - OKR com período livre e progresso combinado.
-- [Gamificação discreta](gamification.md) - Progresso e marcos pessoais, sem pontos ou ranking.
+- [Post](post.md) - Criar, agendar e publicar no Instagram, Facebook e YouTube Shorts.
+- [Campanha](campaign.md) - Agrupador do lançamento, link rastreável e funil.
+- [Automação](automation.md) - Fluxo comentário → resposta pública → DM → entrega.
+- [Ticket](ticket.md) - Conversa com estado, roteamento, fila e caixa.
+- [Chat do site](site-chat.md) - Widget de dúvidas na landing page.
+- [Contato](contact.md) - Identidades por canal e mesclagem manual.
+- [Google Contatos](google-contacts.md) - Sync em duas vias pela etiqueta BOSUN.
+- [Negócio](deal.md) - Pipeline fixo ligado ao contato.
+- [Venda](sale.md) - Webhook da Kiwify e atribuição.
+- [Tarefa](task.md) - Responsável, prazo e vínculos.
+- [Projeto](project.md) - Tarefas em lista e quadro.
+- [Calendário](calendar.md) - Eventos, tarefas, posts e Google Agenda só leitura.
+- [Meu dia](my-day.md) - Home com conversas, tarefas e eventos.
 
-## Atendimento, Social e CRM
+## Transversal
 
-- [Social e atendimento](social.md) - Área Social, área Atendimento, ticket único, estados e promoção.
-- [Publicações e planejamento editorial](publications.md) - Time editorial, campanha, calendário, compositor, publicação e analytics em seis plataformas.
-- [Contatos e Google](contacts-google.md) - Duas vias, etiqueta BOSUN e identidade E.164.
-- [Caixa de atendimento e WhatsApp](inbox-whatsapp.md) - WAHA/GOWS, fila, status e filtros.
-- [Atendimento multicanal](service.md) - Canais de atendimento, SLA, métricas e colaboração interna.
-- [Contatos, empresas e negócios](crm.md) - CRM leve com pipeline padrão.
-
-## Operação
-
-- [Integrações externas](integrations.md) - Calendário por workspace, e-mail IMAP/SMTP e cota de armazenamento.
-- [Offline e apps nativos](offline-native.md) - Leitura e captura offline, PWA e casca Capacitor.
-- [Planos, hospedagem e cobrança](plans.md) - Instalação dedicada, assinatura simples e BYOK.
-
-## MVP e roadmap
-
-- [Escopo do MVP](mvp-scope.md) - Corte, jornada e critério de sucesso.
-- [Onboarding](onboarding.md) - Wizard de quatro telas sem conexão e trilhas de ativação.
-- [Roadmap](roadmap.md) - Mapa de capacidades, dependências e critérios de completo.
-- [Critérios de sucesso do produto completo](success-criteria.md) - Golden path, lançamento + 30 dias e evidências de uso exclusivo.
-- [Anti-goals e fronteiras](anti-goals.md) - Integração por fluxo, limites permanentes e o que fica fora.
+- [Documento](document.md) - Biblioteca de arquivos e links.
+- [Busca](search.md) - Palavra-chave nas entidades do piloto.
+- [Notificação](notification.md) - In-app e push para seis eventos.
+- [LGPD](lgpd.md) - Operadora, direitos do titular, retenção e suboperadores.

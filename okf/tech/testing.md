@@ -52,7 +52,7 @@ Fluxos críticos:
 ## Fixtures e mocks
 
 - Banco de teste isolado por execução.
-- Seed mínimo: workspace, Admin, Manager, Membro, Viewer, status padrão.
+- Seed mínimo: workspace, Admin, Membro, Viewer e o seed do pipeline.
 - Mock/contract test para WAHA e Google People API.
 - Payloads reais anonimizados para webhook.
 - Relógio controlável para retenção e prazos.
@@ -76,6 +76,6 @@ Fluxos críticos:
 
 ## Links
 
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
-- [Plano](../plan/plan.md)
+- [ADR-111](../decisions/adr-111-architecture.md)
+- [Plano](../plan/index.md)
 - [Deploy](deploy.md)

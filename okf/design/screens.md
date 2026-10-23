@@ -14,7 +14,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 - Login (usuário/e-mail + senha), com mostrar/ocultar senha e erros claros.
 - Criar conta: o Admin define o e-mail; convite cria usuário/senha.
 - Aceitar convite por link.
-- Solicitar troca de senha (alerta interno + Resend ao Admin).
+- Solicitar troca de senha (alerta interno ao Admin).
 - Alerta de troca de senha (Admin define senha temporária).
 - Troca obrigatória no próximo login, com explicação da senha temporária.
 
@@ -32,7 +32,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 - Layout de três colunas: sessões, lista de conversas e conversa.
 - Sidebar de sessões WhatsApp com status.
 - Filtros: Fila, Minhas, Aguardando, Resolvidas, Pendentes.
-- Pendentes visível e desabilitado no MVP.
+- Pendentes visível e desabilitado sem agente de IA.
 - Busca na lista.
 - Ordenação FIFO por mensagem sem resposta mais antiga.
 - Conversa: histórico, composer, anexos, notas internas.

@@ -119,9 +119,9 @@ sources:
 
 ## Links
 
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
-- [ADR-101 — Instalação dedicada por cliente](../decisions/adr-101-product-structure.md)
-- [Planos, hospedagem e cobrança](../product/plans.md)
+- [ADR-111](../decisions/adr-111-architecture.md)
+- [ADR-111](../decisions/adr-111-architecture.md)
+- [ADR-101 — Instalação dedicada por cliente](../decisions/adr-101-product.md)
+- [Planos, hospedagem e cobrança](../product/later.md)
 - [Stack](stack.md)
 - [Mídia/RustFS](media-rustfs.md)

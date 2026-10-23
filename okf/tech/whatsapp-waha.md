@@ -52,7 +52,7 @@ O webhook deve ser autenticado/verificado e **idempotente**.
 - Endpoints de mídia suportados pela engine.
 - Webhook por sessão.
 
-> GOWS **não** suporta `GET /api/messages` nem `forwardMessage`. O MVP depende de webhooks e dos endpoints suportados.
+> GOWS **não** suporta `GET /api/messages` nem `forwardMessage`. A BOSUN depende de webhooks e dos endpoints suportados.
 
 ## Webhook
 
@@ -98,6 +98,6 @@ O webhook deve ser autenticado/verificado e **idempotente**.
 
 ## Links
 
-- [Caixa de atendimento](../product/inbox-whatsapp.md)
-- [ADR-107](../decisions/adr-107-service-social.md)
+- [Caixa de atendimento](../product/ticket.md)
+- [ADR-107](../decisions/adr-107-service.md)
 - [Mídia/RustFS](media-rustfs.md)

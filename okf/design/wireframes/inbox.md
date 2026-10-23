@@ -52,5 +52,5 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 ## Links
 
-- [Caixa de atendimento](../../product/inbox-whatsapp.md)
+- [Caixa de atendimento](../../product/ticket.md)
 - [Índice de wireframes](index.md)

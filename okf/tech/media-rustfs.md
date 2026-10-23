@@ -54,7 +54,7 @@ sources:
 
 ## Expurgo
 
-- Alinhado à política de retenção por workspace e tipo de dado.
+- Só por exclusão explícita (documento, ticket ou contato pela LGPD); nada expira sozinho no piloto.
 - Remover objeto e metadado juntos.
 - Se o objeto falhar, manter registro de erro e tentar novamente.
 - Auditar exclusões.
@@ -75,6 +75,6 @@ sources:
 
 ## Links
 
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
+- [ADR-111](../decisions/adr-111-architecture.md)
 - [Deploy](deploy.md)
 - [WhatsApp/WAHA](whatsapp-waha.md)

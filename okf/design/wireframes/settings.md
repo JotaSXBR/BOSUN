@@ -9,30 +9,22 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 # Configurações
 
-## Permissões
+## Membros e papéis
 
 ```text
 +------------------------------------------------------------------+
-| Configurações > Permissões                                       |
+| Configurações > Membros                                          |
 +------------------------------------------------------------------+
-| Recurso             Admin  Manager  Membro     Viewer            |
-| Contatos             [x]     [x]      [x]       [R]              |
-| Conversas            [x]     [x]      [x]       [R]              |
-| Canais/WhatsApp      [x]     [x]      [x]       [R]              |
-| Membros/convites     [x]     [x]      [ ]       [R]              |
-| Configurações        [x]     [x]      [ ]       [R]              |
-| Auditoria            [x]     [x]      [ ]       [ ]              |
-| Relatórios           [x]     [x]      [x]       [R]              |
-| Tarefas/follow-ups   [x]     [x]      [x]       [R]              |
+| Nome             E-mail                Papel      Ações          |
+| Ana              ana@...               Admin      —              |
+| Bruno            bruno@...             Membro ▾   [Remover]      |
+| Carla (convite)  carla@...             Viewer ▾   [Reenviar]     |
 |                                                                  |
-| [Salvar]  Os quatro papéis são presets; não é possível criar novos.|
-| [x] editar/admin  [R] somente leitura                            |
+| [Convidar]   Papéis fixos: Admin, Membro, Viewer.                |
 +------------------------------------------------------------------+
 ```
 
-**Validar:** tabela editável por recurso/ação; granularidade; presets; leitura por papel; explicação de permissão negada.
-
-> A matriz acima é a proposta revisada e aguarda aprovação final.
+**Validar:** papel fixo por membro, sem editor de permissões; o que cada papel faz está em [Papéis](../../product/role.md).
 
 ## Status de atendimento
 
@@ -56,6 +48,6 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 ## Links
 
-- [Papéis e permissões](../../product/roles-permissions.md)
-- [Caixa de atendimento](../../product/inbox-whatsapp.md)
+- [Papéis e permissões](../../product/role.md)
+- [Caixa de atendimento](../../product/ticket.md)
 - [Índice de wireframes](index.md)

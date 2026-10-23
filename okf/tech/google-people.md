@@ -96,6 +96,6 @@ sources:
 
 ## Links
 
-- [Contatos e Google](../product/contacts-google.md)
-- [ADR-106](../decisions/adr-106-contacts-crm.md)
+- [Contatos e Google](../product/google-contacts.md)
+- [ADR-106](../decisions/adr-106-contacts.md)
 - [Modelo de dados](data-model.md)

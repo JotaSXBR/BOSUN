@@ -237,6 +237,8 @@ def validate(root, today=None):
             for n, line in lines:
                 if LINK_RE.search(line) and re.match(r"^\s*[-*]\s+\[", line) and not INDEX_ITEM_RE.match(line):
                     rep.err("E004", rel, n, "item de índice sem descrição curta após o link")
+            if not any(re.match(r"^\s*[-*]\s+\[[^\]]+\]\([^)]+\.md[^)]*\)", l) for _, l in lines):
+                rep.err("E004", rel, 1, "index.md sem nenhum item com link local para .md")
             continue
 
         if name == "log.md":

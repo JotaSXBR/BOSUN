@@ -1,149 +1,65 @@
 ---
 type: Data Model
 title: Modelo de dados
-description: Entidades, relações, índices e restrições do MVP.
-tags: [bosun, data-model, prisma, postgres, schema]
-status: stable
-generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
+description: Entidades, relações, índices e restrições do piloto; mudança estrutural exige atualizar o ADR-111.
+tags: [bosun, dados, prisma, postgres]
+status: draft
+generated:
+  by: claude-opus/5.5
+  at: 2026-10-23T00:00:00Z
 ---
 
 # Modelo de dados
 
-O modelo abaixo foi aprovado como base em 2026-10-21. Mudanças estruturais exigem novo ADR.
+Nomes em inglês. Toda entidade de negócio tem `id` (cuid), `workspace_id`, `created_at` e `updated_at`. Mudança estrutural edita este doc e o [ADR-111](../decisions/adr-111-architecture.md).
 
-> **Nota 2026-10-22 — ADR-101:** cada cliente tem uma instalação dedicada, com banco próprio. `workspace_id` continua obrigatório para separar workspaces dentro da instalação; o isolamento entre clientes é físico. Entidades de automação, agentes, Observer, sugestões e ledger de ações entram na reconciliação técnica.
+## Fundação
 
-> **Nota 2026-10-22 — ADR-104:** `Task` deixa de ser tabela solta e passa a ser `item` + `tarefa_detalhe`, com comentários, vínculos, menções e auditoria apontando para `item.id`. A reescrita faz parte da reconciliação do modelo de dados e **não foi aplicada** neste documento, que continua descrevendo o MVP.
+- `Environment` (1 por instalação), `Workspace` (`name`, `timezone`).
+- `User` (`username`, `email`, `password_hash`, `must_change_password`), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
+- `Invite` (`email`, `role`, `token_hash`, `expires_at`, `accepted_at`).
+- `Session` ([ADR-102](../decisions/adr-102-identity.md)), `PasswordResetRequest`.
+- `AuditLog` (`actor_type`: user | operator | system, `actor_id`, `action`, `target_type`, `target_id`, `data`, `created_at`).
+- `Integration` (`kind`: meta | whatsapp | youtube | google_contacts | google_calendar | kiwify | site_chat, `owner_user_id` opcional, `status`, `encrypted_credentials`, `expires_at`).
 
-> **Nota 2026-10-22 — ADR-102:** `User.session_version` é aposentado e entra a tabela `Session`: `id` (sid), `user_id`, `active_workspace_id`, `device_label`, `user_agent`, `ip`, `created_at`, `last_seen_at`, `last_auth_at`, `expires_at`, `revoked_at`, `revoked_reason`. Aplicada em 2026-10-23.
+## Contatos e venda
 
-> **Nota 2026-10-22 — ADR-106:** `Contact` perde a identidade única por telefone e ganha `ContactIdentity` (`contact_id`, tipo, valor, nome no canal, origem, verificado), com unicidade por tipo e valor no workspace, mais `merged_into_id` para o registro-aliado. A reconciliação ainda **não foi aplicada**.
+- `Contact` (`display_name`, `origin`, `merged_into_id`), `ContactIdentity` (`type`, `value`, `channel_name`, `attested`), `GoogleContactLink` (`resource_name`, `etag`), `GoogleSyncState` (`sync_token`).
+- `Deal` (`contact_id`, `campaign_id?`, `stage`, `value_cents`, `owner_id`, `lost_reason`).
+- `Sale` (`external_id` único por workspace, `contact_id?`, `campaign_id?`, `post_id?`, `flow_id?`, `product`, `value_cents`, `status`, `buyer`, `paid_at`).
+- `TrackedLink` (`code` único, `campaign_id?`, `post_id?`, `flow_id?`, `contact_id?`, `target_url`), `LinkClick`.
 
-## Entidades
+## Canais e atendimento
 
-### Workspace
+- `WhatsAppSession` (`name`, `phone`, `status`).
+- `Ticket` (`channel`, `channel_account_id`, `external_thread_id`, `contact_id`, `state`: automation | pending_agent | waiting_human | human | resolved, `assignee_id?`, `waiting_since`, `last_message_at`, `unread_count`). Único aberto por `(channel_account_id, external_thread_id)`.
+- `Message` (`ticket_id`, `direction`, `external_id`, `body`, `status`, `sent_by_user_id?`). Único por `(channel, external_id)`.
+- `InternalNote`, `SiteChatVisitor` (`session_token_hash`, `declared_name`, `declared_email`, `declared_phone`).
 
-- `id`, `name`, `slug`, `timezone`, `locale`, `created_at`.
+## Publicações e automação
 
-### User
+- `Campaign` (`name`, `starts_at`, `ends_at`, `status`, `checkout_url`).
+- `Post` (`campaign_id?`, `body`, `scheduled_at`, `status`, `author_id`), `PostMedia` (`document_id`, `position`), `PostTarget` (`integration_id`, `format`, `body?`, `title?`, `status`, `external_id?`, `published_at?`, `attempts`, `last_error`).
+- `Flow` (`name`, `integration_id`, `trigger`, `post_id?`, `keywords`, `public_replies`, `dm_body`, `delivery_document_id?`, `handoff_keywords`, `status`, `priority`).
+- `FlowRun` (`flow_id`, `event_external_id` único, `contact_id`, `post_external_id`, `keyword`, `result`, `error`). Deduplicação única por `(flow_id, contact_id, post_external_id, keyword)`.
 
-- `id`, `workspace_id`, `name`, `email`, `username`, `password_hash`.
-- `must_change_password`, `role_id`, `status`, `created_at`.
+## Trabalho e conteúdo
 
-### Role
-
-- `id`, `workspace_id`, `key` (`admin`, `manager`, `attendant`, `viewer`), `name`, `is_system`.
-
-### Permission
-
-- `id`, `resource`, `action`.
-
-### RolePermission
-
-- `role_id`, `permission_id`, `allowed`.
-
-### Invite
-
-- `id`, `workspace_id`, `token_hash`, `email`, `role_id`, `expires_at`, `max_uses`, `used_count`, `created_by`.
-
-### Contact
-
-- `id`, `workspace_id`, `display_name`, `organization`, `photo_url`.
-- `google_resource_name`, `google_sync_state`, `created_at`, `updated_at`.
-
-### ContactMethod
-
-- `id`, `contact_id`, `type` (`phone`/`email`), `value`, `normalized_value`, `is_primary`, `source`.
-
-### WhatsAppSession
-
-- `id`, `workspace_id`, `name`, `phone_number`, `waha_session`, `status`, `last_qr_at`.
-
-### Conversation
-
-- `id`, `workspace_id`, `contact_id`, `session_id`, `status_id`, `assigned_user_id`.
-- `last_message_at`, `last_inbound_at`, `unread_count`.
-
-### Message
-
-- `id`, `conversation_id`, `direction`, `body`, `media_id`, `external_id`, `status`, `sent_at`, `received_at`, `raw_payload`.
-
-### MediaAsset
-
-- `id`, `workspace_id`, `storage_key`, `mime_type`, `size_bytes`, `checksum`, `created_at`.
-
-### TicketStatus
-
-- `id`, `workspace_id`, `name`, `color`, `order`, `is_resolved`, `is_default`, `is_system`.
-
-### Task
-
-- `id`, `workspace_id`, `contact_id`, `conversation_id`, `title`, `status`, `due_at`, `assigned_user_id`.
-
-### AuditLog
-
-- `id`, `workspace_id`, `actor_user_id`, `action`, `resource_type`, `resource_id`, `metadata`, `created_at`.
-
-### GoogleSyncState
-
-- `id`, `workspace_id`, `sync_token`, `last_sync_at`, `status`.
-
-### RetentionPolicy
-
-- `id`, `workspace_id`, `data_type`, `days`.
-
-### PasswordChangeRequest
-
-- `id`, `user_id`, `status`, `requested_at`, `approved_by`.
-
-### AuthSession
-
-Substituída por `Session` (ADR-102): `id` (sid), `user_id`, `active_workspace_id`, `device_label`, `user_agent`, `ip`, `created_at`, `last_seen_at`, `last_auth_at`, `expires_at`, `revoked_at`, `revoked_reason`. O JWT carrega o `sid`.
-
-## Esboço do produto completo (2026-10-23, draft)
-
-Só nomes e relações principais, para orientar a reconciliação; campos e índices virão depois. Toda entidade tem `workspace_id`.
-
-- **Estrutura:** `Environment` → `Workspace` (template Pessoal, Empresa, Produto, Curso ou Serviços); `Team`, `TeamMember`; `Session` (ADR-102).
-- **Item (ADR-104):** `Item` (inbox/processado/arquivado) com `Note`, `Task` (`project_id` anulável, ADR-105), `Document`, `Link` (categoria e visibilidade, ADR-104); `Comment`, `Mention`, `ItemLink`.
-- **Trabalho e tempo:** `Project`, `Dependency`, `Event`, `TimeBlock`, `Habit`, `HabitCheckin`, `Objective`, `KeyResult`, `Checkin`.
-- **Contatos e atendimento:** `Contact` (`company_id`, ADR-106), `ContactIdentity` (ADR-106), `MergeSuggestion`, `Company`, `Deal`, `Channel`, `Ticket` (por thread, ADR-107), `Message`.
-- **Publicações:** `SocialAccount` (várias por rede, ADR-108), `Post` (modelo em aberto), `Campaign`.
-- **Automação e IA:** `Flow`, `FlowRun`, `Agent`, `AgentRun`, `KnowledgeArticle`, `Embedding`.
-- **Transversais:** `Notification`, `Milestone` (gamificação, ADR-110), `MediaAsset`, `AuditLog`.
-
-## Relações principais
-
-- Workspace 1:N User, Contact, WhatsAppSession, Conversation, TicketStatus, AuditLog.
-- User N:1 Role; Role N:N Permission via RolePermission.
-- Contact 1:N ContactMethod, Conversation, Task.
-- WhatsAppSession 1:N Conversation.
-- Conversation 1:N Message, Task.
-- Message N:1 MediaAsset (opcional).
-- Conversation N:1 TicketStatus, User (responsável).
-- Workspace 1:1 GoogleSyncState.
-- Workspace 1:N RetentionPolicy.
+- `Task` (`title`, `body`, `assignee_id`, `due_at?`, `due_has_time`, `status`, `contact_id?`, `ticket_id?`, `deal_id?`, `campaign_id?`, `project_id?`).
+- `Project` (`name`, `body`, `status`, `campaign_id?`).
+- `Event` (`title`, `starts_at`, `ends_at`, `timezone`, `contact_id?`, `campaign_id?`), `EventAttendee`.
+- `ExternalCalendarEvent` (por `integration_id` do membro; cache de leitura).
+- `Document` (`kind`: file | link, `name`, `url?`, `storage_key?`, `size`, `mime`, `tags`).
+- `Notification` (`user_id`, `type`, `target_type`, `target_id`, `read_at`), `NotificationPreference`, `PushSubscription`.
 
 ## Índices e restrições
 
-- `ContactMethod.normalized_value` único por workspace e tipo.
-- `Message.external_id` único por conversa/sessão para idempotência.
-- `Invite.token_hash` único.
-- `Conversation` indexado por `workspace_id`, `status_id`, `assigned_user_id`, `last_message_at` e `last_inbound_at`.
-- `Message` indexado por `conversation_id`, `sent_at` e `received_at`.
-- `AuditLog` indexado por `workspace_id`, `created_at`, `actor_user_id`.
-- Toda tabela multi-tenant tem `workspace_id` e consultas sempre filtram por ele.
+- Índice em `workspace_id` em toda tabela de negócio; chaves únicas citadas acima incluem `workspace_id`.
+- `ContactIdentity` única por `(workspace_id, type, value)`.
+- Índices GIN `tsvector` em português para a [Busca](../product/search.md).
+- Exclusão de contato (LGPD) é física e em cascata, com uma linha de auditoria sem conteúdo.
 
-## Regras
+## Relações
 
-- A fila FIFO usa `last_inbound_at` (mensagem sem resposta mais antiga).
-- `last_inbound_at` é um campo derivado, indexado para performance.
-- Exclusões lógicas são preferidas para contatos e conversas; expurgo físico segue a retenção.
-- `raw_payload` de webhook é mantido para auditoria/depuração, sujeito à retenção.
-- Revogação por linha em `Session` (ADR-102); `session_version` aposentado.
-
-## Links
-
-- [Arquitetura](architecture.md)
-- [ADR-111](../decisions/adr-111-architecture-operations.md)
-- [Auth](auth.md)
+- governado_por: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- detalha: [Arquitetura](architecture.md)
