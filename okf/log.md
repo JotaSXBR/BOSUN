@@ -1,0 +1,149 @@
+# Log de atualizações
+
+## 2026-10-23
+
+- **Consolidação dos ADRs** (pedido do usuário): os 69 ADRs cronológicos viraram **13 ADRs por domínio** (ADR-101 a ADR-113), com conflitos resolvidos pela decisão mais nova. Os antigos foram para `archive/adrs-2026-10-23/`, com tabela de correspondência; as referências no bundle foram remapeadas. As menções a números antigos neste log são históricas.
+- **Regra nova**: decisão nova edita o ADR do domínio; `method.md` e `AGENTS.md` atualizados.
+- **Atualização**: `memory/current-state.md` e `memory/handoff.md` reduzidos a status, pendências e próximo passo.
+- **Lote 2 da revisão**: 28 recomendações com padrão de mercado; 24 aceitas e 4 ajustadas, registradas nos conceitos e num único ADR-069. ADR-063 e ADR-067 corrigidos no próprio texto em vez de ganharem ADRs novos.
+- **Decisão**: post é entidade própria; TikTok e Kwai em modo assistido; broker de OAuth adiado até a segunda instalação (piloto com uma cliente); mínimo de Publicações com UTM.
+- **Decisão**: e-mail sempre IMAP/SMTP, sem OAuth; hábitos de workspace desde o início; Base com quatro olhos em dois formatos.
+- **Em aberto**: hash de senha e criptografia em repouso, aguardando explicação.
+- **Revisão de lacunas**: 21 lacunas levantadas por relatório interativo; decisões e encaminhamentos registrados abaixo.
+- **Decisão**: várias contas por rede em Publicações; cada conta é um canal. O resto de Publicações, salvo o modelo do post, vira capacidade futura (ADR-063).
+- **Decisão**: contato tem no máximo uma empresa atual; troca sugerida por sinais observados (ADR-064).
+- **Decisão**: tarefa pode existir sem projeto (ADR-065).
+- **Decisão**: Link é favorito de URL externa, categorizado, privado, de projeto ou compartilhado (ADR-066).
+- **Decisão**: gamificação incentiva o uso de todos os módulos, individual, acompanhada por Admin/Manager; offline vira capacidade futura (ADR-067).
+- **Decisão**: Serviços é o quinto template, próprio (ADR-068).
+- **Encaminhamento**: comercial e jurídico fora do foco atual; calendário, hábitos e OKR usam padrões e serão revistos depois.
+- **Encaminhamento para entrevista**: modelo do post; agentes (ferramentas, provedor, Observer); conflitos de fluxos; SLA, CSAT e e-mail.
+- **Encaminhamento de trabalho**: revisar architecture + deploy; conferir matriz do MVP linha a linha; um doc técnico por integração; wireframes de baixa fidelidade de todas as telas; revisar os drafts módulo a módulo.
+- **Atualização**: `tech/data-model.md` aplica o ADR-057 e ganha esboço de entidades do produto completo; `memory/handoff.md` regenerado a partir do estado atual.
+- **Criação**: ADR-063 a ADR-068.
+
+## 2026-10-22
+
+- **Decisão**: o supertype **Item** tem escopo fechado — Nota, Tarefa, Documento e Link dentro; projeto, campanha, workspace, time, evento, conversa, ticket e mensagem fora. Ele existe para dar um número único a comentário, menção, vínculo, busca, auditoria e exportação, não para converter tipo (ADR-051).
+- **Decisão**: item tem três estados — `inbox`, `processado` e `arquivado`; subtarefa é item, linha de checklist não é; item publicado ou arquivado congela o tipo.
+- **Decisão**: nota promovida a projeto vira o **brief vivo** do projeto, não é copiada nem arquivada; apagar o projeto devolve a nota ao `inbox`.
+- **Decisão**: o Copiloto **propõe** estrutura em vez de criar; preenche os buracos, mostra o que cria e o esforço, olha a agenda e só age após aceite; etapas são agrupadas por atividade e a entrega é uma tarefa ligada ao rascunho de post (ADR-052).
+- **Decisão**: a mídia é arquivada por **pacote de encerramento** (LEIA, manifesto com checksums, conteúdo e registro); download manual por Admin/Manager em até **90 dias** do encerramento; **expurgo 24 h após download verificado**, nunca antes dos 90 dias; sem download não há expurgo (ADR-053).
+- **Decisão**: depois do expurgo ficam registro, texto publicado, metadados, checksum, destino, auditoria, aprovações e métricas; saem os bytes. A mídia vira `arquivado_externo`, restaurável pelo pacote.
+- **Decisão**: a busca é **palavra-chave em todos os corpora** (`tsvector` do Postgres, em português) e **semântica só onde ganha** — sempre na Base de Conhecimento, opcional em notas e documentos, nunca em conversa por padrão (ADR-054).
+- **Decisão**: embeddings no **pgvector do Postgres da instalação**, com modelo versionado; vetor é índice descartável e a busca degrada para palavra-chave sem provedor; autorização no read time.
+- **Decisão**: notificações têm três níveis — **interrompe** (menção, atribuição, aprovação, conta/segurança), **agrupa** (comentário, status, time) e **só no Meu dia** (prazo, Observer, arquivamento); push só no primeiro e e-mail nunca interrompe (ADR-055).
+- **Decisão**: silêncio cala os níveis 2 e 3; conta e segurança furam o silêncio; SLA só alerta dentro do horário comercial; a notificação guarda referência, não cópia, e resolve permissão no read time.
+- **Decisão**: recuperação de conta sem segundo fator no MVP — **chave de recuperação** gerada no onboarding, guardada como hash, de uso único, auditada; **código por e-mail descartado** e o segundo fator futuro é **app autenticador (TOTP)**; passkey segue como evolução; último caso é `bosun admin unlock` na VPS, auditado como operador (ADR-056).
+- **Decisão**: cada login vira uma linha em **`Session`** e o JWT carrega o `sid`; `session_version` é aposentado. Expiração **absoluta de 12 h** (8/12/24 por workspace), **trava de 30 min** por inatividade e **reautenticação de 5 min** para ação sensível; revogar um dispositivo ou todos; lista de dispositivos é UI posterior (ADR-057).
+- **Decisão**: onboarding **adaptativo por trilhas de ativação** — wizard de quatro telas sem conexão (contexto, chave, intenções, convite); intenções múltiplas com "só explorar" exclusivo; cada intenção vira trilha com checklist de até quatro itens, **evento de ativação** observado e data; a intenção roteia área inicial e preset, mas **não esconde módulo** (ADR-058).
+- **Decisão**: o wizard termina no **primeiro item aberto da trilha principal**, não num painel vazio; checklist recolhe para Primeiros passos depois da ativação; Admin/Manager acrescentam, religam ou desligam trilhas depois, e desligar nunca apaga dado.
+- **Decisão**: **sem dados de exemplo** — conversa fictícia no Inbox polui contato, métrica e auditoria.
+- **Decisão**: quem entra por convite **não passa pelo wizard** — setup curto e único no primeiro login (senha no aceite, perfil, notificações, opt-in da área pessoal, papel e time), entrada derivada da trilha principal + papel + time; tutorial de uso adiado, curto e pulável quando existir (ADR-059).
+- **Decisão**: contato tem **identidades por canal** (telefone E.164, e-mail, Instagram, Telegram, Facebook, visitante de chat), únicas por tipo e valor; adesão silenciosa **só por identificador exato**; mesclagem é sempre **sugerida com motivos** e confirmada por uma pessoa, deixa registro-aliado e é auditada (ADR-060).
+- **Decisão**: o **chat do site exige nome, e-mail e telefone** antes da primeira mensagem — não existe conversa anônima; o identificador de sessão fica só como identidade auxiliar; identidade **declarada** entra como não verificada e **não adere sozinha** a contato com histórico, e identidade não verificada não autoriza envio proativo (ADR-061).
+- **Decisão**: o **ticket é por conversa de canal**, com dono, status, SLA e CSAT próprios; a mesma pessoa pode ter vários abertos; a pessoa é reunida numa **linha do tempo** na ficha do contato; o ticket avisa quando há outra conversa aberta; a fusão é exceção manual e auditada, e a divisão fica de fora por ora (ADR-062).
+- **Criação**: ADR-051, ADR-052, ADR-053, ADR-054, ADR-055, ADR-056, ADR-057, ADR-058, ADR-059, ADR-060, ADR-061 e ADR-062.
+- **Atualização**: `product/content-model.md`, `product/tasks-projects.md`, `product/publications.md`, `product/search.md`, `product/notifications.md`, `tech/auth.md`, `tech/data-model.md` (nota de reconciliação), índices de decisões e `memory/current-state.md`.
+- **Decisão**: a Rodada 8 fecha a definição do produto completo; o roadmap deixa de ser fases de lançamento e passa a ser **mapa de capacidades, dependências e critérios de completo**.
+- **Decisão**: a BOSUN tem uma nova área, **Publicações**, ao lado de Social e Atendimento; ela cobre o ciclo do post em Instagram, Facebook, TikTok, YouTube, Threads e Kwai.
+- **Decisão**: publicação segue **API oficial + modo assistido**; não há automação de navegador; a aprovação é opcional por workspace/canal; o analytics é por post e plataforma; a reciclagem de conteúdo é planejada.
+- **Decisão**: o post pode disparar um fluxo de Social e um checkout; a venda confirmada por webhook é atribuída ao post/fluxo/campanha.
+- **Decisão**: Publicações tem **time próprio**; post e campanha pertencem ao time; workspace solo usa um time padrão com o Admin.
+- **Decisão**: aprovação é por **versão do post**; editar texto/mídia/destino/horário volta a aprovar; pendente no horário segura e notifica; Admin/Manager pode aprovar o próprio post.
+- **Decisão**: **campanha** é uma entidade leve própria, não um projeto; um post pode pertencer a uma campanha.
+- **Decisão**: app **OAuth único da BOSUN**; tokens criptografados na instalação do cliente; Admin/Manager conecta contas.
+- **Decisão**: fila usa **horário explícito**; reciclagem cria nova ocorrência e não re-dispara a mesma DM; mídia é fixada por versão e post publicado vira tombstone.
+- **Decisão**: a IA em Publicações é **só de texto**; a mídia vem da biblioteca de Documentos; sem geração de imagem/vídeo.
+- **Decisão**: integração é **por fluxo, não por acoplamento**; o vínculo é explícito, opcional e auditável; cada módulo funciona sozinho.
+- **Decisão**: o produto é completo quando o **golden path** e o **ciclo de um lançamento + 30 dias** passam sem ferramenta paralela.
+- **Decisão**: anti-goals permanentes: não é Notion/Drive, processador de pagamento, mobile-first, colaboração entre organizações ou data broker/adtech.
+- **Criação**: `product/publications.md`, `product/success-criteria.md`, `product/anti-goals.md`, ADR-048, ADR-049 e ADR-050.
+- **Atualização**: `product/publications.md`, `product/integrations.md`, `product/roadmap.md`, `social.md`, `roles-permissions.md`, índices, `memory/current-state.md` e `memory/handoff.md`.
+- **Builder check**: 9 perguntas; 5 decisões do usuário (time de Publicações, aprovação por versão, campanha leve, OAuth único da BOSUN, autoaprovação de Admin/Manager) e 4 padrões de construção; sem bloqueio de design.
+- **Aprovação**: a matriz de permissões do produto completo foi aprovada em 2026-10-22, incluindo as sete linhas de Publicações/campanhas; `roles-permissions.md` passa a `stable`.
+- **Não aprovado**: o design do produto completo (mapa, critérios, anti-goals e Publicações) não foi aprovado; os documentos continuam `draft` e a revisão é o próximo passo.
+- **Pendência**: revisão do design não aprovado; reconciliação da matriz fina do MVP; reconciliação de arquitetura, modelo de dados e deploy; detalhes de publicação (múltiplas contas, TikTok/Kwai, time, OAuth, modelo do post).
+- **Decisão**: Social e Atendimento são duas áreas; Social cobre Instagram, Facebook, TikTok e Kwai; Atendimento cobre WhatsApp, chat, Telegram e e-mail, com UI própria para e-mail.
+- **Decisão**: a conversa/ticket é única; as áreas são visões com listas e dashboards próprios, mas compartilham histórico, busca e auditoria.
+- **Decisão**: estados de dono são automação → agente → aguardando humano → humano → encerrado; assumir e responder pausa a automação; devolver só ao agente.
+- **Decisão**: promoção de Social para Atendimento é automática nos seis gatilhos de handoff; o ticket é o mesmo e o SLA/CSAT passam a valer.
+- **Decisão**: catálogo inicial de sete agentes (SDR, Suporte, Agendador, Recuperação, Onboarding, Cobrança e Assistente interno), com mapeamento por template.
+- **Decisão**: autonomia em três níveis (livre, aprovação, proibido); checkout livre só da oferta publicada e apenas para SDR e recuperação.
+- **Decisão**: prontidão por scorecard (80% das 30 perguntas, 20 respostas revisadas, 10 objeções, 90% em 30 casos) + 7 dias ou 50 conversas + aprovação do Admin.
+- **Decisão**: Observer opt-in por workspace e canal, retenção de 90 dias; aviso de IA personalizável e redação de identificadores antes do provedor.
+- **Decisão**: custo de IA por agente e por workspace, com alertas em 50%, 80% e 100%, sem bloqueio automático.
+- **Decisão**: automação social com receita pronta + canvas, 30 fluxos ativos, matching case-insensitive sem acento e deduplicação por contato + post + palavra.
+- **Decisão**: venda confirmada via webhook da Kiwify + link único por fluxo/post; webhook genérico para outros checkouts.
+- **Decisão**: instalação R$ 3.000 + R$ 500/mês, 12 h de configuração, 15 dias úteis, 50/50, 3 h de suporte e R$ 200/h excedente.
+- **Decisão**: contrato mensal sem fidelidade, aviso de 30 dias, exportação completa, exclusão após a exportação final, backup de 30 dias e restauração em 8 h úteis.
+- **Decisão**: Asaas com Pix, boleto e cartão; reajuste anual pelo IPCA; suspensão em 10 dias e cancelamento em 30.
+- **Criação**: `product/social.md`, ADR-044, ADR-045, ADR-046 e ADR-047.
+- **Atualização**: `plans.md`, `copilot-ai.md`, `automations.md`, `service.md`, `roles-permissions.md`, índices de produto e decisões.
+- **Pendência**: regime tributário e NFS-e; revisão jurídica do contrato; canal oficial de suporte; viabilidade de TikTok/Kwai; ajuste fino dos falsos positivos da promoção automática.
+- **Decisão**: a BOSUN tem dois motores — automação determinística e agentes de IA; a automação inicia, o agente é reativo e a pessoa é a última instância.
+- **Decisão**: o Observer apenas sugere; não executa ações dentro da BOSUN. Agentes de execução são configurados e habilitados separadamente, com escopo e auditoria.
+- **Decisão**: a autonomia segue a escada visibilidade → SDR com base sólida → agentes de ponta a ponta; o agente só é habilitado com conhecimento suficiente do produto/projeto.
+- **Decisão**: workspace é o contexto de um produto/negócio; produto novo = workspace novo. A Base de Conhecimento e os agentes não misturam dois produtos.
+- **Decisão**: uma instalação dedicada por cliente, em VPS própria; hospedagem, backup e licença gerenciados; ambiente é a unidade de cobrança.
+- **Decisão**: assinatura simples de instalação + mensalidade, sem tiers de funcionalidade ou IA, com BYOK e custos externos do cliente; armazenamento cresce por upgrade de VPS.
+- **Criação**: `product/automations.md`, `product/plans.md`, ADR-041, ADR-042 e ADR-043.
+- **Atualização**: `copilot-ai.md`, `product-model.md`, `roles-permissions.md`, `mvp-scope.md`, `architecture.md`, `data-model.md` e `deploy.md` com as decisões da 7C e notas de reconciliação.
+- **Atualização**: `memory/current-state.md` e `memory/handoff.md` com a 7C parcial, pendências e prompt de retomada.
+- **Pendência**: valores, SLA, contrato, pagamento, catálogo de agentes, prontidão, construtor de fluxos, viabilidade de Instagram, LGPD do Observer e reconciliação da instalação dedicada.
+- **Criação**: `method.md` com o método durável; `AGENTS.md` alinhado (Membro, ADRs cronológicos, documentos derivados).
+- **Atualização**: índices de produto e decisões reorganizados por domínio; trilhas de leitura no índice raiz; **Atendente → Membro** nos documentos atuais.
+- **Atualização**: `memory/current-state.md`, `memory/handoff.md` e `memory/index.md` consolidados com as rodadas 7A e 7B; retomada na 7C.
+- **Decisão**: gamificação discreta = progresso e marcos, sem pontos, XP ou ranking; aplica-se a hábitos e tarefas pessoais; o workspace vê só agregado.
+- **Decisão**: offline cobre leitura em cache, captura de notas/tarefas, conclusão de tarefas e check-in; envio de mensagens espera a conexão.
+- **Decisão**: conflito offline por fila idempotente e último campo vence, com aviso e histórico.
+- **Decisão**: apps nativos via PWA + casca Capacitor, Android primeiro e iOS depois.
+- **Criação**: `product/gamification.md`, `product/offline-native.md`, ADR-039 e ADR-040.
+- **Pendência**: janela do score, catálogo de marcos, opt-out, cache offline, atendimento offline, iOS e cobrança nas lojas.
+- **Decisão**: calendário externo é um por workspace, compartilhado; a BOSUN lê os eventos e grava apenas os que criou; eventos externos são somente leitura.
+- **Decisão**: calendário pessoal fica só na BOSUN, privado e fora da disponibilidade do time; eventos do workspace bloqueiam, pessoais avisam mas não bloqueiam.
+- **Decisão**: e-mail de atendimento usa caixa IMAP/SMTP compartilhada por workspace, sem Gmail API e sem endereço BOSUN; ticket nasce após a primeira resposta.
+- **Decisão**: armazenamento com cota por workspace + limite por arquivo; biblioteca pessoal e anexos contam na mesma cota.
+- **Criação**: `product/integrations.md`, ADR-037 e ADR-038; `calendar.md`, `service.md`, `content-model.md` e `roles-permissions.md` atualizados.
+- **Pendência**: números de cota, lixeira/expurgo, OAuth de e-mail, múltiplos provedores de calendário e aprovação da matriz.
+- **Interrupção**: sessão pausada para nova janela; `memory/handoff.md` e `memory/current-state.md` atualizados com as rodadas 1 a 6, pendências e prompt de retomada.
+- **Decisão**: atendimento do produto completo cobre WhatsApp, e-mail, Instagram, chat do site, Telegram, Facebook, TikTok e Kwai; atribuição manual; SLA por canal em horário comercial; todas as métricas; CSAT ativável; notas com menções.
+- **Decisão**: CRM leve com contato, empresa simples e negócio em pipeline padrão (Novo, Qualificado, Proposta, Ganho, Perdido).
+- **Criação**: `product/service.md`, `product/crm.md`, ADR-032 e ADR-033.
+- **Decisão**: busca híbrida sem resposta gerada; notificações in-app e push com e-mail desligado por padrão; resumos em fase futura.
+- **Decisão**: copiloto escreve com confirmação e acessa apenas o que o usuário pode ver; toda sugestão cita a fonte.
+- **Criação**: `product/search.md`, `product/notifications.md`, `product/summaries.md`, ADR-034 e ADR-035.
+- **Decisão**: papéis Admin, Manager, Membro e Viewer; Atendente vira função; Agente continua reservado para IA.
+- **Decisão**: exceções por membro, times por módulo, visibilidade híbrida; Admin e Manager exportam e veem auditoria; offboarding transfere dados do workspace ao Manager e devolve os pessoais ao membro.
+- **Criação**: matriz do produto completo em `product/roles-permissions.md` e ADR-036.
+- **Pendência**: viabilidade de TikTok, Kwai e Facebook; escala do CSAT; aprovação da matriz de permissões.
+
+## 2026-10-21
+
+- **Criação**: Migração dos documentos legados para o bundle OKF v0.2 em `okf/`.
+- **Criação**: Documentos de produto, tecnologia, design, decisões, plano e memória.
+- **Criação**: 22 ADRs em `okf/decisions/` e índice por assunto.
+- **Criação**: Wireframes de auth, onboarding, inbox, contatos e configurações.
+- **Atualização**: Revisão completa de `okf.ia.br`; `index.md` passou a ser arquivo reservado sem frontmatter, exceto `okf_version: "0.2"` na raiz.
+- **Criação**: `okf/log.md` e validação de conformidade com `@mfdaves/okf-mcp@0.9.1`.
+- **Atualização**: `sources` adicionado aos documentos com afirmações externas; `stale_after` em `memory/research.md`.
+- **Atualização**: ADR-021 decidido: rejeitar nova senha igual à atual; sem histórico no MVP.
+- **Pivô**: definição do produto completo passa a preceder o MVP; implementação pausada.
+- **Criação**: `memory/handoff.md` com contexto, fontes e prompt para a nova janela.
+- **Criação**: ADR-023, registrando a prioridade do produto completo sobre a execução do MVP.
+- **Atualização**: roadmap volta a `draft` até ser reconciliado com o produto completo.
+- **Decisão**: ambiente é a conta que agrupa workspaces; área de atuação é o workspace; autorização por workspace.
+- **Decisão**: templates Pessoal, Empresa, Produto e Curso definem módulos, navegação, papéis, vocabulário e dados iniciais; valem só como ponto de partida.
+- **Decisão**: vida pessoal é privada por padrão e liberada por membro; pode incluir workspace pessoal e módulos privados em workspaces compartilhados.
+- **Criação**: `product/product-model.md`, ADR-024 e ADR-025.
+- **Decisão**: Item é supertype real; captura classifica automaticamente e o usuário corrige.
+- **Decisão**: Documentos é biblioteca de arquivos externos, do workspace e pessoal; anexos referenciam a biblioteca; notas são Itens.
+- **Decisão**: Base de Conhecimento é wiki + RAG, com revisão de seis olhos e uso apenas de artigos publicados pela IA; Segundo Cérebro fica para depois.
+- **Criação**: `product/content-model.md`, ADR-026 e ADR-027.
+- **Decisão**: tarefas têm subtarefas, checklist, recorrência, estimativa/horas, dependências e múltiplos responsáveis; quatro visões; dependência por bloqueio com caminho crítico; hábito e tarefa recorrente são separados.
+- **Criação**: `product/tasks-projects.md` e ADR-028.
+- **Decisão**: calendário próprio com sync em duas vias; Meu dia com tarefas, eventos, hábitos, atendimentos e objetivos, filtrados por permissão; time blocking; prioridade calculada.
+- **Decisão**: hábitos com cinco tipos e score flexível, separados de tarefas recorrentes.
+- **Decisão**: objetivos em OKR, período livre, cinco tipos de KR, check-in semanal, progresso combinado e alinhamento pessoal → workspace.
+- **Criação**: `product/calendar.md`, `product/my-day.md`, `product/habits.md`, `product/goals.md`, ADR-029 a ADR-031.
+- **Pendência**: matriz de permissões e plano do MVP aguardam o design do produto completo.
