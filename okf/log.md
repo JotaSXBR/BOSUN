@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Fatia 0, T1** (`/agent-skills:build`): projeto-piloto confirma a stack sem fallback (ADR-111 item 1): Next 16.4.2, TS 7.0.2, Prisma 7.10.1, Better Auth 1.7.12, Oxlint 1.89.0 + tsgolint + plugin de complexidade (`minLines: 0`). Saídas: `tsc` exit 0, `oxlint --type-aware` exit 0, `next build` exit 0 (rotas `/`, `/_not-found`, `/api/auth/[...all]`), login 200 e senha errada 401. Spec da fatia passa de Next 16.3 para 16.4. `AGENTS.md`: skills do agent-skills passam a ser obrigatórias, com as skills de apoio do build.
 - **Agentes**: subagentes no Sonnet por padrão; `bosun-explorer` (Haiku), `bosun-implementer` (Sonnet médio) e `bosun-reviewer` (Sonnet alto) em `.claude/agents/`. Sessão principal no Opus.
 - **Fatia 0** (`/agent-skills:spec`): mapa de seis módulos e spec do `toolchain`. ADR-102: TOTP para todos, sessão opaca sem cookieCache, sem checagem de senha vazada (exceção ao ASVS 6.2.12).
 - **Segurança da identidade** (ADR-102 itens 6 e 11): TOTP obrigatório para Admin, sessão recente para ações sensíveis, 12 h de inatividade com teto de 7 dias, rate limit e Argon2id, desde a Fatia 0. Alvo ASVS nível 2.

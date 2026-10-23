@@ -22,13 +22,13 @@ generated:
 ## Em aberto
 
 - Aprovar o [padrão de qualidade](../tech/quality-gate.md) (limites propostos).
-- Confirmar na Fatia 0: Prisma 7 e Next.js com TS 7; opções do Oxlint; campos de sessão no Better Auth.
+- Confirmar na Fatia 0: campos de sessão no Better Auth (o modelo padrão já traz `ipAddress` e `userAgent`).
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
 
 ## Próximo passo
 
-- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Próxima tarefa: **T1** (projeto-piloto, sem tela). Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência. Na T6: licença e CodeQL.
+- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). T1 concluída (stack confirmada, ADR-111 item 1). Próxima tarefa: **T2** (scaffold que roda). Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência. Na T6: licença e CodeQL.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
 - Decidir a licença do repositório público (ADR-111 item 14).
 0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).

@@ -25,12 +25,14 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 - O trabalho segue o plano em fatias de [okf/plan/](okf/plan/index.md) e o [guia de trabalho com IA](okf/howto/ai-workflow.md): spec → teste → código → verificação → revisão. Para retomar uma sessão, siga a seção "Retomar" do guia.
 - Uma fatia por vez. Não comece código fora de uma fatia aprovada.
 - Ambiguidade que muda escopo, dados, segurança ou custo: pergunte antes de decidir.
-- Skills (brainstorming, TDD, revisão etc.) são opcionais; use se a sua ferramenta tiver.
+- Ferramenta com o plugin agent-skills (Claude Code, inclusive o app desktop no Windows): as skills são fluxos obrigatórios, não sugestões. Antes de cada etapa, escolha a skill pela árvore de `/agent-skills:using-agent-skills` e siga os passos dela em ordem, inclusive a verificação. Ferramenta sem skills: siga o mesmo fluxo pelo guia de trabalho com IA.
 - Para mexer em `okf/`, siga a skill do projeto [`.claude/skills/okf-bosun/SKILL.md`](.claude/skills/okf-bosun/SKILL.md). Ferramentas sem suporte a skills: leia o arquivo e siga do mesmo jeito.
 
 ## Integração com agent-skills
 
 Invoque sempre pelo nome completo. Toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` + `/agent-skills:code-simplify` (e `/agent-skills:webperf` em tela pesada) → `/agent-skills:ship`.
+
+Dentro do build, aplique também as skills de apoio que a tarefa pedir: `source-driven-development` antes de usar API de biblioteca (confere a doc da versão instalada), `incremental-implementation` em tarefa com mais de um arquivo, `doubt-driven-development` em auth, cifra, dados ou decisão difícil de desfazer, `debugging-and-error-recovery` quando algo quebrar, `git-workflow-and-versioning` ao commitar, `documentation-and-adrs` ao registrar decisão.
 
 O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprovações; o lugar é este:
 

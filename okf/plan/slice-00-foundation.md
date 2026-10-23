@@ -18,7 +18,7 @@ generated:
 ## Escopo
 
 - Scaffold Next.js + TypeScript, Prisma + PostgreSQL, Better Auth, Tailwind/shadcn, pg-boss ([Stack](../tech/stack.md)); docker compose local com Postgres, WAHA e RustFS.
-- **Projeto-piloto de 1 hora primeiro:** Next.js 16.3 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
+- **Projeto-piloto de 1 hora primeiro:** Next.js 16.4 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
 - Oxlint, typecheck (TS 7), Vitest e Playwright configurados; CI na ordem do [padrão de qualidade](../tech/quality-gate.md).
 - Docker Compose para o Coolify (`web`, `worker`, `postgres`, `waha`, `rustfs`) com variáveis geradas; tela de integrações com credenciais cifradas.
 - Entidades `Environment`, `Workspace`, `User`, `Membership`, `Invite`, `Session`, `PasswordResetRequest`, `AuditLog`, `Integration` ([Modelo de dados](../tech/data-model.md)).
@@ -57,7 +57,7 @@ Ordem: `toolchain` → `identity` → `workspace` → `audit` → `secrets`; `de
 
 **Premissas:** aplicação Next.js única (sem monorepo), `web` e `worker` da mesma imagem; pnpm; Node LTS fixado no `.nvmrc`.
 
-**Passo 1 — projeto-piloto (até 1 h, descartável, fora do repositório):** Next.js 16.3 com `experimental.useTypeScriptCli`, TS 7, Prisma 7 com uma tabela, Better Auth com email+senha, Oxlint + tsgolint. Passa se `tsc`, `oxlint`, `next build` e um login de teste funcionam. Se falhar: registrar no ADR-111 e usar TS 6 (ou Drizzle, se o problema for o Prisma).
+**Passo 1 — projeto-piloto (até 1 h, descartável, fora do repositório):** Next.js 16.4 com `experimental.useTypeScriptCli`, TS 7, Prisma 7 com uma tabela, Better Auth com email+senha, Oxlint + tsgolint. Passa se `tsc`, `oxlint`, `next build` e um login de teste funcionam. Se falhar: registrar no ADR-111 e usar TS 6 (ou Drizzle, se o problema for o Prisma).
 
 **Comandos (os nomes viram scripts no `package.json`):**
 
@@ -137,8 +137,8 @@ Feito com `/agent-skills:plan` em 2026-10-23. Módulo `toolchain`; os outros mó
 
 Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em paralelo.
 
-- [ ] **T1 — Projeto-piloto da stack** (fora do repositório, até 1 h)
-  - Aceite: Next 16.3 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
+- [x] **T1 — Projeto-piloto da stack** (fora do repositório, até 1 h)
+  - Aceite: Next 16.4 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
   - Verificar: saída dos quatro comandos colada no log; resultado (passou ou fallback) registrado no ADR-111.
   - Arquivos: `okf/decisions/adr-111-architecture.md`, `okf/log.md`.
 - [ ] **T2 — Scaffold que roda** (fatia vertical mínima)

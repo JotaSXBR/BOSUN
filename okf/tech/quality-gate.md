@@ -112,9 +112,11 @@ Detalhe dos workflows em [CI/CD](cicd.md).
 
 ## A conferir na Fatia 0
 
-- Opções exatas do `max-lines` e do `max-lines-per-function` no Oxlint (ignorar linhas brancas e comentários).
-- Se o `oxlint-plugin-complexity` roda como `jsPlugin` na versão fixada.
-- Prisma 7 e Next.js 16.3 com TS 7: não há declaração oficial do Prisma; um projeto-piloto de 1 hora confirma ou reverte para o TS 6.
+Conferido na T1 (2026-10-23):
+
+- `max-lines` e `max-lines-per-function` aceitam `skipBlankLines` e `skipComments`; testado.
+- O `oxlint-plugin-complexity` 4.0.0 roda como `jsPlugin` com a regra `complexity/complexity`, mas precisa de `"minLines": 0`: o padrão (10) ignora funções curtas. A ciclomática usa a regra nativa `complexity`.
+- Prisma 7.10.1 e Next.js 16.4.2 com TS 7.0.2 passam juntos; sem volta ao TS 6.
 
 [^oxlint-rules]: Oxlint rules
 [^oxlint-config]: Oxlint configuration
