@@ -11,3 +11,12 @@ next-env.d.ts
 test-results/
 playwright-report/
 coverage/
+# Arquivos locais que costumam guardar segredo ou caminho da máquina
+.claude/settings.local.json
+.claude/worktrees/
+*.local.*
+*.pem
+*.key
+*.p12
+.coolify-secrets*
+.devin/

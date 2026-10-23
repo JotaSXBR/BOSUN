@@ -35,9 +35,10 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      include: ["src/**/*.{ts,tsx}", "worker/**/*.ts"],
-      // Páginas e layout ficam com o E2E; worker/index.ts só liga os sinais ao src/lib/worker.ts.
-      exclude: ["**/*.test.ts", "src/app/**/page.tsx", "src/app/**/layout.tsx", "worker/*.ts", "src/generated/**"],
+      // worker/ fica fora: index.ts só liga os sinais ao src/lib/worker.ts e migrate.ts roda no db:migrate.
+      include: ["src/**/*.{ts,tsx}"],
+      // Páginas e layout ficam com o E2E.
+      exclude: ["**/*.test.ts", "src/app/**/page.tsx", "src/app/**/layout.tsx", "src/generated/**"],
       thresholds: { lines: 80, branches: 80 },
     },
   },

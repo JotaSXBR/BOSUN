@@ -23,6 +23,18 @@ describe("logger", () => {
     expect(error).toHaveBeenCalledWith("[queue] erro (erro não identificado)");
   });
 
+  it("troca quebra de linha e caractere de controle por espaço, para não forjar linha de log", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    logger.error("webhook", "falhou\r\n[admin] login ok", new Error("a\nb\u0000c"));
+    expect(error).toHaveBeenCalledWith("[webhook] falhou [admin] login ok (Error: a b c)");
+  });
+
+  it("corta a mensagem do erro em 300 caracteres", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    logger.error("queue", "erro", new Error("x".repeat(500)));
+    expect(error).toHaveBeenCalledWith(`[queue] erro (Error: ${"x".repeat(300)}…)`);
+  });
+
   it("omite o parêntese quando não há erro", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     logger.error("worker", "parado");

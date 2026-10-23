@@ -167,6 +167,10 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Verificar: `./scripts/validate.sh ./okf` sem erro; revisão com `/agent-skills:review`.
   - Arquivos: `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.
 
+**Pendências do `/agent-skills:ship` do `toolchain`** (2026-10-23), a assumir nos módulos indicados:
+- `identity`: CSP com nonce (os outros cabeçalhos de segurança já estão no `next.config.ts`); remover ou bloquear `/api/dev/*` quando houver auth; limite de 90% de ramos no Vitest por glob do módulo; testes de banco fora do ar na rota, de job que falha com retry, de job duplicado e de shutdown com job em andamento; `createShutdown` com timeout no `stop`; confirmar o job pelo estado no pg-boss, não pelo texto do log; portas do compose configuráveis para worktrees em paralelo.
+- `delivery`: dois papéis no Postgres (`migrate` com DDL, `web` e `worker` sem) e `sslmode` explícito fora do loopback; healthcheck de RustFS e WAHA; cobertura de 80% também no código novo (diferencial).
+
 **Ponto de checagem:** depois da T1 (stack confirmada ou trocada) e depois da T7 (módulo aceito), antes de escrever a spec do `identity`.
 
 **Riscos:** TS 7 sem suporte do Prisma ou do Next (mitigado pela T1); regras do Oxlint sem a opção esperada (T1 confere, T4 registra a exceção); repositório no GitHub ainda não criado (necessário na T6: o usuário cria o repositório público).

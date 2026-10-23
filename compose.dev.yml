@@ -1,7 +1,8 @@
 # Serviços locais de desenvolvimento. Suba com `pnpm services:up` (lê o .env.local; veja .env.example).
+# Imagens fixadas por tag e digest; o Dependabot (docker-compose) renova as duas.
 services:
   postgres:
-    image: postgres:18.6-alpine
+    image: postgres:18.6-alpine@sha256:898c60cb390d1085bc97bdd6a1ae968757421df394b071848b52b1c09c89d6a5
     environment:
       POSTGRES_USER: bosun
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina no .env.local}
@@ -13,14 +14,14 @@ services:
       interval: 2s
       retries: 30
   rustfs:
-    image: rustfs/rustfs:1.0.3
+    image: rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:?defina no .env.local}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:?defina no .env.local}
     ports: ["127.0.0.1:9000:9000"]
     volumes: [rustfs:/data]
   waha:
-    image: devlikeapro/waha:gows-2026.9.2
+    image: devlikeapro/waha:gows-2026.9.2@sha256:1ae3c6a994ee97e5039bf41103193d7bf9175f1a31db73ba89bdeed6277901bc
     environment:
       WAHA_API_KEY: ${WAHA_API_KEY:?defina no .env.local}
     ports: ["127.0.0.1:3001:3000"]

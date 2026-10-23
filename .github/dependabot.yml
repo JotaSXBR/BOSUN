@@ -9,7 +9,7 @@ updates:
       # Major sai em PR próprio, para revisar e bisectar.
       npm-minor-patch: { patterns: ["*"], update-types: [minor, patch] }
   - package-ecosystem: github-actions
-    directory: /
+    directories: [/, /.github/actions/setup]
     schedule: { interval: weekly }
     cooldown: { default-days: 1 }
     groups:
@@ -20,5 +20,9 @@ updates:
     cooldown: { default-days: 1 }
   - package-ecosystem: docker
     directory: /.github/gitleaks
+    schedule: { interval: weekly }
+    cooldown: { default-days: 1 }
+  - package-ecosystem: docker-compose
+    directory: /
     schedule: { interval: weekly }
     cooldown: { default-days: 1 }

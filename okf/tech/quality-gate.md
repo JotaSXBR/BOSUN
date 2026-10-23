@@ -64,6 +64,7 @@ O que o CI exige em todo pull request e o que uma auditoria externa (due diligen
 | `max-params` | 4 | Acima disso, um objeto |
 | `max-nested-callbacks` | 3 | |
 | `typescript/no-explicit-any` | erro | Tipagem é a primeira linha de defesa |
+| `typescript/ban-ts-comment` | erro | `@ts-ignore` e `@ts-nocheck` desligam o typecheck; `@ts-expect-error` só com descrição |
 | `typescript/no-floating-promises`, `no-misused-promises` | erro | Promessa solta perde erro e dado |
 | `import/no-cycle` | erro | Módulos sem dependência circular ([Engenharia](engineering.md)) |
 | `no-console` | erro | Log só pelo logger, sem dado sensível |

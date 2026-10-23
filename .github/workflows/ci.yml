@@ -17,29 +17,24 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:18.6-alpine
-        env:
-          POSTGRES_USER: bosun
-          POSTGRES_PASSWORD: ci-only
-          POSTGRES_DB: bosun
-        ports: ["5432:5432"]
-        options: --health-cmd "pg_isready -U bosun" --health-interval 2s --health-retries 30
     env:
+      # Valores descartáveis, só do CI. O compose exige todas as variáveis, mesmo subindo só o Postgres.
+      POSTGRES_PASSWORD: ci-only
+      RUSTFS_ACCESS_KEY: ci-only
+      RUSTFS_SECRET_KEY: ci-only
+      WAHA_API_KEY: ci-only
       DATABASE_URL: postgresql://bosun:ci-only@localhost:5432/bosun
       # Teto de exceções do oxlint: só sobe com aprovação no PR.
       LINT_EXCEPTIONS_MAX: 0
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { persist-credentials: false }
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with: { node-version-file: .nvmrc, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      # Mesmo Postgres do dev, pela imagem fixada no compose.dev.yml (uma fonte só, renovada pelo Dependabot).
+      - run: docker compose -f compose.dev.yml up -d --wait postgres
+      - uses: ./.github/actions/setup
       # Self-tests dos scripts que o verify usa.
       - run: bash scripts/test_lint_exceptions.sh && bash scripts/test_validate.sh
-      # O mesmo do local: typecheck, lint, exceções, testes com cobertura (Postgres de serviço), jscpd e okf.
+      # O mesmo do local: typecheck, lint, exceções, testes com cobertura (Postgres do compose), jscpd e okf.
       - run: pnpm verify
 
   e2e:
@@ -48,16 +43,19 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { persist-credentials: false }
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with: { node-version-file: .nvmrc, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
       # Só o headless shell: a imagem do runner já tem as bibliotecas; o apt do --with-deps levava até 11 min.
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Cache só gravado pela main; PR apenas lê.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --only-shell chromium
+      - if: github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm test:e2e
       - if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -70,16 +68,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { fetch-depth: 0, persist-credentials: false }
       # Só o histórico do commit testado (o padrão varre todas as branches do clone).
-      # safe.directory: o checkout pertence ao usuário do runner, não ao do container.
+      # Código só leitura e sem rede; safe.directory: o checkout pertence ao usuário do runner, não ao do container.
       - name: gitleaks
         run: |
           docker build -q -t gitleaks .github/gitleaks
-          docker run --rm -v "$PWD:/src" -w /src \
+          docker run --rm --network none -v "$PWD:/src:ro" -w /src \
             -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/src \
             gitleaks git --redact --no-banner --log-opts=HEAD .
       # Roda mesmo se o gitleaks falhar, para nenhum achado ficar escondido.
       - name: osv-scanner
         if: ${{ !cancelled() }}
+        # Só leitura; precisa de rede para consultar a base do OSV.
         run: |
           docker build -q -t osv-scanner .github/osv-scanner
-          docker run --rm -v "$PWD:/src" -w /src osv-scanner scan source --config=osv-scanner.toml --lockfile=pnpm-lock.yaml
+          docker run --rm -v "$PWD:/src:ro" -w /src osv-scanner scan source --config=osv-scanner.toml --lockfile=pnpm-lock.yaml
