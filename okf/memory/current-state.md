@@ -28,6 +28,7 @@ generated:
 
 ## Próximo passo
 
+- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Pendente do usuário: escolher se o prompt do design system vem antes da T1 ou antes do `identity`; criar o repositório público no GitHub antes da T6.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
 - Decidir a licença do repositório público (ADR-111 item 14).
 0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).

@@ -39,6 +39,7 @@ O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprov
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
 - Padrão de qualidade (`CONSTRAINTS.md` do `/agent-skills:constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
+- **Modelos dos agentes:** a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes rodam no Sonnet por padrão (`.claude/settings.json`). Agentes do projeto em `.claude/agents/`: `bosun-explorer` (Haiku, busca), `bosun-implementer` (Sonnet, tarefa em paralelo), `bosun-reviewer` (Sonnet, esforço alto).
 - **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
 
 

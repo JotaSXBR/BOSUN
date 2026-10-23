@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Agentes**: subagentes no Sonnet por padrão; `bosun-explorer` (Haiku), `bosun-implementer` (Sonnet médio) e `bosun-reviewer` (Sonnet alto) em `.claude/agents/`. Sessão principal no Opus.
 - **Fatia 0** (`/agent-skills:spec`): mapa de seis módulos e spec do `toolchain`. ADR-102: TOTP para todos, sessão opaca sem cookieCache, sem checagem de senha vazada (exceção ao ASVS 6.2.12).
 - **Segurança da identidade** (ADR-102 itens 6 e 11): TOTP obrigatório para Admin, sessão recente para ações sensíveis, 12 h de inatividade com teto de 7 dias, rate limit e Argon2id, desde a Fatia 0. Alvo ASVS nível 2.
 - **Fatia 0** (ADR-102 itens 12 e 13): workspace, membro e convite pelo plugin `organization` do Better Auth; contas pelo plugin `admin`; isolamento por extensão de query do Prisma, sem RLS no piloto.
