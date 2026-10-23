@@ -129,6 +129,47 @@ Nenhuma fatia. Bloqueio externo: VPS e domínio da piloto.
 
 Nenhuma no `toolchain`.
 
+## Tarefas
+
+Feito com `/agent-skills:plan` em 2026-10-23. Módulo `toolchain`; os outros módulos ganham tarefas quando a spec deles for aprovada. Uma tarefa = um commit; `[x]` só com a verificação mostrada.
+
+### toolchain
+
+Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em paralelo.
+
+- [ ] **T1 — Projeto-piloto da stack** (fora do repositório, até 1 h)
+  - Aceite: Next 16.3 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
+  - Verificar: saída dos quatro comandos colada no log; resultado (passou ou fallback) registrado no ADR-111.
+  - Arquivos: `okf/decisions/adr-111-architecture.md`, `okf/log.md`.
+- [ ] **T2 — Scaffold que roda** (fatia vertical mínima)
+  - Aceite: `pnpm install --frozen-lockfile` + `pnpm dev` abre a página inicial; versões exatas; `.nvmrc`; `.env.example` sem valor real.
+  - Verificar: clone limpo em pasta temporária, os dois comandos, página responde 200.
+  - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `app/page.tsx`, `.env.example`.
+- [ ] **T3 — Banco e worker locais**
+  - Aceite: `compose.dev.yml` sobe Postgres, RustFS e WAHA; `pnpm db:migrate` cria o schema e o do pg-boss; o `worker` processa um job de exemplo enfileirado pelo `web`.
+  - Verificar: `docker compose -f compose.dev.yml up -d`, `pnpm db:migrate`, log do worker com o job concluído.
+  - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma/migrations/`, `worker/index.ts`, `lib/queue.ts`.
+- [ ] **T4 — Lint e typecheck no padrão de qualidade**
+  - Aceite: `.oxlintrc.json` com todas as regras e limites do [padrão de qualidade](../tech/quality-gate.md); `pnpm typecheck` e `pnpm lint` saem 0; um arquivo de teste com `any` e outro com função de 61 linhas falham.
+  - Verificar: os dois comandos verdes; os dois casos ruins vermelhos (e removidos depois).
+  - Arquivos: `.oxlintrc.json`, `package.json`.
+- [ ] **T5 — Testes, cobertura e duplicação**
+  - Aceite: Vitest com projetos `unit` e `integration` e limites de cobertura; Playwright com um teste da página inicial; jscpd com limite de 3%; `pnpm verify` sai 0.
+  - Verificar: `pnpm test`, `pnpm test:int` (contra o compose), `pnpm test:e2e`, `pnpm dup`, `pnpm verify`.
+  - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`.
+- [ ] **T6 — CI e cadeia de suprimentos**
+  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
+  - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
+  - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.pre-commit-config.yaml` ou hook equivalente.
+- [ ] **T7 — Fechamento do módulo**
+  - Aceite: comandos exatos no `AGENTS.md` (seção Comandos); `resource` preenchido nos conceitos materializados; os quatro critérios de aceite do `toolchain` com evidência.
+  - Verificar: `./scripts/validate.sh ./okf` sem erro; revisão com `/agent-skills:review`.
+  - Arquivos: `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.
+
+**Ponto de checagem:** depois da T1 (stack confirmada ou trocada) e depois da T7 (módulo aceito), antes de escrever a spec do `identity`.
+
+**Riscos:** TS 7 sem suporte do Prisma ou do Next (mitigado pela T1); regras do Oxlint sem a opção esperada (T1 confere, T4 registra a exceção); repositório no GitHub ainda não criado (necessário na T6: o usuário cria o repositório público).
+
 ## Ao terminar
 
 Acrescente ao `AGENTS.md` os comandos exatos (instalar, lint, typecheck, testes, migrations, ambiente local) e preencha o `resource` dos conceitos que a fatia materializou.
