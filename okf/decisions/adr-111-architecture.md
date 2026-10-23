@@ -30,7 +30,7 @@ generated:
 11. **LGPD:** a BOSUN é **operadora**; o workspace é **controlador**. O piloto entrega exportação e exclusão de um contato com todos os dados dele, retenção fixa documentada e a lista de suboperadores ([LGPD](../product/lgpd.md)).
 12. Conteúdo de mensagens é dado não confiável.
 13. **Estratégia de código:** a BOSUN recomeça neste repositório e porta do CRMv2 (commit `f2a338d`, só leitura) o WAHA, o Google People, o chat do site e utilitários de segurança, conforme o [mapa de porte](../tech/crmv2-review.md). Não porta o design system (novo, do zero) nem o CI/CD ([CI/CD](../tech/cicd.md)). Decidido em 2026-10-23.
-14. **Repositório público:** o código e o `okf/` são públicos no GitHub. Consequências: nada de domínio, IP, URL do Coolify, credencial ou dado da piloto no repositório; segredos só nos environments `beta` e `stable` do GitHub; PR de fork sem segredos; CodeQL, secret scanning e attestations de proveniência ligados ([CI/CD](../tech/cicd.md)). Licença do projeto: a decidir. Decidido em 2026-10-23.
+14. **Repositório público:** o código e o `okf/` são públicos no GitHub. Consequências: nada de domínio, IP, URL do Coolify, credencial ou dado da piloto no repositório; segredos só nos environments `beta` e `stable` do GitHub; PR de fork sem segredos; CodeQL, secret scanning e attestations de proveniência ligados ([CI/CD](../tech/cicd.md)). Licença: nenhuma; todos os direitos reservados (código visível, sem permissão de reuso), sem arquivo `LICENSE`. Decidido em 2026-10-23.
 15. **Risco de calendário:** o App Review da Meta e a verificação do app no Google Cloud (escopos sensíveis de Contatos, Agenda e upload no YouTube) levam semanas e precisam começar antes do código.
 
 ## Relations
