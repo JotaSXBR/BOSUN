@@ -23,6 +23,8 @@ Com o agent-skills, os comandos seguem este ciclo: `/agent-skills:spec` (passo 1
 4. **Verificação.** Rode lint, typecheck, testes e `./scripts/validate.sh ./okf`. Mostre a saída. Para tela, abra o app e confira à mão o fluxo da fatia.
 5. **Revisão.** Releia o diff procurando: consulta sem `workspace_id`, autorização faltando, webhook ou job não idempotente, segredo em log, ação sensível sem auditoria. Se a ferramenta tiver revisão por subagente, use.
 
+Uma branch `slice-XX` por fatia. Cada tarefa vira um commit revisado pelo `code-reviewer`, sem PR próprio. Ao fim da fatia, o `/agent-skills:ship` dá o go ou no-go e abre um PR para a `main`, que exige os checks do CI; o merge faz o deploy no beta. Na Fatia 0, por ter seis módulos, o PR sai ao fim de cada módulo, da mesma branch `slice-00`.
+
 Trabalhe em passos pequenos, com um commit por passo que funciona. Uma fatia grande demais para uma sessão vira subtarefas dentro da própria fatia.
 
 ## Comandos
