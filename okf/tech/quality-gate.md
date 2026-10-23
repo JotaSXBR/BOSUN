@@ -39,7 +39,7 @@ sources:
 
 # Padrão de qualidade
 
-O que o CI exige em todo pull request e o que uma auditoria externa (due diligence técnica, revisão de segurança) costuma conferir. Os números são **propostas** baseadas em padrões de mercado e só valem depois de aprovados. É o `CONSTRAINTS.md` do agent-skills (`/constraints`), guardado no OKF.
+O que o CI exige em todo pull request e o que uma auditoria externa (due diligence técnica, revisão de segurança) costuma conferir. Os números são **propostas** baseadas em padrões de mercado e só valem depois de aprovados. É o `CONSTRAINTS.md` do agent-skills (`/agent-skills:constraints`), guardado no OKF.
 
 ## Em que se baseia
 

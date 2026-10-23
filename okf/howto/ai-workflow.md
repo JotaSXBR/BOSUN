@@ -15,7 +15,7 @@ Vale para qualquer ferramenta. Uma pessoa conduz; o agente executa uma fatia por
 
 ## Ciclo de uma fatia
 
-Com o agent-skills, os comandos seguem este ciclo: `/spec` (passo 1), `/plan` (fim do passo 1: tarefas na seção `## Tarefas` da fatia), `/build` e `/test` (passos 2 e 3), `/review` e `/code-simplify` (passo 5), `/webperf` quando houver tela pesada, `/ship` (deploy). O mapeamento de onde cada saída fica está no `AGENTS.md`.
+Com o agent-skills, os comandos seguem este ciclo: `/agent-skills:spec` (passo 1), `/agent-skills:plan` (fim do passo 1: tarefas na seção `## Tarefas` da fatia), `/agent-skills:build` e `/agent-skills:test` (passos 2 e 3), `/agent-skills:review` e `/agent-skills:code-simplify` (passo 5), `/agent-skills:webperf` quando houver tela pesada, `/agent-skills:ship` (deploy). Sempre pelo nome completo. O mapeamento de onde cada saída fica está no `AGENTS.md`.
 
 1. **Spec.** Leia a fatia em `okf/plan/` e os conceitos e ADRs ligados nela. Complete a seção `## Spec` da fatia com o que a sessão descobriu (rotas, campos, dúvidas resolvidas) e faça o commit antes do código; spec só no chat se perde. Dúvida que muda escopo, dados, segurança ou custo vai para o usuário antes.
 2. **Teste.** Escreva primeiro os testes do critério de aceite e veja falhar. Use fixtures com payloads reais gravados para Meta, WAHA, Kiwify e Google; nunca chame a API real nos testes.

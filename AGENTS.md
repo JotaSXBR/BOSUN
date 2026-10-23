@@ -28,14 +28,16 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 - Skills (brainstorming, TDD, revisão etc.) são opcionais; use se a sua ferramenta tiver.
 - Para mexer em `okf/`, siga a skill do projeto [`.claude/skills/okf-bosun/SKILL.md`](.claude/skills/okf-bosun/SKILL.md). Ferramentas sem suporte a skills: leia o arquivo e siga do mesmo jeito.
 
-## Integração com agent-skills (/spec, /plan, /build, /test, /review, /ship)
+## Integração com agent-skills
+
+Invoque sempre pelo nome completo. Toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` + `/agent-skills:code-simplify` (e `/agent-skills:webperf` em tela pesada) → `/agent-skills:ship`.
 
 O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprovações; o lugar é este:
 
 - Spec da fatia (objetivo, critérios de sucesso, perguntas abertas): `okf/plan/slice-XX.md`, seções Objetivo, Spec, Critério de aceite e Perguntas abertas.
 - Stack e comandos: [okf/tech/stack.md](okf/tech/stack.md) e a seção Comandos abaixo.
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
-- Padrão de qualidade (`CONSTRAINTS.md` do `/constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
+- Padrão de qualidade (`CONSTRAINTS.md` do `/agent-skills:constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
 - **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
 
