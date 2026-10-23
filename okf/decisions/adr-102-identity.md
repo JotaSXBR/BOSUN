@@ -27,6 +27,8 @@ generated:
 9. **Atendente** é função, não papel. **Agente** é reservado para IA.
 10. Permissão nunca vem do cliente; a autorização é sempre no servidor.
 11. Sem segundo fator, chave de recuperação, trava de inatividade nem reautenticação por ação no piloto.
+12. **Workspace, membro e convite usam o plugin `organization` do Better Auth** (organização = workspace, `member` = Membership, `invitation` = Invite, `activeOrganizationId` = `active_workspace_id`). Os três papéis são os papéis do plugin. Contas, criação pela CLI, revogação de sessões e bloqueio usam o plugin `admin`. Decidido em 2026-10-23.
+13. **Isolamento por `workspace_id`:** extensão de query do Prisma ligada ao workspace da requisição, mais o teste de repositório; sem RLS no Postgres no piloto (uma VPS por cliente). Decidido em 2026-10-23.
 
 ## Relations
 

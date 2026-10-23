@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Fatia 0** (ADR-102 itens 12 e 13): workspace, membro e convite pelo plugin `organization` do Better Auth; contas pelo plugin `admin`; isolamento por extensão de query do Prisma, sem RLS no piloto.
 - **Repositório público** (ADR-111 item 14): CI sem custo de minutos, environment `stable` com revisor, CodeQL, secret scanning e attestations no lugar do cosign; nenhum dado de infraestrutura ou da piloto no repositório. Licença a decidir.
 - **Estratégia de código** (ADR-111): recomeçar aqui portando do CRMv2 WAHA, Google People, chat do site e utilitários de segurança; mapa de porte em `tech/crmv2-review.md` e seção "Portar do CRMv2" nas fatias. Design system e CI/CD não são portados; **CI/CD redesenhado** em `tech/cicd.md` (Grype no lugar do Trivy, imagem única, stable por tag). Prompt do design system fica para antes da Fatia 0.
 - **Correção**: a Fatia 0, o índice de Tecnologia e os metadados da stack deixam de citar Auth.js e passam a citar Better Auth, conforme a stack decidida.
