@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Fatia 0, T2** (`/agent-skills:build`): scaffold Next 16.4.2 + React 19.3.1 + TS 7.0.2 em `src/app` (conforme `tech/engineering.md`), versões exatas, `.nvmrc` 24.21.0, pnpm 12.15.0 com `minimumReleaseAge: 1440`. Clone limpo: `pnpm install --frozen-lockfile` ok, `pnpm dev` responde 200 em `/`; `next build` e `tsc` saem 0.
 - **Fatia 0, T1** (`/agent-skills:build`): projeto-piloto confirma a stack sem fallback (ADR-111 item 1): Next 16.4.2, TS 7.0.2, Prisma 7.10.1, Better Auth 1.7.12, Oxlint 1.89.0 + tsgolint + plugin de complexidade (`minLines: 0`). Saídas: `tsc` exit 0, `oxlint --type-aware` exit 0, `next build` exit 0 (rotas `/`, `/_not-found`, `/api/auth/[...all]`), login 200 e senha errada 401. Spec da fatia passa de Next 16.3 para 16.4. `AGENTS.md`: skills do agent-skills passam a ser obrigatórias, com as skills de apoio do build.
 - **Agentes**: subagentes no Sonnet por padrão; `bosun-explorer` (Haiku), `bosun-implementer` (Sonnet médio) e `bosun-reviewer` (Sonnet alto) em `.claude/agents/`. Sessão principal no Opus.
 - **Fatia 0** (`/agent-skills:spec`): mapa de seis módulos e spec do `toolchain`. ADR-102: TOTP para todos, sessão opaca sem cookieCache, sem checagem de senha vazada (exceção ao ASVS 6.2.12).

@@ -4,3 +4,7 @@
 !.env.example
 archive/
 .obsidian/
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo

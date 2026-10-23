@@ -1,0 +1,2 @@
+# minimumReleaseAge em minutos: recusa pacote publicado há menos de 1 dia (ADR-111 item 1)
+minimumReleaseAge: 1440

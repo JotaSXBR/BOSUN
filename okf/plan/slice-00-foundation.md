@@ -141,10 +141,10 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: Next 16.4 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
   - Verificar: saída dos quatro comandos colada no log; resultado (passou ou fallback) registrado no ADR-111.
   - Arquivos: `okf/decisions/adr-111-architecture.md`, `okf/log.md`.
-- [ ] **T2 — Scaffold que roda** (fatia vertical mínima)
+- [x] **T2 — Scaffold que roda** (fatia vertical mínima)
   - Aceite: `pnpm install --frozen-lockfile` + `pnpm dev` abre a página inicial; versões exatas; `.nvmrc`; `.env.example` sem valor real.
   - Verificar: clone limpo em pasta temporária, os dois comandos, página responde 200.
-  - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `app/page.tsx`, `.env.example`.
+  - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `src/app/page.tsx`, `src/app/layout.tsx`, `pnpm-workspace.yaml`, `.env.example`.
 - [ ] **T3 — Banco e worker locais**
   - Aceite: `compose.dev.yml` sobe Postgres, RustFS e WAHA; `pnpm db:migrate` cria o schema e o do pg-boss; o `worker` processa um job de exemplo enfileirado pelo `web`.
   - Verificar: `docker compose -f compose.dev.yml up -d`, `pnpm db:migrate`, log do worker com o job concluído.
