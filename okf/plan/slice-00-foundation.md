@@ -158,7 +158,7 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: Vitest com projetos `unit` e `integration` e limites de cobertura; Playwright com um teste da página inicial; jscpd com limite de 3%; `pnpm verify` sai 0.
   - Verificar: `pnpm test`, `pnpm test:int` (contra o compose), `pnpm test:e2e`, `pnpm dup`, `pnpm verify`.
   - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`, `tests/integration/`, `src/lib/worker.ts` e os `*.test.ts`. A meta de 90% de ramos nos módulos críticos entra nas fatias que os criam.
-- [ ] **T6 — CI e cadeia de suprimentos**
+- [x] **T6 — CI e cadeia de suprimentos**
   - Aceite: `ci.yml` com os jobs `check`, `e2e`, `security` (gitleaks, osv-scanner) e CodeQL (o Semgrep saiu: regras do registro sem versão fixa), ações fixadas por SHA e `permissions: contents: read`; job `check` com Postgres de serviço (o `pnpm test` inclui a integração), `playwright install chromium` no job `e2e`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
   - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
   - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.githooks/pre-commit`, `osv-scanner.toml`, `scripts/lint_exceptions.sh` e o self-test. Sem job `integration` próprio: a integração roda no `check`. Hook git em vez do framework pre-commit, que exigiria Python e Go.
