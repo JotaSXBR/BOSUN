@@ -20,49 +20,33 @@ sources:
 
 # Stack
 
-**Opção A aprovada em 2026-10-21.**
+Decidida em 2026-10-23, com base na [revisão da stack](stack-review.md). Fonte da decisão: [ADR-111](../decisions/adr-111-architecture.md).
 
 ## Decisão
 
-- **Next.js full-stack (App Router) + TypeScript**.
-- **PostgreSQL + Prisma**.
-- **Auth.js** com **JWT + tabela `Session`** para sessões revogáveis e expiração curta ([ADR-102](../decisions/adr-102-identity.md)).
+- **Next.js full-stack (App Router) + TypeScript 7** (compilador nativo; `next build` com `experimental.useTypeScriptCli`).
+- **Dois processos da mesma imagem:** `web` (Next.js) e `worker` (pg-boss), com o mesmo código.
+- **PostgreSQL + Prisma 7**.
+- **Better Auth** com sessão no banco (tabela `Session`) e revogação ([ADR-102](../decisions/adr-102-identity.md)).
 - **Tailwind CSS + shadcn/ui**.
-- **pg-boss** para jobs no PostgreSQL.
-- **RustFS** para storage S3-compatível (Apache 2.0).
-- **Resend** para e-mail transacional, fora do piloto (o piloto não envia e-mail; ver [Para depois](../product/later.md)).
-- **Docker + Coolify + VPS CIS Level 1 + Tailscale + Cloudflare Tunnel**.
-- **Vitest + Playwright** para testes.
+- **pg-boss** para jobs no PostgreSQL, sem Redis.
+- **RustFS** para storage compatível com S3 (Apache 2.0).
+- **Oxlint** (com tsgolint) para lint e **Vitest + Playwright** para testes; limites em [Padrão de qualidade](quality-gate.md).
+- **Docker Compose no Coolify**, VPS com CIS Level 1, Tailscale e Cloudflare Tunnel ([Deploy](deployment.md)).
+- Resend fica fora do piloto (o piloto não envia e-mail).
 
-## Por que A
+## Por que
 
-- Menos serviços e um único deploy; ideal para uma pessoa + IA.
-- Prisma é maduro, schema declarativo, migrations e client type-safe.
-- Auth.js tem Credentials provider; a lógica de senha temporária e troca forçada fica no domínio.
-- pg-boss evita Redis; webhooks e sync rodam como jobs no PostgreSQL.
-- Next.js `output: "standalone"` é suportado para Docker.
-- Grande base de exemplos e boa compatibilidade com agentes de IA.
+- Um repositório TypeScript serve uma pessoa com IA; o worker separado segue o padrão do Chatwoot, Postiz e Mixpost.
+- O Auth.js está em manutenção e o próprio time recomenda o Better Auth para projetos novos.
+- O pg-boss enfileira dentro da transação do banco e dispensa o Redis.
+- O TS 7 compila de 8 a 12 vezes mais rápido; o Oxlint substitui o typescript-eslint, que não roda no TS 7.
 
-## Alternativas
+## Riscos
 
-- **B — Drizzle:** mais leve e próximo de SQL, mas migrations e relações exigem mais disciplina manual; ecossistema menor.
-- **C — NestJS + API separada:** boundaries fortes, mas mais boilerplate, dois deployables e mais contexto para uma pessoa + IA.
-- **Supabase gerenciado:** acelera auth/banco/storage, mas adiciona dependência externa e dificulta o fluxo customizado de senha temporária.
-
-## Consequências
-
-- Um único app pode ficar grande; precisa de boundaries internos claros.
-- A revogação de sessão exige resolver a linha de `Session` a cada requisição autenticada.
-- O storage S3 adiciona um serviço e precisa entrar no backup.
-- Prisma adiciona uma camada de abstração; consultas críticas precisam de revisão.
-
-## Pontos em aberto
-
-- Hash de senha: **Argon2id** (preferido) ou bcrypt.
-- Política de reutilização de senha.
-- Configuração fina do RustFS: single-node, backup e retenção.
-- Valor final da expiração de sessão.
-- Provedor de IA do copiloto.
+- TS 7 sem API do compilador: ferramentas que dependem dela não rodam. Se o Prisma 7 ou o Next.js falharem com o TS 7 no projeto-piloto da Fatia 0, voltamos ao TS 6 com Oxlint e registramos no ADR-111.
+- Um app grande precisa de limites internos claros ([Engenharia](engineering.md)).
+- A revogação de sessão consulta a `Session` a cada requisição.
 
 ## Relations
 

@@ -25,6 +25,7 @@ src/
     jobs.ts            handlers do pg-boss
     *.test.ts          testes unitários ao lado do código
   lib/                 utilitários compartilhados (cifra, auth, logger)
+  worker.ts            entrada do processo worker (pg-boss), mesma imagem do web
 prisma/schema.prisma   modelo de dados
 tests/integration/     testes de integração e fixtures de webhooks
 e2e/                   Playwright
@@ -35,7 +36,7 @@ Um módulo não importa o `repository` de outro; chama o `service` dele.
 
 ## Estilo de código
 
-- TypeScript estrito; sem `any` sem comentário de motivo.
+- TypeScript 7 estrito; limites de lint, complexidade e tamanho no [Padrão de qualidade](quality-gate.md).
 - Entrada externa (HTTP, webhook, job) validada com schema na borda; o resto do código recebe tipos já validados.
 - Nomes em inglês; textos de interface em pt-BR.
 - Funções pequenas; erro de negócio como valor tipado, exceção só para falha inesperada.

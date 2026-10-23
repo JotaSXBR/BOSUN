@@ -61,7 +61,7 @@ sources:
 
 # Revisão da stack e do deploy
 
-Pesquisa de 2026-10-23, feita para decidir a stack antes da Fatia 0. Nada aqui é decisão até entrar no [ADR-111](../decisions/adr-111-architecture.md). Fontes de blogs e guias de terceiros foram tratadas como indício, não como fato; onde a fonte é oficial, está dito.
+Pesquisa de 2026-10-23, feita para decidir a stack antes da Fatia 0. **Decidido em 2026-10-23** (ADR-111): Better Auth, worker separado, beta e stable no mesmo servidor com domínios e contas separados, compose com variáveis geradas e integrações pela UI, Instagram e Facebook separados, Prisma 7, TypeScript 7 com Oxlint. Fontes de blogs e guias de terceiros foram tratadas como indício, não como fato; onde a fonte é oficial, está dito.
 
 ## O que o mercado usa
 

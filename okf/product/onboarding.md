@@ -16,7 +16,7 @@ generated:
 O operador cria o primeiro Admin pela CLI com senha temporária; o primeiro login força a troca. Depois, uma tela de **setup** com checklist fixo, na ordem do golden path:
 
 1. Nome do workspace e fuso.
-2. Conectar **Instagram e Facebook** (OAuth da Meta, conta profissional com página).
+2. Conectar o **Instagram** (Instagram Login, conta profissional) e, se usar, o **Facebook** (Facebook Login, com a página).
 3. Conectar **WhatsApp** (QR code do WAHA).
 4. Conectar **YouTube** (OAuth do Google).
 5. Conectar **Google Contatos** e o **Google Agenda** do próprio Admin.

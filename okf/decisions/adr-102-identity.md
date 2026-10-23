@@ -20,7 +20,7 @@ generated:
 2. Convite por link; o convidado define a senha no aceite.
 3. Esqueceu a senha: o pedido na tela de login avisa o Admin dentro do produto. O Admin define uma **senha temporária**, e o próximo login **força a troca**. A nova senha não pode ser igual à atual.
 4. Último recurso: `bosun admin unlock <email>` na VPS gera senha temporária com troca forçada, auditada com o ator **operador**.
-5. Cada login é uma linha em **`Session`** (`id`, `user_id`, `active_workspace_id`, `user_agent`, `ip`, `created_at`, `last_seen_at`, `expires_at`, `revoked_at`, `revoked_reason`). O JWT do Auth.js carrega só o `sid`; toda requisição confere a sessão no banco.
+5. Cada login é uma linha em **`Session`** (`id`, `user_id`, `active_workspace_id`, `user_agent`, `ip`, `created_at`, `last_seen_at`, `expires_at`, `revoked_at`, `revoked_reason`). A sessão é do **Better Auth**, guardada no banco; toda requisição confere a sessão e a revogação.
 6. Expiração **fixa de 12 h**, sem renovação deslizante. Trocar de workspace atualiza `active_workspace_id`.
 7. Trocar senha, sair de todos e remover do workspace revogam as sessões. Mudar o papel não revoga, porque a permissão é resolvida no servidor a cada requisição.
 8. **Três papéis fixos por workspace**: **Admin** (configura canais, integrações, membros, fluxos e vê a auditoria), **Membro** (opera atendimento, CRM, posts, tarefas, projetos, calendário e documentos), **Viewer** (só leitura). Sem matriz editável, exceções por membro, times nem Manager.

@@ -2,7 +2,7 @@
 
 Fatias verticais, na ordem em que entregam valor à piloto. Cada fatia vai ao ar na VPS dela quando passa o critério de aceite. Como trabalhar em cada fatia: [Guia de trabalho com IA](../howto/ai-workflow.md).
 
-Status: **draft**, aguardando a aprovação do usuário. A Fatia 0 espera a revisão da stack e do deploy (ver [Estado atual](../memory/current-state.md)). As fatias são enriquecidas uma por vez, com o usuário, via `/spec` e `/plan`.
+Status: **draft**, aguardando a aprovação do usuário. A Fatia 0 espera a aprovação do [padrão de qualidade](../tech/quality-gate.md). As fatias são enriquecidas uma por vez, com o usuário, via `/spec` e `/plan`.
 
 - [Fatia 0 — Fundação](slice-00-foundation.md) - Scaffold, login, papéis, workspace, CI e VPS com backup restaurado.
 - [Fatia 1 — Caixa com WhatsApp](slice-01-whatsapp-inbox.md) - Primeiro valor: atender o WhatsApp pela BOSUN.

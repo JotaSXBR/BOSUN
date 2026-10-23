@@ -18,7 +18,9 @@ generated:
 ## Escopo
 
 - Scaffold Next.js + TypeScript, Prisma + PostgreSQL, Auth.js, Tailwind/shadcn, pg-boss ([Stack](../tech/stack.md)); docker compose local com Postgres, WAHA e RustFS.
-- Lint, typecheck, Vitest e Playwright configurados; CI rodando os três e o `validate.sh`.
+- **Projeto-piloto de 1 hora primeiro:** Next.js 16.3 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
+- Oxlint, typecheck (TS 7), Vitest e Playwright configurados; CI na ordem do [padrão de qualidade](../tech/quality-gate.md).
+- Docker Compose para o Coolify (`web`, `worker`, `postgres`, `waha`, `rustfs`) com variáveis geradas; tela de integrações com credenciais cifradas.
 - Entidades `Environment`, `Workspace`, `User`, `Membership`, `Invite`, `Session`, `PasswordResetRequest`, `AuditLog`, `Integration` ([Modelo de dados](../tech/data-model.md)).
 - Login, sessão de 12 h, logout, sair de todos, senha temporária, troca forçada, `bosun admin create` e `bosun admin unlock` ([Autenticação](../tech/auth.md)).
 - Papéis fixos e o guarda de autorização no servidor; convite por link ([Papéis](../product/role.md)).

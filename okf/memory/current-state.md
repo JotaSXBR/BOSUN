@@ -21,7 +21,8 @@ generated:
 
 ## Em aberto
 
-- **Revisão da stack e do deploy antes da Fatia 0**, com pesquisa de mercado: stack comparada com o que produtos parecidos usam, e Coolify com ambientes stable e beta. Bloqueia a Fatia 0.
+- Aprovar o [padrão de qualidade](../tech/quality-gate.md) (limites propostos).
+- Confirmar na Fatia 0: Prisma 7 e Next.js com TS 7; opções do Oxlint; campos de sessão no Better Auth.
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
 

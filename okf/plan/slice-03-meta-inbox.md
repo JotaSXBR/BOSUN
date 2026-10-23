@@ -15,7 +15,7 @@ generated:
 
 ## Escopo
 
-- OAuth da Meta, escolha da conta profissional e da página, token de longa duração cifrado e renovado antes de 60 dias ([Canal](../product/channel.md)).
+- Duas conexões: Instagram (Instagram Login, conta profissional) e Facebook (Facebook Login, página); tokens de longa duração cifrados e renovados antes de 60 dias ([Canal](../product/channel.md)).
 - Webhook da Meta com assinatura validada e evento bruto gravado; processamento em job.
 - Identidades `instagram` e `facebook`; contato criado pelo primeiro evento.
 - Comentário, resposta de story, menção e DM viram ticket em `waiting_human` (ainda sem fluxos) ([Ticket](../product/ticket.md)).

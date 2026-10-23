@@ -15,8 +15,8 @@ Canal é uma conta conectada a um workspace. O Admin conecta e desconecta; todos
 
 | Canal | Conversa | Publicação | Conexão |
 |---|---|---|---|
-| Instagram | comentário, resposta de story, menção, DM | feed, carrossel, reel | OAuth da Meta; conta profissional com página |
-| Facebook | comentário, Messenger | feed, reel | OAuth da Meta (mesma conexão) |
+| Instagram | comentário, resposta de story, menção, DM | feed, carrossel, reel | Instagram Login; conta profissional, sem página do Facebook |
+| Facebook | comentário, Messenger | feed, reel | Facebook Login, com a página (conexão separada) |
 | WhatsApp | mensagens | — | WAHA/GOWS por QR code ([WhatsApp via WAHA](../tech/whatsapp.md)) |
 | YouTube | — | Shorts | OAuth do Google |
 | Chat do site | mensagens | — | snippet na landing page ([Chat do site](site-chat.md)) |

@@ -6,7 +6,7 @@ Vale para qualquer ferramenta (Claude Code, OpenCode, Codex, Cursor). Leia este 
 
 Central de operação do infoprodutor: post → comentário → automação → atendimento → CRM → venda → tarefa → calendário → Meu dia. O escopo é o **piloto** com uma founder de infoprodutos ([okf/product/pilot.md](okf/product/pilot.md)). O que foi adiado está em [okf/product/later.md](okf/product/later.md) e não entra sem uma decisão nova.
 
-Stack: Next.js + TypeScript + PostgreSQL + Prisma + Auth.js + Tailwind/shadcn + pg-boss + RustFS. Uma VPS dedicada por cliente.
+Stack: Next.js + TypeScript 7 + PostgreSQL + Prisma 7 + Better Auth + Tailwind/shadcn + pg-boss + RustFS; Oxlint; Docker Compose no Coolify, uma VPS por cliente ([okf/tech/stack.md](okf/tech/stack.md)).
 
 ## Onde está o conhecimento
 
@@ -34,8 +34,9 @@ O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprov
 - Spec da fatia (objetivo, critérios de sucesso, perguntas abertas): `okf/plan/slice-XX.md`, seções Objetivo, Spec, Critério de aceite e Perguntas abertas.
 - Stack e comandos: [okf/tech/stack.md](okf/tech/stack.md) e a seção Comandos abaixo.
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
+- Padrão de qualidade (`CONSTRAINTS.md` do `/constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
-- **Não crie `SPEC.md` com conteúdo nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
+- **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
 
 
 

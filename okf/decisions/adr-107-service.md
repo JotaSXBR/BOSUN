@@ -27,7 +27,8 @@ generated:
 9. Caixa em **três colunas** (canais/sessões, conversas, conversa), com a ficha do contato em drawer lateral. Filtros: Fila, Minhas, Automação, Resolvidas e Pendentes (visível e desabilitado sem agente). Notas internas sem menções.
 10. **Chat do site**: widget na landing page do infoproduto; exige **nome, e-mail e telefone** antes da primeira mensagem, com finalidade e base legal na coleta; dados declarados entram não verificados e não autorizam envio proativo.
 11. Painel por campanha: comentários → DMs → tickets → negócios → vendas e receita. Sem SLA, CSAT nem métricas de atendente no piloto.
-12. **Limites da Meta:** sem DM fria; resposta privada a comentário dentro da janela permitida; janela de conversa de 7 dias; token de 60 dias renovado; conta profissional com página vinculada.
+12. **Instagram e Facebook são conexões separadas:** Instagram pela API com Instagram Login (conta profissional, sem página do Facebook; escopos `instagram_business_basic`, `instagram_business_manage_messages`, `instagram_business_manage_comments`, `instagram_business_content_publish`); Facebook pelo Facebook Login com a página. Decidido em 2026-10-23.
+13. **Limites da Meta:** sem DM fria; resposta privada a comentário dentro da janela permitida; janela de conversa de 7 dias; token de 60 dias renovado; conta profissional com página vinculada.
 
 ## Relations
 
