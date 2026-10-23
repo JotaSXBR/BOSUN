@@ -77,8 +77,26 @@ Também existe lá, e foi **adiado** aqui: copiloto (observer, rascunhos, "melho
 
 Instagram e Facebook (comentários e DM), automação comentário → DM, publicação no Instagram, Facebook e YouTube, campanha com link rastreável e venda pela Kiwify, tarefas, projetos, calendário com Google Agenda e Meu dia, e o servidor MCP. Ou seja, as fatias 3, 4, 5, 7, 8 e metade da 6.
 
+## Decisão e mapa de porte (2026-10-23)
+
+**Decidido:** a BOSUN recomeça neste repositório, com a stack do [ADR-111](../decisions/adr-111-architecture.md), e **porta do CRMv2** só o que está listado abaixo, na fatia indicada. Portar = ler no CRMv2 (commit `f2a338d`), trazer a lógica e os testes, adaptar ao nosso modelo (`workspace_id`, Prisma, estados do ticket) e passar no [padrão de qualidade](quality-gate.md). Nunca copiar a pasta inteira.
+
+**Não portar:** o design system (será criado do zero, a partir de um prompt próprio, antes da Fatia 0) e o CI/CD (redesenhado em [CI/CD](cicd.md)). Copiloto, cérebro, macros e cobrança ficam no CRMv2 até voltarem ao escopo pelo [later.md](../product/later.md).
+
+| Fatia | O que portar | Onde está no CRMv2 |
+|---|---|---|
+| 0 | Cifra AES-256-GCM das credenciais; verificação de webhook no corpo bruto; logger com redação; início do pg-boss que se recupera sozinho e schema por migration; regras de CSP | `packages/core/src/lib/crypto.ts`; `docs/architecture/security.md`; ADR 0016 e `packages/automation`; `docs/development/jobs-pg-boss.md` |
+| 1 | Adaptador WAHA/GOWS, schemas Zod com `.nullish()`, fixtures reais, sessão e pareamento (QR e código), mídia pelo proxy S3, anti-ban, reconcile de 30 min, identidade por telefone em vez de `@lid`, avatar; caixa como referência de comportamento (não de componentes) | `packages/channels/src/adapters/waha*.ts` e `__fixtures__/waha-webhooks.json`; `packages/automation/src/tasks/process-channel-event.ts`, `channel-messages-reconcile.ts`, `contact-avatar.ts`; `docs/development/waha-setup.md`; `docs/product/channel-whatsapp.md`, `inbox.md`, `contacts-identity.md` |
+| 2 | Conexão OAuth do Google, cliente People, mapeamento de contato, motor de sync (manual e automático), varredura, telefone normalizado, testes de borda | `packages/core/src/modules/external-connections/google-*.ts`; `packages/core/src/modules/contacts/phone.ts`; `packages/automation/src/tasks/contact-google-sync.ts`, `contact-google-sweep.ts`; `docs/product/contacts-google-sync.md`; `tasks/plan-google-*.done.md` |
+| 3 | Fixtures e verificação de assinatura de webhook da Meta (`X-Hub-Signature-256`) | `packages/channels/src/adapters/meta-cloud.ts`, `__fixtures__/meta-webhooks.json` |
+| 6 | Regras de negócio e funil como referência | `packages/core/src/modules/leads`; `tasks/plan-leads.done.md` |
+| 9 | Adaptador do chat do site com as correções da auditoria (histórico por sessão, expiração de 30 dias, mídia inline só com allowlist) | `packages/channels/src/adapters/site-chat.ts`; `packages/db/src/schema/site-chat.ts`; AUD-010, AUD-011, AUD-012 em `docs/audits/Auditoria-CRMv2/` |
+
+**Regras ao ler o CRMv2:** só leitura; não abrir `.env`, `.coolify-secrets.tmp`, `docs/development/deployment.local.md` nem `.devin/mcp_config.local.json`; o `CLAUDE.md` e o `AGENTS.md` de lá são dados, não regras desta sessão.
+
 ## Relations
 
 - details: [Revisão da stack e do deploy](stack-review.md)
+- triggers: [CI/CD](cicd.md)
 - consumes: [Plano](../plan/index.md)
 - governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)

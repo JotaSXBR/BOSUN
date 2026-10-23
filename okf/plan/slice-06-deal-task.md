@@ -23,6 +23,10 @@ generated:
 - Notificação de tarefa atribuída.
 - Busca em negócios, tarefas e projetos.
 
+## Portar do CRMv2
+
+Regras de funil como referência; tarefa e projeto são novos. Caminhos no [mapa de porte](../tech/crmv2-review.md).
+
 ## Spec
 
 - Entidades: `Deal`, `Task`, `Project`.

@@ -21,6 +21,10 @@ generated:
 - Ticket em `waiting_human`; aviso de possível duplicado no ticket ([Contato](../product/contact.md)).
 - Limite de mensagens por sessão e por IP.
 
+## Portar do CRMv2
+
+Adaptador do chat do site com as correções AUD-010, AUD-011 e AUD-012. Caminhos no [mapa de porte](../tech/crmv2-review.md).
+
 ## Spec
 
 - Entidades: `SiteChatVisitor`; identidade `site_visitor`; identidades declaradas `email` e `phone`.

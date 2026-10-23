@@ -2,6 +2,8 @@
 
 ## 2026-10-23
 
+- **Estratégia de código** (ADR-111): recomeçar aqui portando do CRMv2 WAHA, Google People, chat do site e utilitários de segurança; mapa de porte em `tech/crmv2-review.md` e seção "Portar do CRMv2" nas fatias. Design system e CI/CD não são portados; **CI/CD redesenhado** em `tech/cicd.md` (Grype no lugar do Trivy, imagem única, stable por tag). Prompt do design system fica para antes da Fatia 0.
+- **Correção**: a Fatia 0, o índice de Tecnologia e os metadados da stack deixam de citar Auth.js e passam a citar Better Auth, conforme a stack decidida.
 - **Análise do CRMv2** (`tech/crmv2-review.md`, só leitura, commit f2a338d): fatias 0, 1, 2 e 9 já feitas lá, metade da 6 também; conflitos com a stack decidida hoje listados, sem resolver.
 - **Stack decidida** (ADR-111, ADR-102, ADR-107): Better Auth, TS 7 + Oxlint, Prisma 7, worker separado, compose no Coolify com beta e stable no mesmo servidor, integrações pela UI, Instagram e Facebook separados, regra da camada de serviço para o futuro MCP. **Padrão de qualidade** proposto em `tech/quality-gate.md`.
 - **Pesquisa:** `tech/stack-review.md` compara a stack com Chatwoot, Postiz e Mixpost e recomenda Better Auth, worker separado, beta no servidor do operador, compose com variáveis geradas pelo Coolify e integrações pela UI. Aguarda decisão.

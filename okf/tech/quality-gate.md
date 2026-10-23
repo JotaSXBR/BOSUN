@@ -92,12 +92,14 @@ Todas as 871 regras do Oxlint estão na referência oficial[^oxlint-rules]. Arqu
 
 - **Semgrep CE** com as regras de TypeScript e OWASP Top 10: achado alto ou crítico reprova.
 - **gitleaks** no CI e no pre-commit: nenhum segredo no repositório.
-- **osv-scanner** (ou `npm audit`): nenhuma vulnerabilidade alta ou crítica sem exceção registrada com prazo.
-- **SBOM CycloneDX** gerado a cada release e guardado com a imagem.
+- **osv-scanner** no lockfile e **Grype** na imagem: nenhuma vulnerabilidade alta ou crítica sem exceção registrada com prazo. Trivy fica de fora pelo comprometimento de 2026 ([CI/CD](cicd.md)).
+- **SBOM CycloneDX** (Syft) gerado a cada release e guardado com a imagem.
 - **Licenças**: só MIT, Apache-2.0, BSD, ISC e semelhantes nas dependências embutidas na imagem da BOSUN; GPL e AGPL reprovam. Serviços que rodam em container separado (WAHA, RustFS) têm a licença conferida e registrada no ADR-111.
 - Fluxos com auth, sessão, autorização, cifra ou logs seguem o checklist do ASVS nível 2 no `/review`.
 
 ## Ordem no CI
+
+Detalhe dos workflows em [CI/CD](cicd.md).
 
 1. `tsc` (TS 7, sem emitir).
 2. `oxlint --deny-warnings`.

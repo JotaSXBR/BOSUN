@@ -2,7 +2,7 @@
 type: Technology Decision
 title: Stack da aplicação
 description: Opção A aprovada, justificativa, alternativas e pontos em aberto.
-tags: [bosun, stack, nextjs, prisma, authjs, postgres]
+tags: [bosun, stack, nextjs, prisma, better-auth, postgres]
 status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
@@ -10,8 +10,8 @@ sources:
     title: Next.js documentation
   - resource: https://www.prisma.io/docs
     title: Prisma documentation
-  - resource: https://authjs.dev/
-    title: Auth.js documentation
+  - resource: https://www.better-auth.com/docs
+    title: Better Auth documentation
   - resource: https://github.com/timgit/pg-boss
     title: pg-boss repository
   - resource: https://resend.com/docs

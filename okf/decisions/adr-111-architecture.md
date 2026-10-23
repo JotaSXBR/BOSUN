@@ -29,7 +29,8 @@ generated:
 10. Testes unitários, de integração e E2E dos fluxos críticos: auth, autorização, webhooks (Meta, WAHA, Kiwify), sync Google, roteamento do ticket, fluxo e publicação.
 11. **LGPD:** a BOSUN é **operadora**; o workspace é **controlador**. O piloto entrega exportação e exclusão de um contato com todos os dados dele, retenção fixa documentada e a lista de suboperadores ([LGPD](../product/lgpd.md)).
 12. Conteúdo de mensagens é dado não confiável.
-13. **Risco de calendário:** o App Review da Meta e a verificação do app no Google Cloud (escopos sensíveis de Contatos, Agenda e upload no YouTube) levam semanas e precisam começar antes do código.
+13. **Estratégia de código:** a BOSUN recomeça neste repositório e porta do CRMv2 (commit `f2a338d`, só leitura) o WAHA, o Google People, o chat do site e utilitários de segurança, conforme o [mapa de porte](../tech/crmv2-review.md). Não porta o design system (novo, do zero) nem o CI/CD ([CI/CD](../tech/cicd.md)). Decidido em 2026-10-23.
+14. **Risco de calendário:** o App Review da Meta e a verificação do app no Google Cloud (escopos sensíveis de Contatos, Agenda e upload no YouTube) levam semanas e precisam começar antes do código.
 
 ## Relations
 
@@ -37,3 +38,4 @@ generated:
 - details: [Modelo de dados](../tech/data-model.md)
 - details: [LGPD](../product/lgpd.md)
 - details: [Estratégia de testes](../tech/test-strategy.md)
+- details: [CI/CD](../tech/cicd.md)

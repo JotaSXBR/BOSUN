@@ -4,6 +4,8 @@ Fatias verticais, na ordem em que entregam valor à piloto. Cada fatia vai ao ar
 
 Status: **draft**, aguardando a aprovação do usuário. A Fatia 0 espera a aprovação do [padrão de qualidade](../tech/quality-gate.md). As fatias são enriquecidas uma por vez, com o usuário, via `/spec` e `/plan`.
 
+**Antes da Fatia 0:** o usuário recebe o prompt para criar o design system novo do zero, a partir das imagens de referência dele. O design system do CRMv2 não é portado.
+
 - [Fatia 0 — Fundação](slice-00-foundation.md) - Scaffold, login, papéis, workspace, CI e VPS com backup restaurado.
 - [Fatia 1 — Caixa com WhatsApp](slice-01-whatsapp-inbox.md) - Primeiro valor: atender o WhatsApp pela BOSUN.
 - [Fatia 2 — Contatos e Google Contatos](slice-02-google-contacts.md) - Ficha, mesclagem e sync pela etiqueta BOSUN.

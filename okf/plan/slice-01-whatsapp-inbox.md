@@ -24,6 +24,10 @@ generated:
 - Meu dia com o bloco "conversas que esperam por mim" ([Meu dia](../product/my-day.md)).
 - Sino de notificações in-app (`Notification`) com conversa nova na fila e conversa atribuída a mim ([Notificação](../product/notification.md)).
 
+## Portar do CRMv2
+
+Adaptador WAHA/GOWS completo, fixtures, reconcile, anti-ban, identidade por telefone e avatar. A caixa do CRMv2 é referência de comportamento, não de componentes. Caminhos no [mapa de porte](../tech/crmv2-review.md).
+
 ## Spec
 
 - Entidades: `WhatsAppSession`, `Contact`, `ContactIdentity`, `Ticket`, `Message`, `InternalNote`, `Notification`.

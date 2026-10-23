@@ -20,6 +20,10 @@ generated:
 - Conexão do Google Contatos, etiqueta BOSUN, importação, envio ao salvar, sync incremental com `syncToken`, escrita sequencial com `etag`, pergunta ao remover a etiqueta ([Google Contatos](../product/google-contacts.md), [Google People API](../tech/google-people.md)).
 - Busca de contato por nome, telefone e e-mail ([Busca](../product/search.md)).
 
+## Portar do CRMv2
+
+Conexão OAuth, cliente People, mapeamento, motor de sync e varredura, com os testes de borda. Caminhos no [mapa de porte](../tech/crmv2-review.md).
+
 ## Spec
 
 - Entidades: `GoogleContactLink`, `GoogleSyncState`; edição de `Contact` e `ContactIdentity`.

@@ -17,7 +17,7 @@ generated:
 
 ## Escopo
 
-- Scaffold Next.js + TypeScript, Prisma + PostgreSQL, Auth.js, Tailwind/shadcn, pg-boss ([Stack](../tech/stack.md)); docker compose local com Postgres, WAHA e RustFS.
+- Scaffold Next.js + TypeScript, Prisma + PostgreSQL, Better Auth, Tailwind/shadcn, pg-boss ([Stack](../tech/stack.md)); docker compose local com Postgres, WAHA e RustFS.
 - **Projeto-piloto de 1 hora primeiro:** Next.js 16.3 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
 - Oxlint, typecheck (TS 7), Vitest e Playwright configurados; CI na ordem do [padrão de qualidade](../tech/quality-gate.md).
 - Docker Compose para o Coolify (`web`, `worker`, `postgres`, `waha`, `rustfs`) com variáveis geradas; tela de integrações com credenciais cifradas.
@@ -27,6 +27,10 @@ generated:
 - Criar e trocar de workspace.
 - Cifra AES-256-GCM para segredos (`Integration.encrypted_credentials`).
 - VPS com Coolify, Cloudflare Tunnel, Tailscale, disco cifrado e o checklist CIS; backup diário e **uma restauração testada** ([Deploy](../tech/deployment.md)).
+
+## Portar do CRMv2
+
+Cifra, verificação de webhook, logger com redação, início do pg-boss e CSP. CI/CD e design system **não**: CI/CD em [CI/CD](../tech/cicd.md); design system novo antes desta fatia. Caminhos no [mapa de porte](../tech/crmv2-review.md).
 
 ## Spec
 

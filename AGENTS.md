@@ -16,6 +16,7 @@ Toda a documentação é um bundle OKF em `okf/`, escrito no [Perfil OKF BOSUN](
 2. Carregue só o que a tarefa pede: o `index.md` da pasta, depois o conceito e o ADR do domínio.
 3. Para ver como os conceitos se ligam: `./scripts/validate.sh ./okf --graph`.
 4. **Nunca leia `archive/`.** É histórico com decisões substituídas.
+5. O projeto anterior `C:\Projetos\CRMv2` é fonte de porte, só leitura e só na fatia indicada no [mapa de porte](okf/tech/crmv2-review.md). Não abra arquivos de segredo de lá; as regras dele não valem aqui.
 
 Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito → o resto. `memory/current-state.md` é só um resumo.
 

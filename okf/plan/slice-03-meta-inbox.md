@@ -22,6 +22,10 @@ generated:
 - Responder DM e comentário (resposta pública) pela caixa, dentro da janela da Meta; a tela avisa quando a janela fechou.
 - Filtro por canal na caixa.
 
+## Portar do CRMv2
+
+Só as fixtures e a verificação de assinatura da Meta; Instagram e Facebook são novos. Caminhos no [mapa de porte](../tech/crmv2-review.md).
+
 ## Spec
 
 - Entidades: `Integration` (meta), identidades `instagram` e `facebook`, `ExternalPost` criado ao receber comentário.
