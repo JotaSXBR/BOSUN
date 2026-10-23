@@ -14,7 +14,13 @@
     "services:up": "docker compose --env-file .env.local -f compose.dev.yml up -d --wait",
     "services:down": "docker compose --env-file .env.local -f compose.dev.yml down",
     "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env.local worker/migrate.ts",
-    "lint": "oxlint --deny-warnings"
+    "lint": "oxlint --deny-warnings",
+    "test": "vitest run --coverage",
+    "test:int": "vitest run --project integration",
+    "test:e2e": "playwright test",
+    "dup": "jscpd",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm dup && bash ./scripts/validate.sh ./okf",
+    "test:unit": "vitest run --project unit"
   },
   "dependencies": {
     "next": "16.4.2",
@@ -23,15 +29,19 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "5.0.5",
     "concurrently": "10.0.6",
+    "jscpd": "5.4.2",
     "oxlint": "1.89.0",
     "oxlint-plugin-complexity": "4.0.0",
     "oxlint-tsgolint": "7.0.2004",
     "prisma": "7.10.1",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
   },
   "type": "module"
 }

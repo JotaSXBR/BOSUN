@@ -66,13 +66,14 @@ pnpm install --frozen-lockfile
 pnpm dev            # next dev + worker em watch
 pnpm typecheck      # tsc --noEmit
 pnpm lint           # oxlint --deny-warnings
-pnpm test           # vitest run --coverage
+pnpm test           # vitest run --coverage (unit + integration; precisa do compose)
+pnpm test:unit      # vitest run --project unit (sem banco)
 pnpm test:int       # vitest run --project integration (Postgres e RustFS reais)
 pnpm test:e2e       # playwright test
 pnpm dup            # jscpd
 pnpm db:migrate     # prisma migrate dev
 pnpm verify         # typecheck + lint + test + dup + ./scripts/validate.sh ./okf
-docker compose -f compose.dev.yml up -d   # postgres, rustfs, waha
+pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 ```
 
 **Estrutura:** a de [Engenharia](../tech/engineering.md); a fatia cria só as pastas que usa.
@@ -153,12 +154,12 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: `.oxlintrc.json` com todas as regras e limites do [padrão de qualidade](../tech/quality-gate.md); `pnpm typecheck` e `pnpm lint` saem 0; um arquivo de teste com `any` e outro com função de 61 linhas falham.
   - Verificar: os dois comandos verdes; os dois casos ruins vermelhos (e removidos depois).
   - Arquivos: `.oxlintrc.json`, `package.json`, `src/lib/logger.ts` (único ponto com `console`).
-- [ ] **T5 — Testes, cobertura e duplicação**
+- [x] **T5 — Testes, cobertura e duplicação**
   - Aceite: Vitest com projetos `unit` e `integration` e limites de cobertura; Playwright com um teste da página inicial; jscpd com limite de 3%; `pnpm verify` sai 0.
   - Verificar: `pnpm test`, `pnpm test:int` (contra o compose), `pnpm test:e2e`, `pnpm dup`, `pnpm verify`.
-  - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`.
+  - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`, `tests/integration/`, `src/lib/worker.ts` e os `*.test.ts`. A meta de 90% de ramos nos módulos críticos entra nas fatias que os criam.
 - [ ] **T6 — CI e cadeia de suprimentos**
-  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
+  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; job `check` com Postgres de serviço (o `pnpm test` inclui a integração), `playwright install chromium` no job `e2e`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
   - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
   - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.pre-commit-config.yaml` ou hook equivalente.
 - [ ] **T7 — Fechamento do módulo**

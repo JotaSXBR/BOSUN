@@ -1,0 +1,44 @@
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vitest/config";
+
+// Local usa o .env.local; no CI as variáveis vêm do ambiente.
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
+
+// Integração roda num banco próprio, para não disputar jobs com o worker do dev.
+function testDatabaseUrl(): string | undefined {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) return undefined;
+  const url = new URL(raw);
+  url.pathname = "/bosun_test";
+  return url.toString();
+}
+
+const testUrl = testDatabaseUrl();
+
+export default defineConfig({
+  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+  test: {
+    projects: [
+      { extends: true, test: { name: "unit", include: ["src/**/*.test.ts", "worker/**/*.test.ts"] } },
+      {
+        extends: true,
+        test: {
+          name: "integration",
+          include: ["tests/integration/**/*.test.ts"],
+          globalSetup: ["tests/integration/global-setup.ts"],
+          env: testUrl ? { DATABASE_URL: testUrl } : {},
+          testTimeout: 20_000,
+          hookTimeout: 20_000,
+        },
+      },
+    ],
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}", "worker/**/*.ts"],
+      // Páginas e layout ficam com o E2E; worker/index.ts só liga os sinais ao src/lib/worker.ts.
+      exclude: ["**/*.test.ts", "src/app/**/page.tsx", "src/app/**/layout.tsx", "worker/*.ts", "src/generated/**"],
+      thresholds: { lines: 80, branches: 80 },
+    },
+  },
+});
