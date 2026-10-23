@@ -6,12 +6,14 @@
     "node": "24.21.0"
   },
   "scripts": {
-    "dev": "concurrently -n web,worker \"next dev\" \"node --env-file-if-exists=.env --env-file-if-exists=.env.local --watch worker/index.ts\"",
+    "dev": "concurrently -n web,worker \"next dev\" \"node --env-file-if-exists=.env.local --watch worker/index.ts\"",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "worker": "node --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
-    "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env --env-file-if-exists=.env.local worker/migrate.ts"
+    "worker": "node --env-file-if-exists=.env.local worker/index.ts",
+    "services:up": "docker compose --env-file .env.local -f compose.dev.yml up -d --wait",
+    "services:down": "docker compose --env-file .env.local -f compose.dev.yml down",
+    "db:migrate": "prisma migrate dev && node --env-file-if-exists=.env.local worker/migrate.ts"
   },
   "dependencies": {
     "next": "16.4.2",

@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { defineConfig, env } from "prisma/config";
 
-// O Prisma 7 não lê env sozinho; .env.local sobrescreve .env, como no Next. No CI vêm do ambiente.
-for (const f of [".env.local", ".env"]) if (existsSync(f)) process.loadEnvFile(f);
+// O Prisma 7 não lê env sozinho; local usa o .env.local, no CI as variáveis vêm do ambiente.
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
