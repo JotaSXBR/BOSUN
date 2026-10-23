@@ -37,13 +37,10 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version-file: .nvmrc, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: bash scripts/test_lint_exceptions.sh && bash scripts/lint_exceptions.sh
-      # Unitário e integração (contra o Postgres de serviço), com limites de cobertura.
-      - run: pnpm test
-      - run: pnpm dup
-      - run: bash scripts/test_validate.sh && bash scripts/validate.sh ./okf
+      # Self-tests dos scripts que o verify usa.
+      - run: bash scripts/test_lint_exceptions.sh && bash scripts/test_validate.sh
+      # O mesmo do local: typecheck, lint, exceções, testes com cobertura (Postgres de serviço), jscpd e okf.
+      - run: pnpm verify
 
   e2e:
     runs-on: ubuntu-latest
