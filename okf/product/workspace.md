@@ -18,7 +18,7 @@ generated:
 - Todo workspace nasce com o mesmo seed: estágios do pipeline, status de tarefa e fuso `America/Sao_Paulo`. Não há templates.
 - Criar workspace: só o Admin de um workspace existente ou o operador pela CLI.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
-- parte_de: [Piloto](pilot.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- part_of: [Piloto](pilot.md)

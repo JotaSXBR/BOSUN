@@ -25,8 +25,8 @@ Widget que a piloto cola na landing page do infoproduto para tirar dúvidas ante
 1. O visitante só envia depois de preencher os três campos.
 2. A mensagem aparece na fila da caixa em segundos, e a resposta volta no widget.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
-- produz: [Ticket](ticket.md)
-- parte_de: [Canal](channel.md)
+- governed_by: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
+- produces: [Ticket](ticket.md)
+- part_of: [Canal](channel.md)

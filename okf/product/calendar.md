@@ -29,8 +29,8 @@ Dia, semana e mês. Arrastar um evento da BOSUN muda o horário; tarefas e posts
 
 Sem recorrência própria, time blocking, calendário pessoal interno nem resolução de conflito.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
-- consome: [Tarefa](task.md)
-- consome: [Post](post.md)
+- governed_by: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
+- consumes: [Tarefa](task.md)
+- consumes: [Post](post.md)

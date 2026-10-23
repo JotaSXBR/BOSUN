@@ -19,8 +19,8 @@ generated:
 - Visão em quadro por estágio, com filtro por campanha.
 - Sem empresa, estágios editáveis, probabilidade nem previsão.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
-- depende_de: [Contato](contact.md)
-- consome: [Campanha](campaign.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- depends_on: [Contato](contact.md)
+- consumes: [Campanha](campaign.md)

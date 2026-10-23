@@ -69,8 +69,8 @@ Contatos: jobs incrementais com `syncToken` e escrita sequencial com `etag` ([Go
 - Cota da YouTube Data API limita uploads por dia.
 - O parâmetro de rastreio da Kiwify precisa ser confirmado na documentação.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
-- depende_de: [Stack](stack.md)
-- depende_de: [Modelo de dados](data-model.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- depends_on: [Stack](stack.md)
+- depends_on: [Modelo de dados](data-model.md)

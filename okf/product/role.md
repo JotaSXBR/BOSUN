@@ -31,7 +31,7 @@ Três papéis fixos por workspace. Sem editor de permissões, exceções por mem
 - Membro removido: tickets, tarefas e negócios dele ficam sem responsável e aparecem para o Admin.
 - **Atendente** é função de quem atende; **Agente** é reservado para IA.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-102 — Identidade, acesso e papéis](../decisions/adr-102-identity.md)
-- parte_de: [Workspace](workspace.md)
+- governed_by: [ADR-102 — Identidade, acesso e papéis](../decisions/adr-102-identity.md)
+- part_of: [Workspace](workspace.md)

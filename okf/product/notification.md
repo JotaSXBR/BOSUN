@@ -25,7 +25,7 @@ generated:
 - A notificação guarda só a referência; a permissão é conferida ao abrir.
 - Texto calmo, sem urgência artificial.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
-- depende_de: [Papéis](role.md)
+- governed_by: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
+- depends_on: [Papéis](role.md)

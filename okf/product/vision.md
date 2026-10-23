@@ -34,7 +34,7 @@ O piloto prova isso com uma founder de infoprodutos ([Piloto](pilot.md)). O que 
 - Hierarquia forte, microinterações discretas, referência marítima sutil.
 - Paleta, tipografia e logo ainda não definidos; usar tokens neutros e um accent funcional.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
-- detalha: [Piloto](pilot.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- details: [Piloto](pilot.md)

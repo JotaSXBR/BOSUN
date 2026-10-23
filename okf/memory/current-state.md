@@ -30,7 +30,7 @@ generated:
 2. Reescrever AGENTS.md e README.md (Etapa 6).
 3. Escrever o plano em fatias e o guia de trabalho com IA (Etapa 7).
 
-## Relações
+## Relations
 
-- consome: [Piloto](../product/pilot.md)
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- consumes: [Piloto](../product/pilot.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)

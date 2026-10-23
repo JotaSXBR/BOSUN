@@ -28,7 +28,7 @@ generated:
 10. Analytics do piloto: o funil por post e por campanha (comentários, DMs, tickets, vendas, receita). Alcance e engajamento ficam para depois.
 11. App OAuth da BOSUN por plataforma, apontando direto para o domínio da instalação; tokens cifrados ([ADR-111](adr-111-architecture.md)). Sem broker central no piloto.
 
-## Relações
+## Relations
 
-- detalha: [Post](../product/post.md)
-- detalha: [Campanha](../product/campaign.md)
+- details: [Post](../product/post.md)
+- details: [Campanha](../product/campaign.md)

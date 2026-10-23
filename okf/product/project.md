@@ -17,8 +17,8 @@ generated:
 - Arquivar o projeto não apaga as tarefas.
 - Sem seções, marcos, linha do tempo nem progresso ponderado.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
-- consome: [Campanha](campaign.md)
-- depende_de: [Tarefa](task.md)
+- governed_by: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
+- consumes: [Campanha](campaign.md)
+- depends_on: [Tarefa](task.md)

@@ -20,7 +20,7 @@ Uma biblioteca por workspace, navegável, com busca e etiquetas.
 - Download por URL assinada de curta duração.
 - Sem biblioteca pessoal, versões nem pastas aninhadas.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-104 — Documentos e busca](../decisions/adr-104-content.md)
-- parte_de: [Workspace](workspace.md)
+- governed_by: [ADR-104 — Documentos e busca](../decisions/adr-104-content.md)
+- part_of: [Workspace](workspace.md)

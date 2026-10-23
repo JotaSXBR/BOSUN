@@ -40,9 +40,9 @@ A piloto sai do app do Instagram: escreve, agenda e publica na BOSUN.
 2. Uma falha no YouTube deixa o Instagram publicado e o post `partial`.
 3. O comentário no post publicado pode disparar um fluxo ([Automação](automation.md)).
 
-## Relações
+## Relations
 
-- governado_por: [ADR-108 — Publicações e campanha](../decisions/adr-108-publications.md)
-- depende_de: [Canal](channel.md)
-- consome: [Documento](document.md)
-- parte_de: [Campanha](campaign.md)
+- governed_by: [ADR-108 — Publicações e campanha](../decisions/adr-108-publications.md)
+- depends_on: [Canal](channel.md)
+- consumes: [Documento](document.md)
+- part_of: [Campanha](campaign.md)

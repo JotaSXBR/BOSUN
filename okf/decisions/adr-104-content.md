@@ -23,7 +23,7 @@ generated:
 5. A autorização vale no momento da leitura: a busca só mostra o que o papel pode ver.
 6. Sem busca semântica, embeddings nem pgvector no piloto.
 
-## Relações
+## Relations
 
-- detalha: [Documento](../product/document.md)
-- detalha: [Busca](../product/search.md)
+- details: [Documento](../product/document.md)
+- details: [Busca](../product/search.md)

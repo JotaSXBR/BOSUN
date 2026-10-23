@@ -59,7 +59,7 @@ Nomes em inglês. Toda entidade de negócio tem `id` (cuid), `workspace_id`, `cr
 - Índices GIN `tsvector` em português para a [Busca](../product/search.md).
 - Exclusão de contato (LGPD) é física e em cascata, com uma linha de auditoria sem conteúdo.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
-- detalha: [Arquitetura](architecture.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- details: [Arquitetura](architecture.md)

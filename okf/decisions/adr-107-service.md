@@ -29,9 +29,9 @@ generated:
 11. Painel por campanha: comentários → DMs → tickets → negócios → vendas e receita. Sem SLA, CSAT nem métricas de atendente no piloto.
 12. **Limites da Meta:** sem DM fria; resposta privada a comentário dentro da janela permitida; janela de conversa de 7 dias; token de 60 dias renovado; conta profissional com página vinculada.
 
-## Relações
+## Relations
 
-- detalha: [Ticket](../product/ticket.md)
-- detalha: [Canal](../product/channel.md)
-- detalha: [Chat do site](../product/site-chat.md)
-- depende_de: [ADR-109 — Automação](adr-109-automation.md)
+- details: [Ticket](../product/ticket.md)
+- details: [Canal](../product/channel.md)
+- details: [Chat do site](../product/site-chat.md)
+- depends_on: [ADR-109 — Automação](adr-109-automation.md)

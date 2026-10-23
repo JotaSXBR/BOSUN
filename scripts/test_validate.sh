@@ -46,8 +46,8 @@ Veja `[falso](nada.md)` e [o ticket](/product/ticket.md).
 ```
 [dentro de código](nada.md)
 ```
-## Relações
-- produz: [Ticket](ticket.md)
+## Relations
+- produces: [Ticket](ticket.md)
 EOF
 cat > "$v/product/ticket.md" <<'EOF'
 ---
@@ -58,8 +58,8 @@ status: stable
 domain: service
 ---
 # Ticket
-## Relações
-- depende_de: [Contato](/product/contact.md)
+## Relations
+- depends_on: [Contato](/product/contact.md)
 EOF
 
 out="$("$here/validate.sh" "$v")"; code=$?
@@ -67,7 +67,7 @@ if [ $code -ne 0 ] || ! grep -q "resumo: 0 erro(s), 0 aviso(s)" <<<"$out"; then
   echo "FALHOU: bundle válido deveria passar limpo"; echo "$out"; fail=1
 else echo "ok  bundle válido: código 0, sem erro nem aviso"; fi
 graph="$("$here/validate.sh" "$v" --graph)"
-grep -q "product/contact.md --produz--> product/ticket.md" <<<"$graph" \
+grep -q "product/contact.md --produces--> product/ticket.md" <<<"$graph" \
   && echo "ok  --graph imprime arestas" || { echo "FALHOU: --graph"; fail=1; }
 
 # ---------- bundle inválido ----------
@@ -90,13 +90,13 @@ printf -- '---\ntype: [quebrado\ntitle: X\n---\n# X\n' > "$b/product/badyaml.md"
 printf -- '---\ntype: Concept\ntitle: Contato\nstatus: pronto\n---\n# Dup\n[quebrado](/product/nao-existe.md)\n' > "$b/product/dup.md"
 # E011 + W001 + W004
 long="$(printf 'x%.0s' $(seq 1 170))"
-printf -- '---\ntype: ADR\ntitle: Outro ADR\ndescription: %s\nstatus: draft\ndomain: service\n---\n# A\n## Relações\n- detalha: [Ticket](ticket.md)\n' "$long" > "$b/product/adr2.md"
+printf -- '---\ntype: ADR\ntitle: Outro ADR\ndescription: %s\nstatus: draft\ndomain: service\n---\n# A\n## Relations\n- details: [Ticket](ticket.md)\n' "$long" > "$b/product/adr2.md"
 # E009: verbo fora do vocabulário e linha mal formada; E008: sem saída válida
-printf -- '---\ntype: Concept\ntitle: Verbo\ndescription: d.\nstatus: draft\n---\n# V\n## Relações\n- inventa: [Ticket](ticket.md)\n- solto sem link\n' > "$b/product/verb.md"
+printf -- '---\ntype: Concept\ntitle: Verbo\ndescription: d.\nstatus: draft\n---\n# V\n## Relations\n- inventa: [Ticket](ticket.md)\n- solto sem link\n' > "$b/product/verb.md"
 # W002 + W003 + E007 (não está no index? está) -> órfão separado abaixo
-printf -- '---\ntype: Concept\ntitle: Velho\ndescription: d.\nstatus: draft\nstale_after: 2020-01-01\nverified: sim\n---\n# O\n## Relações\n- parte_de: [Contato](contact.md)\n' > "$b/product/old.md"
+printf -- '---\ntype: Concept\ntitle: Velho\ndescription: d.\nstatus: draft\nstale_after: 2020-01-01\nverified: sim\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/old.md"
 # E007: fora de qualquer index
-printf -- '---\ntype: Concept\ntitle: Orfao\ndescription: d.\nstatus: draft\n---\n# O\n## Relações\n- parte_de: [Contato](contact.md)\n' > "$b/product/orphan.md"
+printf -- '---\ntype: Concept\ntitle: Orfao\ndescription: d.\nstatus: draft\n---\n# O\n## Relations\n- part_of: [Contato](contact.md)\n' > "$b/product/orphan.md"
 
 out="$("$here/validate.sh" "$b")"; code=$?
 [ $code -ne 0 ] && echo "ok  bundle inválido: código $code" || { echo "FALHOU: bundle inválido saiu 0"; fail=1; }

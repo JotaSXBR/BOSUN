@@ -37,8 +37,8 @@ Cada item mostra o estado (feito, pendente, com erro), pode ser pulado e volta a
 2. Pular um item não bloqueia os outros.
 3. O convidado entra com a senha que definiu e cai no Meu dia.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
-- depende_de: [Canal](channel.md)
-- aciona: [Google Contatos](google-contacts.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- depends_on: [Canal](channel.md)
+- triggers: [Google Contatos](google-contacts.md)

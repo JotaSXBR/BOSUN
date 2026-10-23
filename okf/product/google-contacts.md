@@ -31,8 +31,8 @@ Mantém os contatos da BOSUN no celular da piloto, para que o WhatsApp mostre os
 4. Conflito de identidade é mostrado ao usuário.
 5. Revogar a conexão para o sync e preserva os dados locais.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
-- depende_de: [Contato](contact.md)
-- detalha: [Contato](contact.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- depends_on: [Contato](contact.md)
+- details: [Contato](contact.md)

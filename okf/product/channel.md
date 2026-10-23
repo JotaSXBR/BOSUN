@@ -28,7 +28,7 @@ Canal é uma conta conectada a um workspace. O Admin conecta e desconecta; todos
 - **WhatsApp via WAHA** não é API oficial: há risco de bloqueio do número.
 - Os apps da Meta e do Google precisam ser aprovados **antes** de a piloto usar; isso começa junto com a primeira fatia.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
-- parte_de: [Workspace](workspace.md)
+- governed_by: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
+- part_of: [Workspace](workspace.md)

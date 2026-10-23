@@ -11,9 +11,9 @@ import sys
 
 REQUIRED = ("type", "title", "description", "status")
 STATUSES = {"draft", "stable", "deprecated"}
-DEFAULT_VOCAB = {"depende_de", "produz", "consome", "aciona",
-                 "governado_por", "parte_de", "detalha", "substitui"}
-RELATIONS_H = "## Relações"
+DEFAULT_VOCAB = {"depends_on", "produces", "consumes", "triggers",
+                 "governed_by", "part_of", "details", "supersedes"}
+RELATIONS_H = "## Relations"
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
 REL_RE = re.compile(r"^\s*[-*]\s+([a-z_]+):\s*(.+)$")
 INDEX_ITEM_RE = re.compile(r"^\s*[-*]\s+\[[^\]]+\]\([^)]+\)\s*(?:-|—|–|:)\s*\S")
@@ -324,9 +324,9 @@ def validate(root, today=None):
                     edges.append((rel, verb, path))
                     out += 1
         if rel_line is None:
-            rep.err("E008", rel, len(text.split("\n")), "concept sem seção '## Relações'")
+            rep.err("E008", rel, len(text.split("\n")), "concept sem seção '## Relations'")
         elif out == 0:
-            rep.err("E008", rel, rel_line, "seção Relações sem relação de saída válida")
+            rep.err("E008", rel, rel_line, "seção Relations sem relação de saída válida")
 
     for rel in files:
         if rel != "index.md" and rel not in indexed:

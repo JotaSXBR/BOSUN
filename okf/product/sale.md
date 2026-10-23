@@ -36,9 +36,9 @@ Clique não é venda. Reembolso muda o status e sai da receita do painel.
 2. A venda pelo link da DM aparece no painel da campanha certa.
 3. A venda sem link é ligada ao contato pelo e-mail.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
-- consome: [Campanha](campaign.md)
-- produz: [Contato](contact.md)
-- aciona: [Notificação](notification.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- consumes: [Campanha](campaign.md)
+- produces: [Contato](contact.md)
+- triggers: [Notificação](notification.md)

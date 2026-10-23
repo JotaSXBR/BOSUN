@@ -18,8 +18,8 @@ generated:
 - A autorização vale na leitura: só aparece o que o papel pode ver, sempre no workspace ativo.
 - Sem busca semântica nem resposta gerada.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-104 — Documentos e busca](../decisions/adr-104-content.md)
-- consome: [Contato](contact.md)
-- consome: [Documento](document.md)
+- governed_by: [ADR-104 — Documentos e busca](../decisions/adr-104-content.md)
+- consumes: [Contato](contact.md)
+- consumes: [Documento](document.md)

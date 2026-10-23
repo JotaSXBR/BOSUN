@@ -19,7 +19,7 @@ generated:
 - **Suboperadores do piloto:** Meta (Instagram, Facebook), WhatsApp via WAHA (sem terceiro), Google (Contatos, Agenda, YouTube), Kiwify, Cloudflare e o provedor da VPS. Verificar a transferência internacional de cada um.
 - Conteúdo de mensagens é dado não confiável.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
-- governado_por: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)

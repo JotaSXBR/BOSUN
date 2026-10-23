@@ -26,9 +26,9 @@ generated:
 8. Venda confirmada aparece no contato e sugere mover o negócio aberto para Ganho; a mudança é um clique, nunca automática.
 9. Clique não é venda.
 
-## Relações
+## Relations
 
-- detalha: [Contato](../product/contact.md)
-- detalha: [Google Contatos](../product/google-contacts.md)
-- detalha: [Negócio](../product/deal.md)
-- detalha: [Venda](../product/sale.md)
+- details: [Contato](../product/contact.md)
+- details: [Google Contatos](../product/google-contacts.md)
+- details: [Negócio](../product/deal.md)
+- details: [Venda](../product/sale.md)

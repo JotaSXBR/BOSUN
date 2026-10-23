@@ -18,9 +18,9 @@ generated:
 - Com prazo, aparece no [Calendário](calendar.md) e no [Meu dia](my-day.md).
 - Sem subtarefas, checklist, dependências, estimativa nem recorrência.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
-- consome: [Ticket](ticket.md)
-- parte_de: [Projeto](project.md)
-- aciona: [Notificação](notification.md)
+- governed_by: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
+- consumes: [Ticket](ticket.md)
+- part_of: [Projeto](project.md)
+- triggers: [Notificação](notification.md)

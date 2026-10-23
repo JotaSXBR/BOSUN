@@ -38,13 +38,13 @@ Validar: `./scripts/validate.sh ./okf` (sai 0 sem erro). Grafo para consulta: `.
 - Antes de criar um arquivo, leia o `index.md` da pasta. Título duplicado é erro.
 - Todo arquivo aparece em algum `index.md`.
 
-## Relações (arestas)
+## Relations (arestas)
 
-Todo concept termina com `## Relações`. Uma linha por aresta, com verbo do vocabulário e link markdown normal (sem `[[wikilinks]]`):
+Todo concept termina com `## Relations`. Verbos e título da seção ficam em inglês, como os identificadores do código; o significado de cada verbo fica abaixo, em pt-BR. Uma linha por aresta, com verbo do vocabulário e link markdown normal (sem `[[wikilinks]]`):
 
 ```
-## Relações
-- depende_de: [Contato](/product/contact.md)
+## Relations
+- depends_on: [Contato](/product/contact.md)
 ```
 
 Links relativos ou absolutos à raiz do bundle. Concept sem relação de saída é erro; sem relação de entrada é aviso.
@@ -53,14 +53,14 @@ Links relativos ou absolutos à raiz do bundle. Concept sem relação de saída 
 
 O validador lê esta lista. Verbo novo entra aqui, com o significado, antes de ser usado.
 
-- `depende_de` — precisa do outro nó para existir ou funcionar.
-- `produz` — cria registros ou eventos do outro nó.
-- `consome` — lê ou usa dados do outro nó.
-- `aciona` — dispara uma ação ou um fluxo no outro nó.
-- `governado_por` — segue a decisão ou regra do outro nó (ex.: um ADR).
-- `parte_de` — é componente do outro nó.
-- `detalha` — aprofunda o outro nó (spec técnica, wireframe).
-- `substitui` — toma o lugar do outro nó (o antigo fica `deprecated`).
+- `depends_on` — precisa do outro nó para existir ou funcionar.
+- `produces` — cria registros ou eventos do outro nó.
+- `consumes` — lê ou usa dados do outro nó.
+- `triggers` — dispara uma ação ou um fluxo no outro nó.
+- `governed_by` — segue a decisão ou regra do outro nó (ex.: um ADR).
+- `part_of` — é componente do outro nó.
+- `details` — aprofunda o outro nó (spec técnica, wireframe).
+- `supersedes` — toma o lugar do outro nó (o antigo fica `deprecated`).
 
 ## Decisões
 
@@ -77,7 +77,7 @@ Um ADR por domínio em `decisions/`. Decisão nova ou alterada edita o ADR do do
 | E005 | erro | `log.md` fora da regra |
 | E006 | erro | link interno quebrado ou saindo do bundle |
 | E007 | erro | arquivo fora de qualquer `index.md` |
-| E008 | erro | concept sem `## Relações` ou sem relação de saída |
+| E008 | erro | concept sem `## Relations` ou sem relação de saída |
 | E009 | erro | verbo fora do vocabulário ou linha de relação mal formada |
 | E010 | erro | título duplicado |
 | E011 | erro | mais de um ADR para o mesmo domínio |
@@ -86,6 +86,6 @@ Um ADR por domínio em `decisions/`. Decisão nova ou alterada edita o ADR do do
 | W003 | aviso | `verified` sem `by`/`at` |
 | W004 | aviso | `description` com mais de 160 caracteres |
 
-## Relações
+## Relations
 
-- detalha: [Índice OKF](index.md)
+- details: [Índice OKF](index.md)

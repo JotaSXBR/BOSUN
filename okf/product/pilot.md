@@ -40,11 +40,11 @@ Cada passo deixa **evidência**: registro, status, horário ou auditoria. Passo 
 - Painel da campanha com o funil comentários → DMs → tickets → negócios → vendas.
 - Backup restaurado com sucesso antes do go-live.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
-- depende_de: [Post](post.md)
-- depende_de: [Automação](automation.md)
-- depende_de: [Ticket](ticket.md)
-- depende_de: [Venda](sale.md)
-- depende_de: [Meu dia](my-day.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- depends_on: [Post](post.md)
+- depends_on: [Automação](automation.md)
+- depends_on: [Ticket](ticket.md)
+- depends_on: [Venda](sale.md)
+- depends_on: [Meu dia](my-day.md)

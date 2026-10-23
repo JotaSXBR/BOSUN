@@ -34,7 +34,7 @@ O contato é o centro do fio: o comentarista do Instagram, quem chama no WhatsAp
 3. Um e-mail declarado no chat que bate com um contato gera aviso, não mesclagem.
 4. Mesclar move tudo e deixa auditoria.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
-- depende_de: [Workspace](workspace.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- depends_on: [Workspace](workspace.md)

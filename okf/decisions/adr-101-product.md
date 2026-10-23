@@ -29,7 +29,7 @@ generated:
 11. O que foi adiado fica em uma linha no [later.md](../product/later.md). Itens removidos não voltam sem uma decisão nova neste ADR.
 12. Removidos em 2026-10-23: templates, hábitos, OKR, gamificação, Observer, scorecard de prontidão, Item como supertype, links favoritos como módulo, revisão por quatro olhos e pacote de encerramento de mídia.
 
-## Relações
+## Relations
 
-- governado_por: [Perfil OKF BOSUN](../okf-profile.md)
-- detalha: [Piloto](../product/pilot.md)
+- governed_by: [Perfil OKF BOSUN](../okf-profile.md)
+- details: [Piloto](../product/pilot.md)

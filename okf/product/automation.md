@@ -41,9 +41,9 @@ O fluxo termina depois da entrega. A partir daí, a resposta da pessoa vai para 
 2. Comentar de novo no mesmo post não repete a DM.
 3. Responder a DM com uma palavra de handoff coloca o ticket na fila.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-109 — Automação](../decisions/adr-109-automation.md)
-- consome: [Post](post.md)
-- produz: [Ticket](ticket.md)
-- produz: [Contato](contact.md)
+- governed_by: [ADR-109 — Automação](../decisions/adr-109-automation.md)
+- consumes: [Post](post.md)
+- produces: [Ticket](ticket.md)
+- produces: [Contato](contact.md)

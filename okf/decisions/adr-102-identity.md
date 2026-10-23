@@ -28,7 +28,7 @@ generated:
 10. Permissão nunca vem do cliente; a autorização é sempre no servidor.
 11. Sem segundo fator, chave de recuperação, trava de inatividade nem reautenticação por ação no piloto.
 
-## Relações
+## Relations
 
-- detalha: [Papéis](../product/role.md)
-- governado_por: [ADR-111 — Arquitetura, operação e privacidade](adr-111-architecture.md)
+- details: [Papéis](../product/role.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](adr-111-architecture.md)

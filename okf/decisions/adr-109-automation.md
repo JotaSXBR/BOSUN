@@ -28,7 +28,7 @@ generated:
 10. Conteúdo de mensagem é dado não confiável: nunca altera o fluxo nem executa instruções.
 11. **IA fora do piloto:** Copiloto, agentes, Base com RAG e BYOK estão no [later.md](../product/later.md). O estado `pending_agent` ([ADR-107](adr-107-service.md)) reserva o lugar dos agentes.
 
-## Relações
+## Relations
 
-- detalha: [Automação](../product/automation.md)
-- consome: [ADR-108 — Publicações e campanha](adr-108-publications.md)
+- details: [Automação](../product/automation.md)
+- consumes: [ADR-108 — Publicações e campanha](adr-108-publications.md)

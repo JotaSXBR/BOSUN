@@ -67,6 +67,6 @@ Adiado em 2026-10-23. Para voltar, o item ganha decisão no ADR do domínio e um
 - Retenção configurável por tipo de dado.
 - Modelo comercial: instalação + mensalidade, Asaas, NFS-e e contrato (antes do primeiro cliente pagante).
 
-## Relações
+## Relations
 
-- governado_por: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)
+- governed_by: [ADR-101 — Produto, piloto e escopo](../decisions/adr-101-product.md)

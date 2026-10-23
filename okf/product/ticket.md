@@ -51,9 +51,9 @@ O ticket é a conversa de um canal com estado e responsável. Social e Atendimen
 2. Assumir e responder envia pelo canal certo e pausa a automação.
 3. Nenhuma mensagem é perdida nem duplicada com webhooks repetidos.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
-- depende_de: [Canal](channel.md)
-- depende_de: [Contato](contact.md)
-- aciona: [Notificação](notification.md)
+- governed_by: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
+- depends_on: [Canal](channel.md)
+- depends_on: [Contato](contact.md)
+- triggers: [Notificação](notification.md)

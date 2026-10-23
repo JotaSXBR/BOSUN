@@ -25,8 +25,8 @@ generated:
 
 Funil por campanha e por post: comentários com palavra-chave → DMs enviadas → cliques → tickets → negócios → vendas e receita. Tudo vem de registros da BOSUN; dado que falta aparece como indisponível, nunca estimado.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-108 — Publicações e campanha](../decisions/adr-108-publications.md)
-- parte_de: [Piloto](pilot.md)
-- consome: [Post](post.md)
+- governed_by: [ADR-108 — Publicações e campanha](../decisions/adr-108-publications.md)
+- part_of: [Piloto](pilot.md)
+- consumes: [Post](post.md)

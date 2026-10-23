@@ -21,9 +21,9 @@ A home de cada pessoa. Três blocos, nesta ordem:
 - Mostra só o que o papel pode ver.
 - Bloco vazio mostra uma frase calma ("Nenhuma conversa esperando por você."), sem pressão.
 
-## Relações
+## Relations
 
-- governado_por: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
-- consome: [Ticket](ticket.md)
-- consome: [Tarefa](task.md)
-- consome: [Calendário](calendar.md)
+- governed_by: [ADR-105 — Trabalho, tempo e notificações](../decisions/adr-105-work.md)
+- consumes: [Ticket](ticket.md)
+- consumes: [Tarefa](task.md)
+- consumes: [Calendário](calendar.md)

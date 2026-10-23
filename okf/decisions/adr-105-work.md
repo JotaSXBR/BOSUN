@@ -24,10 +24,10 @@ generated:
 6. **Notificações** in-app e web push para: conversa nova na fila, conversa atribuída a mim, tarefa atribuída a mim, venda confirmada, falha de publicação e conexão expirada. Cada pessoa liga ou desliga cada tipo. Sem níveis, silêncio nem e-mail.
 7. Notificação guarda só a referência e resolve a permissão na leitura.
 
-## Relações
+## Relations
 
-- detalha: [Tarefa](../product/task.md)
-- detalha: [Projeto](../product/project.md)
-- detalha: [Calendário](../product/calendar.md)
-- detalha: [Meu dia](../product/my-day.md)
-- detalha: [Notificação](../product/notification.md)
+- details: [Tarefa](../product/task.md)
+- details: [Projeto](../product/project.md)
+- details: [Calendário](../product/calendar.md)
+- details: [Meu dia](../product/my-day.md)
+- details: [Notificação](../product/notification.md)

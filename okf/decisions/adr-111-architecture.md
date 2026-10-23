@@ -30,8 +30,8 @@ generated:
 12. Conteúdo de mensagens é dado não confiável.
 13. **Risco de calendário:** o App Review da Meta e a verificação do app no Google Cloud (escopos sensíveis de Contatos, Agenda e upload no YouTube) levam semanas e precisam começar antes do código.
 
-## Relações
+## Relations
 
-- detalha: [Arquitetura](../tech/architecture.md)
-- detalha: [Modelo de dados](../tech/data-model.md)
-- detalha: [LGPD](../product/lgpd.md)
+- details: [Arquitetura](../tech/architecture.md)
+- details: [Modelo de dados](../tech/data-model.md)
+- details: [LGPD](../product/lgpd.md)
