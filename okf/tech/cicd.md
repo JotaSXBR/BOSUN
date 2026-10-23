@@ -29,6 +29,15 @@ sources:
   - id: coolify-api
     resource: https://coolify.io/docs/api-reference/authorization
     title: Coolify API authorization
+  - id: gha-billing
+    resource: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+    title: GitHub Actions billing (repositórios públicos)
+  - id: gha-environments
+    resource: https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments
+    title: GitHub deployment environments
+  - id: gha-fork-pr
+    resource: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-runs
+    title: Workflows de pull request vindos de fork
   - id: trivy-incident
     resource: https://www.aikido.dev/blog/trivy-alternatives
     title: Trivy alternatives (incidente de 2026)
@@ -48,7 +57,8 @@ Desenhado do zero para a BOSUN: um app Next.js, uma imagem, um compose no Coolif
 3. **Menor privilégio:** `permissions: contents: read` no topo; escrita só no job que precisa; segredos de deploy só no workflow de release[^gha-hardening].
 4. **Ações fixadas por SHA** de 40 caracteres, com comentário da versão; o Dependabot atualiza[^gha-best].
 5. **Sem `pull_request_target`**, build e publicação em jobs separados, cache só de branches confiáveis. Foi exatamente esse conjunto de falhas que permitiu os ataques de cache e de token em 2026[^gha-hardening][^trivy-incident].
-6. **Enxuto:** um repositório só (sem Turbo), dois workflows, cabe nos 2.000 minutos mensais do plano gratuito para repositório privado[^gha-pricing].
+6. **Enxuto:** um repositório só (sem Turbo), dois workflows. O repositório é **público**: os runners padrão do GitHub não cobram minutos[^gha-billing].
+7. **Repositório público:** nada de domínio, IP, URL do Coolify ou dado da piloto no código ou no `okf/`; tudo isso fica em segredos e variáveis do ambiente. PR de fork roda o `ci.yml` sem segredos e com token só de leitura[^gha-fork-pr]; runner self-hosted nunca.
 
 ## Workflow `ci.yml` (pull request e push na `main`)
 
@@ -61,7 +71,7 @@ Desenhado do zero para a BOSUN: um app Next.js, uma imagem, um compose no Coolif
 | `e2e` | build de produção + Playwright, com serviços externos falsos | sim |
 | `security` | gitleaks (segredos); osv-scanner no `pnpm-lock.yaml`; Semgrep CE (TypeScript + OWASP Top 10) | sim, para achado alto ou crítico |
 
-Estimativa: de 8 a 12 minutos por execução.
+Estimativa: de 8 a 12 minutos por execução. No repositório público também entram, de graça, o **CodeQL** (análise de código do GitHub), o **secret scanning com push protection** e os alertas do Dependabot.
 
 ## Workflow `release.yml`
 
@@ -79,7 +89,7 @@ Estimativa: de 8 a 12 minutos por execução.
 3. Atualiza `IMAGE_TAG=vX.Y.Z` no recurso stable, faz o deploy e o smoke test.
 4. Publica a release no GitHub com o SBOM e o digest.
 
-A tag de release é a aprovação humana: as regras de aprovação de ambiente do GitHub não existem em repositório privado no plano gratuito.
+A tag de release é a aprovação humana, e o job de deploy do stable usa o **environment `stable` com revisor obrigatório** (disponível no plano gratuito para repositório público)[^gha-environments]. Os segredos do Coolify ficam nos environments `beta` e `stable`, não no nível do repositório.
 
 ### Rollback
 
@@ -93,13 +103,13 @@ A tag de release é a aprovação humana: as regras de aprovação de ambiente d
 ## Manutenção
 
 - **Dependabot** semanal e agrupado para npm, GitHub Actions (atualiza os SHAs) e a imagem base do Docker.
-- **Fora do piloto:** attestations de proveniência do GitHub, porque em repositório privado exigem Enterprise Cloud[^gha-attest]. Assinatura com cosign keyless também fica de fora, porque grava o nome do repositório no log público do Sigstore. O SBOM e o digest na release cobrem a auditoria por enquanto.
+- **Proveniência:** `actions/attest-build-provenance` e a attestation do SBOM em cada imagem, disponíveis em repositório público[^gha-attest]. O deploy confere a attestation (`gh attestation verify`) antes de mudar a tag. Isso substitui o cosign.
 
 ## A conferir na Fatia 0
 
 - Os endpoints exatos da API do Coolify para atualizar variável de um recurso compose e disparar o deploy, na versão instalada.
 - O SHA atual de cada ação usada.
-- O consumo real de minutos depois das primeiras semanas.
+- Se o `gh attestation verify` roda no job de deploy sem permissão extra.
 
 [^gha-hardening]: Security hardening GitHub workflows at scale
 [^gha-best]: GitHub Actions best practices
@@ -108,6 +118,9 @@ A tag de release é a aprovação humana: as regras de aprovação de ambiente d
 [^docker-gha-cache]: Docker build cache GitHub Actions backend
 [^coolify-compose]: Coolify Docker Compose
 [^coolify-api]: Coolify API authorization
+[^gha-billing]: GitHub Actions billing (repositórios públicos)
+[^gha-environments]: GitHub deployment environments
+[^gha-fork-pr]: Workflows de pull request vindos de fork
 [^trivy-incident]: Trivy alternatives (incidente de 2026)
 [^trivy-grype]: Trivy vs Grype
 
