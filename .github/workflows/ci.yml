@@ -67,13 +67,14 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { fetch-depth: 0, persist-credentials: false }
+      # Só o histórico do commit testado (o padrão varre todas as branches do clone).
       # safe.directory: o checkout pertence ao usuário do runner, não ao do container.
       - name: gitleaks
         run: |
           docker build -q -t gitleaks .github/gitleaks
           docker run --rm -v "$PWD:/src" -w /src \
             -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/src \
-            gitleaks git --redact --no-banner .
+            gitleaks git --redact --no-banner --log-opts=HEAD .
       # Roda mesmo se o gitleaks falhar, para nenhum achado ficar escondido.
       - name: osv-scanner
         if: ${{ !cancelled() }}
