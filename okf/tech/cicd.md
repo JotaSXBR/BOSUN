@@ -3,6 +3,7 @@ type: Pipeline Design
 title: CI/CD
 description: Pipeline enxuto no GitHub Actions — checagens do padrão de qualidade, imagem única por commit, beta automático, stable por tag e rollback por tag.
 tags: [bosun, cicd, github-actions, coolify, supply-chain]
+resource: .github/workflows
 status: draft
 generated:
   by: claude-opus/5.5
@@ -56,22 +57,21 @@ Desenhado do zero para a BOSUN: um app Next.js, uma imagem, um compose no Coolif
 2. **Promover não recompila:** o stable recebe o **mesmo digest** que passou no beta, só com outra tag.
 3. **Menor privilégio:** `permissions: contents: read` no topo; escrita só no job que precisa; segredos de deploy só no workflow de release[^gha-hardening].
 4. **Ações fixadas por SHA** de 40 caracteres, com comentário da versão; o Dependabot atualiza[^gha-best].
-5. **Sem `pull_request_target`**, build e publicação em jobs separados, cache só de branches confiáveis. Foi exatamente esse conjunto de falhas que permitiu os ataques de cache e de token em 2026[^gha-hardening][^trivy-incident].
+5. **Sem `pull_request_target`**, build e publicação em jobs separados, cache só de branches confiáveis: o PR só lê o cache (`actions/cache/restore`); só a `main` grava. Foi exatamente esse conjunto de falhas que permitiu os ataques de cache e de token em 2026[^gha-hardening][^trivy-incident].
 6. **Enxuto:** um repositório só (sem Turbo), dois workflows. O repositório é **público**: os runners padrão do GitHub não cobram minutos[^gha-billing].
 7. **Repositório público:** nada de domínio, IP, URL do Coolify ou dado da piloto no código ou no `okf/`; tudo isso fica em segredos e variáveis do ambiente. PR de fork roda o `ci.yml` sem segredos e com token só de leitura[^gha-fork-pr]; runner self-hosted nunca.
 
 ## Workflow `ci.yml` (pull request e push na `main`)
 
-`concurrency` cancela a execução anterior do mesmo PR. Jobs em paralelo:
+`concurrency` cancela a execução anterior do mesmo PR (na `main` não cancela). Jobs em paralelo; a integração roda dentro do `check`, sem job próprio:
 
 | Job | Passos | Bloqueia? |
 |---|---|---|
-| `check` | Node pelo `.nvmrc`; `pnpm install --frozen-lockfile` com cache do setup-node; `tsc` (TS 7); `oxlint --deny-warnings`; Vitest com cobertura e limites; jscpd; `./scripts/validate.sh ./okf` | sim |
-| `integration` | Postgres e RustFS como `services`; `prisma migrate deploy`; testes de integração (webhooks com fixtures reais, sync Google, filas) | sim |
+| `check` | Setup comum em `.github/actions/setup` (Node pelo `.nvmrc`, pnpm, `pnpm install --frozen-lockfile`); Postgres pelo `compose.dev.yml` (mesma imagem fixada por digest do dev); self-tests dos scripts; `pnpm verify` (`tsc`, `oxlint --deny-warnings`, exceções do oxlint com motivo e teto, Vitest unitário e de integração com cobertura e limites, jscpd, `./scripts/validate.sh ./okf`) | sim |
 | `e2e` | build de produção + Playwright, com serviços externos falsos | sim |
-| `security` | gitleaks (segredos); osv-scanner no `pnpm-lock.yaml`; Semgrep CE (TypeScript + OWASP Top 10) | sim, para achado alto ou crítico |
+| `security` | gitleaks (segredos, histórico inteiro) e osv-scanner no `pnpm-lock.yaml`, cada um por imagem oficial fixada por digest em `.github/<ferramenta>/Dockerfile`, que o Dependabot renova, com o código montado só para leitura (o gitleaks também sem rede); sem a `gitleaks-action`, que tem licença comercial (reprova qualquer severidade; exceção com prazo no `osv-scanner.toml`) | sim |
 
-Estimativa: de 8 a 12 minutos por execução. No repositório público também entram, de graça, o **CodeQL** (análise de código do GitHub), o **secret scanning com push protection** e os alertas do Dependabot.
+Estimativa: de 8 a 12 minutos por execução. No repositório público também entram, de graça, o **CodeQL** (`security-extended`, a análise estática de segurança do projeto; o Semgrep saiu porque as regras do registro não têm versão fixa), o **secret scanning com push protection** e os alertas do Dependabot.
 
 ## Workflow `release.yml`
 

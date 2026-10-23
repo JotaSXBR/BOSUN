@@ -1,0 +1,6 @@
+# Exceções do osv-scanner no CI. Cada uma precisa de motivo e prazo.
+# Modelo:
+# [[IgnoredVulns]]
+# id = "GHSA-xxxx-xxxx-xxxx"
+# ignoreUntil = 2026-12-31
+# reason = "sem caminho de exploração no BOSUN; aguardando correção do upstream"

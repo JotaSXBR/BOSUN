@@ -1,0 +1,8 @@
+{
+  "threshold": 3,
+  "path": ["src", "worker", "tests", "e2e"],
+  "format": ["typescript", "tsx"],
+  "ignore": ["**/node_modules/**", "**/.next/**", "src/generated/**"],
+  "reporters": ["console"],
+  "exitCode": 1
+}

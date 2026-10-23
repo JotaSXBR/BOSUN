@@ -1,0 +1,7 @@
+# minimumReleaseAge em minutos: recusa pacote publicado há menos de 1 dia (ADR-111 item 1)
+minimumReleaseAge: 1440
+# Scripts de instalação ficam desligados; cada pacote é decidido aqui (o pnpm 12 reprova os não listados).
+# O Prisma 7 não precisa dos dele: o client vem do `prisma generate` e não há motor binário a baixar.
+allowBuilds:
+  prisma: false
+  "@prisma/engines": false

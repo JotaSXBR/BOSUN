@@ -25,21 +25,22 @@ Fontes de verdade, em ordem: o ADR do domínio (`okf/decisions/`) → o conceito
 - O trabalho segue o plano em fatias de [okf/plan/](okf/plan/index.md) e o [guia de trabalho com IA](okf/howto/ai-workflow.md): spec → teste → código → verificação → revisão. Para retomar uma sessão, siga a seção "Retomar" do guia.
 - Uma fatia por vez. Não comece código fora de uma fatia aprovada.
 - Ambiguidade que muda escopo, dados, segurança ou custo: pergunte antes de decidir.
-- Skills (brainstorming, TDD, revisão etc.) são opcionais; use se a sua ferramenta tiver.
+- Ferramenta com o plugin agent-skills (Claude Code, inclusive o app desktop no Windows): as 8 skills abaixo são fluxos obrigatórios, não sugestões. Siga os passos de cada uma em ordem, inclusive a verificação; as subskills que elas chamam não precisam ser listadas aqui. Ferramenta sem skills: siga o mesmo fluxo pelo guia de trabalho com IA.
 - Para mexer em `okf/`, siga a skill do projeto [`.claude/skills/okf-bosun/SKILL.md`](.claude/skills/okf-bosun/SKILL.md). Ferramentas sem suporte a skills: leia o arquivo e siga do mesmo jeito.
 
 ## Integração com agent-skills
 
-Invoque sempre pelo nome completo. Toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` + `/agent-skills:code-simplify` (e `/agent-skills:webperf` em tela pesada) → `/agent-skills:ship`.
+Invoque sempre pelo nome completo. São 8: toda fatia passa, em ordem, por `/agent-skills:spec` → `/agent-skills:plan` → `/agent-skills:build` + `/agent-skills:test` → `/agent-skills:review` → `/agent-skills:code-simplify` (logo após cada review) → `/agent-skills:ship`. `/agent-skills:webperf` entra depois do review só em fatia com tela pesada.
 
 O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprovações; o lugar é este:
 
 - Spec da fatia (objetivo, critérios de sucesso, perguntas abertas): `okf/plan/slice-XX.md`, seções Objetivo, Spec, Critério de aceite e Perguntas abertas.
 - Stack e comandos: [okf/tech/stack.md](okf/tech/stack.md) e a seção Comandos abaixo.
 - Estrutura, estilo de código e fronteiras: [okf/tech/engineering.md](okf/tech/engineering.md).
-- Padrão de qualidade (`CONSTRAINTS.md` do `/agent-skills:constraints`): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
+- Padrão de qualidade (o `CONSTRAINTS.md` do agent-skills): [okf/tech/quality-gate.md](okf/tech/quality-gate.md).
 - Plano e lista de tarefas (`tasks/plan.md`, `tasks/todo.md`): seção `## Tarefas` da fatia, checklist no formato de tarefa do agent-skills.
-- **Modelos dos agentes:** a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes rodam no Sonnet por padrão (`.claude/settings.json`). Agentes do projeto em `.claude/agents/`: `bosun-explorer` (Haiku, busca), `bosun-implementer` (Sonnet, tarefa em paralelo), `bosun-reviewer` (Sonnet, esforço alto).
+- **Agentes do projeto** (`.claude/agents/`): a sessão principal (orquestra, especifica, decide) roda no Opus; subagentes no Sonnet por padrão (`.claude/settings.json`). `explorer` (Haiku, busca), `implementer` (Sonnet, tarefa em paralelo numa worktree da branch atual, começa por `/agent-skills:build`), `code-reviewer` (revisão de cada tarefa, começa por `/agent-skills:review`), `security-auditor` e `test-engineer`. `code-reviewer`, `security-auditor` e `test-engineer` têm o mesmo nome das personas do plugin, por isso o `/agent-skills:ship` usa os do projeto no lugar delas. Só o `explorer` é só leitura por ferramenta; os outros três têm `Bash` e não editam o projeto por regra do prompt: rodam testes e comandos de leitura e devolvem achados.
+- **Branch e PR:** uma branch `slice-XX` por fatia; commit e `code-reviewer` a cada tarefa, sem PR por tarefa. O `/agent-skills:ship` roda antes de cada PR para a `main` (o merge faz o deploy no beta): um PR por fatia; na Fatia 0, um PR por módulo, na mesma branch `slice-00`.
 - **Não crie `SPEC.md` nem `CONSTRAINTS.md` com conteúdo, nem a pasta `tasks/`.** O `SPEC.md` da raiz é só um ponteiro para a fatia ativa; atualize-o ao começar uma fatia. O validador falha se isso for violado.
 
 
@@ -64,22 +65,46 @@ O sistema de spec do projeto é o OKF. As skills cuidam do conteúdo e das aprov
 
 ## Bibliotecas
 
-Antes de escrever código que usa uma biblioteca, framework, SDK ou API externa, confira a documentação oficial **da versão em uso** (veja o `package.json`). Use o Context7 quando a sua ferramenta tiver (recomendado, não obrigatório). Não confie em memória para APIs que mudam (Next.js, Auth.js, Prisma, Meta Graph API, YouTube Data API, Kiwify).
+Antes de escrever código que usa uma biblioteca, framework, SDK ou API externa, confira a documentação oficial **da versão em uso** (veja o `package.json`). Use o Context7 quando a sua ferramenta tiver (recomendado, não obrigatório). O Next.js traz a doc da versão instalada em `node_modules/next/dist/docs/`. Não confie em memória para APIs que mudam (Next.js, Auth.js, Prisma, Meta Graph API, YouTube Data API, Kiwify).
 
 ## Comandos
 
-Ainda não há aplicação. Hoje:
+Node pelo `.nvmrc` e pnpm pelo `packageManager`. No Windows, rode pelo Git Bash.
 
 ```bash
+# Instalar (também ativa o hook de pre-commit com gitleaks; instale o gitleaks antes)
+pnpm install --frozen-lockfile
+
+# Ambiente local: copie .env.example para .env.local e preencha
+pnpm services:up      # Postgres, RustFS e WAHA (compose.dev.yml)
+pnpm db:migrate       # schema do Prisma e do pg-boss
+pnpm dev              # web (next dev) + worker em watch
+pnpm services:down
+
+# Qualidade
+pnpm typecheck        # tsc --noEmit (TS 7)
+pnpm lint             # oxlint --deny-warnings
+bash scripts/lint_exceptions.sh   # oxlint-disable exige "-- motivo"; teto em LINT_EXCEPTIONS_MAX (ci.yml; local usa 0)
+pnpm dup              # jscpd, limite de 3%
+
+# Testes
+pnpm test:unit        # unitário, sem banco
+pnpm test:int         # integração, precisa do services:up
+pnpm test             # unitário + integração com cobertura; precisa do services:up
+pnpm test:e2e         # Playwright sobre o build de produção
+
+# Os mesmos checks do job check do CI (menos os self-tests dos scripts); precisa do services:up
+pnpm verify
+
+# Documentação
 ./scripts/validate.sh ./okf          # valida o bundle; sai 0 sem erro
 ./scripts/validate.sh ./okf --graph  # imprime nós e arestas
 ./scripts/test_validate.sh           # self-test do validador
+bash scripts/test_lint_exceptions.sh # self-test do script de exceções
 ```
 
-Quando o scaffold existir, a fatia que o criar acrescenta aqui os comandos exatos de instalar, lint, typecheck, testes (unitário, integração, E2E), migrations e ambiente local.
+CI no GitHub Actions (`.github/workflows/`): `check`, `e2e`, `security` e CodeQL, todos exigidos pelo ruleset da `main`.
 
 ## Definição de pronto
 
 Está no [guia de trabalho com IA](okf/howto/ai-workflow.md), seção "Definição de pronto". Não declare nada pronto sem cumprir todos os itens e mostrar a evidência.
-
-No Windows, rode os scripts pelo Git Bash.

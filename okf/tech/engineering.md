@@ -3,6 +3,7 @@ type: Engineering Guide
 title: Engenharia
 description: Estrutura de pastas, estilo de código e fronteiras (sempre, perguntar antes, nunca) para quem escreve código na BOSUN.
 tags: [bosun, engenharia, convenções, fronteiras]
+resource: src
 status: draft
 generated:
   by: claude-opus/5.5
@@ -25,7 +26,7 @@ src/
     jobs.ts            handlers do pg-boss
     *.test.ts          testes unitários ao lado do código
   lib/                 utilitários compartilhados (cifra, auth, logger)
-  worker.ts            entrada do processo worker (pg-boss), mesma imagem do web
+worker/                 entrada do processo worker (pg-boss), mesma imagem do web; roda .ts direto no Node, imports relativos com .ts
 prisma/schema.prisma   modelo de dados
 tests/integration/     testes de integração e fixtures de webhooks
 e2e/                   Playwright

@@ -3,6 +3,7 @@ type: Test Strategy
 title: Estratégia de testes
 description: Unitários, integração e E2E dos fluxos críticos, com ferramentas e critérios.
 tags: [bosun, testing, vitest, playwright, qa]
+resource: vitest.config.ts
 status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 ---

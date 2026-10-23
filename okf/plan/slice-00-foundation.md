@@ -18,7 +18,7 @@ generated:
 ## Escopo
 
 - Scaffold Next.js + TypeScript, Prisma + PostgreSQL, Better Auth, Tailwind/shadcn, pg-boss ([Stack](../tech/stack.md)); docker compose local com Postgres, WAHA e RustFS.
-- **Projeto-piloto de 1 hora primeiro:** Next.js 16.3 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
+- **Projeto-piloto de 1 hora primeiro:** Next.js 16.4 + Prisma 7 + Better Auth + TS 7 + Oxlint compilam e passam juntos; se não, voltar ao TS 6 e registrar no ADR-111.
 - Oxlint, typecheck (TS 7), Vitest e Playwright configurados; CI na ordem do [padrão de qualidade](../tech/quality-gate.md).
 - Docker Compose para o Coolify (`web`, `worker`, `postgres`, `waha`, `rustfs`) com variáveis geradas; tela de integrações com credenciais cifradas.
 - Entidades `Environment`, `Workspace`, `User`, `Membership`, `Invite`, `Session`, `PasswordResetRequest`, `AuditLog`, `Integration` ([Modelo de dados](../tech/data-model.md)).
@@ -57,7 +57,7 @@ Ordem: `toolchain` → `identity` → `workspace` → `audit` → `secrets`; `de
 
 **Premissas:** aplicação Next.js única (sem monorepo), `web` e `worker` da mesma imagem; pnpm; Node LTS fixado no `.nvmrc`.
 
-**Passo 1 — projeto-piloto (até 1 h, descartável, fora do repositório):** Next.js 16.3 com `experimental.useTypeScriptCli`, TS 7, Prisma 7 com uma tabela, Better Auth com email+senha, Oxlint + tsgolint. Passa se `tsc`, `oxlint`, `next build` e um login de teste funcionam. Se falhar: registrar no ADR-111 e usar TS 6 (ou Drizzle, se o problema for o Prisma).
+**Passo 1 — projeto-piloto (até 1 h, descartável, fora do repositório):** Next.js 16.4 com `experimental.useTypeScriptCli`, TS 7, Prisma 7 com uma tabela, Better Auth com email+senha, Oxlint + tsgolint. Passa se `tsc`, `oxlint`, `next build` e um login de teste funcionam. Se falhar: registrar no ADR-111 e usar TS 6 (ou Drizzle, se o problema for o Prisma).
 
 **Comandos (os nomes viram scripts no `package.json`):**
 
@@ -66,13 +66,14 @@ pnpm install --frozen-lockfile
 pnpm dev            # next dev + worker em watch
 pnpm typecheck      # tsc --noEmit
 pnpm lint           # oxlint --deny-warnings
-pnpm test           # vitest run --coverage
+pnpm test           # vitest run --coverage (unit + integration; precisa do compose)
+pnpm test:unit      # vitest run --project unit (sem banco)
 pnpm test:int       # vitest run --project integration (Postgres e RustFS reais)
 pnpm test:e2e       # playwright test
 pnpm dup            # jscpd
 pnpm db:migrate     # prisma migrate dev
-pnpm verify         # typecheck + lint + test + dup + ./scripts/validate.sh ./okf
-docker compose -f compose.dev.yml up -d   # postgres, rustfs, waha
+pnpm verify         # typecheck + lint + lint_exceptions + test + dup + ./scripts/validate.sh ./okf
+pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 ```
 
 **Estrutura:** a de [Engenharia](../tech/engineering.md); a fatia cria só as pastas que usa.
@@ -80,7 +81,7 @@ docker compose -f compose.dev.yml up -d   # postgres, rustfs, waha
 **Entrega:**
 - `.oxlintrc.json` com as regras e limites do padrão de qualidade; `vitest.config.ts` com limites de cobertura; `.jscpd.json`.
 - `compose.dev.yml` com Postgres, RustFS e WAHA; `.env.example` sem nenhum valor real.
-- `.github/workflows/ci.yml` como em [CI/CD](../tech/cicd.md), ações fixadas por SHA; `dependabot.yml`; pre-commit com gitleaks.
+- `.github/workflows/ci.yml` como em [CI/CD](../tech/cicd.md), ações fixadas por SHA; `dependabot.yml`; hook de pre-commit com gitleaks.
 - Página inicial mínima e o `worker` com um job de exemplo no pg-boss.
 
 **Critério de aceite:**
@@ -137,34 +138,38 @@ Feito com `/agent-skills:plan` em 2026-10-23. Módulo `toolchain`; os outros mó
 
 Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em paralelo.
 
-- [ ] **T1 — Projeto-piloto da stack** (fora do repositório, até 1 h)
-  - Aceite: Next 16.3 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
+- [x] **T1 — Projeto-piloto da stack** (fora do repositório, até 1 h)
+  - Aceite: Next 16.4 + `useTypeScriptCli` + TS 7, Prisma 7 com uma tabela, Better Auth email+senha e Oxlint + tsgolint passam em `tsc`, `oxlint`, `next build` e um login de teste. Opções do `max-lines` e o `oxlint-plugin-complexity` como jsPlugin conferidos.
   - Verificar: saída dos quatro comandos colada no log; resultado (passou ou fallback) registrado no ADR-111.
   - Arquivos: `okf/decisions/adr-111-architecture.md`, `okf/log.md`.
-- [ ] **T2 — Scaffold que roda** (fatia vertical mínima)
+- [x] **T2 — Scaffold que roda** (fatia vertical mínima)
   - Aceite: `pnpm install --frozen-lockfile` + `pnpm dev` abre a página inicial; versões exatas; `.nvmrc`; `.env.example` sem valor real.
   - Verificar: clone limpo em pasta temporária, os dois comandos, página responde 200.
-  - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `app/page.tsx`, `.env.example`.
-- [ ] **T3 — Banco e worker locais**
+  - Arquivos: `package.json`, `pnpm-lock.yaml`, `.nvmrc`, `next.config.ts`, `tsconfig.json`, `src/app/page.tsx`, `src/app/layout.tsx`, `pnpm-workspace.yaml`, `.env.example`.
+- [x] **T3 — Banco e worker locais**
   - Aceite: `compose.dev.yml` sobe Postgres, RustFS e WAHA; `pnpm db:migrate` cria o schema e o do pg-boss; o `worker` processa um job de exemplo enfileirado pelo `web`.
   - Verificar: `docker compose -f compose.dev.yml up -d`, `pnpm db:migrate`, log do worker com o job concluído.
-  - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma/migrations/`, `worker/index.ts`, `lib/queue.ts`.
-- [ ] **T4 — Lint e typecheck no padrão de qualidade**
+  - Arquivos: `compose.dev.yml`, `prisma/schema.prisma`, `prisma.config.ts`, `worker/index.ts`, `worker/migrate.ts`, `src/lib/queue.ts`, `src/app/api/dev/example-job/route.ts`. `prisma/migrations/` nasce com o primeiro modelo, no `identity`.
+- [x] **T4 — Lint e typecheck no padrão de qualidade**
   - Aceite: `.oxlintrc.json` com todas as regras e limites do [padrão de qualidade](../tech/quality-gate.md); `pnpm typecheck` e `pnpm lint` saem 0; um arquivo de teste com `any` e outro com função de 61 linhas falham.
   - Verificar: os dois comandos verdes; os dois casos ruins vermelhos (e removidos depois).
-  - Arquivos: `.oxlintrc.json`, `package.json`.
-- [ ] **T5 — Testes, cobertura e duplicação**
+  - Arquivos: `.oxlintrc.json`, `package.json`, `src/lib/logger.ts` (único ponto com `console`).
+- [x] **T5 — Testes, cobertura e duplicação**
   - Aceite: Vitest com projetos `unit` e `integration` e limites de cobertura; Playwright com um teste da página inicial; jscpd com limite de 3%; `pnpm verify` sai 0.
   - Verificar: `pnpm test`, `pnpm test:int` (contra o compose), `pnpm test:e2e`, `pnpm dup`, `pnpm verify`.
-  - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`.
-- [ ] **T6 — CI e cadeia de suprimentos**
-  - Aceite: `ci.yml` com os jobs `check`, `integration`, `e2e`, `security` (gitleaks, osv-scanner, Semgrep) e CodeQL, ações fixadas por SHA e `permissions: contents: read`; `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
+  - Arquivos: `vitest.config.ts`, `playwright.config.ts`, `e2e/home.spec.ts`, `.jscpd.json`, `package.json`, `tests/integration/`, `src/lib/worker.ts` e os `*.test.ts`. A meta de 90% de ramos nos módulos críticos entra nas fatias que os criam.
+- [x] **T6 — CI e cadeia de suprimentos**
+  - Aceite: `ci.yml` com os jobs `check`, `e2e`, `security` (gitleaks, osv-scanner) e CodeQL (o Semgrep saiu: regras do registro sem versão fixa), ações fixadas por SHA e `permissions: contents: read`; job `check` com Postgres de serviço (o `pnpm test` inclui a integração), `playwright install chromium` no job `e2e`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
   - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
-  - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.pre-commit-config.yaml` ou hook equivalente.
-- [ ] **T7 — Fechamento do módulo**
+  - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.githooks/pre-commit`, `osv-scanner.toml`, `scripts/lint_exceptions.sh` e o self-test. Sem job `integration` próprio: a integração roda no `check`. Hook git em vez do framework pre-commit, que exigiria Python e Go.
+- [x] **T7 — Fechamento do módulo**
   - Aceite: comandos exatos no `AGENTS.md` (seção Comandos); `resource` preenchido nos conceitos materializados; os quatro critérios de aceite do `toolchain` com evidência.
   - Verificar: `./scripts/validate.sh ./okf` sem erro; revisão com `/agent-skills:review`.
   - Arquivos: `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.
+
+**Pendências do `/agent-skills:ship` do `toolchain`** (2026-10-23), a assumir nos módulos indicados:
+- `identity`: CSP com nonce (os outros cabeçalhos de segurança já estão no `next.config.ts`); remover ou bloquear `/api/dev/*` quando houver auth; limite de 90% de ramos no Vitest por glob do módulo; testes de banco fora do ar na rota, de job que falha com retry, de job duplicado e de shutdown com job em andamento; `createShutdown` com timeout no `stop`; confirmar o job pelo estado no pg-boss, não pelo texto do log; portas do compose configuráveis para worktrees em paralelo.
+- `delivery`: dois papéis no Postgres (`migrate` com DDL, `web` e `worker` sem) e `sslmode` explícito fora do loopback; healthcheck de RustFS e WAHA; cobertura de 80% também no código novo (diferencial).
 
 **Ponto de checagem:** depois da T1 (stack confirmada ou trocada) e depois da T7 (módulo aceito), antes de escrever a spec do `identity`.
 

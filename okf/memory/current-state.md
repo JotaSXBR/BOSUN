@@ -21,16 +21,14 @@ generated:
 
 ## Em aberto
 
-- Aprovar o [padrão de qualidade](../tech/quality-gate.md) (limites propostos).
-- Confirmar na Fatia 0: Prisma 7 e Next.js com TS 7; opções do Oxlint; campos de sessão no Better Auth.
+- Confirmar na Fatia 0: campos de sessão no Better Auth (o modelo padrão já traz `ipAddress` e `userAgent`).
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
 
 ## Próximo passo
 
-- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Próxima tarefa: **T1** (projeto-piloto, sem tela). Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência. Na T6: licença e CodeQL.
+- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Módulo `toolchain` concluído (T1–T7, critérios de aceite com evidência no log). Próximo: **spec do módulo `identity`** com `/agent-skills:spec`, depois do ponto de checagem com o usuário. Trabalho na branch `slice-00`; na Fatia 0, um PR por módulo, via `/agent-skills:ship` (o do `toolchain` é o próximo); da Fatia 1 em diante, um PR por fatia. Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
-- Decidir a licença do repositório público (ADR-111 item 14).
 0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).
 1. O usuário revisa e aprova o [plano em fatias](../plan/index.md).
 2. Começar a [Fatia 0](../plan/slice-00-foundation.md) e, no mesmo dia, o App Review da Meta e a verificação do Google.

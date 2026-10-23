@@ -3,6 +3,7 @@ type: Quality Gate
 title: Padrão de qualidade
 description: Limites de lint, complexidade, tamanho, cobertura, duplicação, segurança, dependências e licenças que o CI exige e uma auditoria externa confere.
 tags: [bosun, qualidade, oxlint, auditoria, ci]
+resource: .oxlintrc.json
 status: draft
 generated:
   by: claude-opus/5.5
@@ -39,7 +40,7 @@ sources:
 
 # Padrão de qualidade
 
-O que o CI exige em todo pull request e o que uma auditoria externa (due diligence técnica, revisão de segurança) costuma conferir. Os números são **propostas** baseadas em padrões de mercado e só valem depois de aprovados. É o `CONSTRAINTS.md` do agent-skills (`/agent-skills:constraints`), guardado no OKF.
+O que o CI exige em todo pull request e o que uma auditoria externa (due diligence técnica, revisão de segurança) costuma conferir. Os números se baseiam em padrões de mercado e foram **aprovados pelo usuário em 2026-10-23** (complexidade, tamanho, cobertura, duplicação e teto de exceções). É o `CONSTRAINTS.md` do agent-skills (`/agent-skills:constraints`), guardado no OKF.
 
 ## Em que se baseia
 
@@ -63,6 +64,7 @@ O que o CI exige em todo pull request e o que uma auditoria externa (due diligen
 | `max-params` | 4 | Acima disso, um objeto |
 | `max-nested-callbacks` | 3 | |
 | `typescript/no-explicit-any` | erro | Tipagem é a primeira linha de defesa |
+| `typescript/ban-ts-comment` | erro | `@ts-ignore` e `@ts-nocheck` desligam o typecheck; `@ts-expect-error` só com descrição |
 | `typescript/no-floating-promises`, `no-misused-promises` | erro | Promessa solta perde erro e dado |
 | `import/no-cycle` | erro | Módulos sem dependência circular ([Engenharia](engineering.md)) |
 | `no-console` | erro | Log só pelo logger, sem dado sensível |
@@ -90,10 +92,9 @@ Todas as 871 regras do Oxlint estão na referência oficial[^oxlint-rules]. Arqu
 
 ## Segurança e dependências
 
-- **Semgrep CE** com as regras de TypeScript e OWASP Top 10: achado alto ou crítico reprova.
-- **gitleaks** no CI e no pre-commit, mais o secret scanning com push protection do GitHub: nenhum segredo no repositório, que é público.
-- **CodeQL** (JavaScript/TypeScript) em todo PR: alerta alto ou crítico reprova.
-- **osv-scanner** no lockfile e **Grype** na imagem: nenhuma vulnerabilidade alta ou crítica sem exceção registrada com prazo. Trivy fica de fora pelo comprometimento de 2026 ([CI/CD](cicd.md)).
+- **CodeQL** `security-extended` (TypeScript e workflows do Actions): achado alto ou crítico reprova pela regra de code scanning do ruleset da `main`.
+- **gitleaks** no CI e no hook de pre-commit (`.githooks/pre-commit`, ativado pelo `pnpm install`), mais o secret scanning com push protection do GitHub: nenhum segredo no repositório, que é público.
+- **osv-scanner** no lockfile: nenhuma vulnerabilidade, de qualquer severidade, sem exceção com motivo e prazo no `osv-scanner.toml`. **Grype** na imagem: nenhuma alta ou crítica sem exceção registrada com prazo. Trivy fica de fora pelo comprometimento de 2026 ([CI/CD](cicd.md)).
 - **SBOM CycloneDX** (Syft) gerado a cada release e guardado com a imagem.
 - **Licenças**: só MIT, Apache-2.0, BSD, ISC e semelhantes nas dependências embutidas na imagem da BOSUN; GPL e AGPL reprovam. Serviços que rodam em container separado (WAHA, RustFS) têm a licença conferida e registrada no ADR-111.
 - Fluxos com auth, sessão, autorização, cifra ou logs seguem o checklist do ASVS nível 2 no `/review`.
@@ -106,15 +107,18 @@ Detalhe dos workflows em [CI/CD](cicd.md).
 2. `oxlint --deny-warnings`.
 3. Testes com cobertura.
 4. jscpd.
-5. Semgrep, CodeQL, gitleaks, osv-scanner.
+5. CodeQL, gitleaks, osv-scanner.
 6. Build da imagem, SBOM e conferência de licenças.
 7. `./scripts/validate.sh ./okf`.
 
 ## A conferir na Fatia 0
 
-- Opções exatas do `max-lines` e do `max-lines-per-function` no Oxlint (ignorar linhas brancas e comentários).
-- Se o `oxlint-plugin-complexity` roda como `jsPlugin` na versão fixada.
-- Prisma 7 e Next.js 16.3 com TS 7: não há declaração oficial do Prisma; um projeto-piloto de 1 hora confirma ou reverte para o TS 6.
+Conferido na T1 (2026-10-23):
+
+- `max-lines` e `max-lines-per-function` aceitam `skipBlankLines` e `skipComments`; testado.
+- O `oxlint-plugin-complexity` 4.0.0 roda como `jsPlugin` com a regra `complexity/complexity`, mas precisa de `"minLines": 0`: o padrão (10) ignora funções curtas. A ciclomática usa a regra nativa `complexity`.
+- Prisma 7.10.1 e Next.js 16.4.2 com TS 7.0.2 passam juntos; sem volta ao TS 6.
+- Conferido na T4: o oxlint não exige o `-- motivo` nas exceções nem as conta; o CI da T6 faz isso. A ciclomática fica só na regra nativa `complexity`, porque o plugin também a reporta e duplicaria o erro.
 
 [^oxlint-rules]: Oxlint rules
 [^oxlint-config]: Oxlint configuration
