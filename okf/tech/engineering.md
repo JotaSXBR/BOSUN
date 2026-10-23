@@ -3,6 +3,7 @@ type: Engineering Guide
 title: Engenharia
 description: Estrutura de pastas, estilo de código e fronteiras (sempre, perguntar antes, nunca) para quem escreve código na BOSUN.
 tags: [bosun, engenharia, convenções, fronteiras]
+resource: src
 status: draft
 generated:
   by: claude-opus/5.5

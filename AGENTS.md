@@ -68,18 +68,42 @@ Antes de escrever código que usa uma biblioteca, framework, SDK ou API externa,
 
 ## Comandos
 
-Ainda não há aplicação. Hoje:
+Node pelo `.nvmrc` e pnpm pelo `packageManager`. No Windows, rode pelo Git Bash.
 
 ```bash
+# Instalar (também ativa o hook de pre-commit com gitleaks; instale o gitleaks antes)
+pnpm install --frozen-lockfile
+
+# Ambiente local: copie .env.example para .env.local e preencha
+pnpm services:up      # Postgres, RustFS e WAHA (compose.dev.yml)
+pnpm db:migrate       # schema do Prisma e do pg-boss
+pnpm dev              # web (next dev) + worker em watch
+pnpm services:down
+
+# Qualidade
+pnpm typecheck        # tsc --noEmit (TS 7)
+pnpm lint             # oxlint --deny-warnings
+bash scripts/lint_exceptions.sh   # oxlint-disable exige "-- motivo"; teto em LINT_EXCEPTIONS_MAX (ci.yml; local usa 0)
+pnpm dup              # jscpd, limite de 3%
+
+# Testes
+pnpm test:unit        # unitário, sem banco
+pnpm test:int         # integração, precisa do services:up
+pnpm test             # unitário + integração com cobertura; precisa do services:up
+pnpm test:e2e         # Playwright sobre o build de produção
+
+# Os mesmos checks do job check do CI (menos os self-tests dos scripts); precisa do services:up
+pnpm verify
+
+# Documentação
 ./scripts/validate.sh ./okf          # valida o bundle; sai 0 sem erro
 ./scripts/validate.sh ./okf --graph  # imprime nós e arestas
 ./scripts/test_validate.sh           # self-test do validador
+bash scripts/test_lint_exceptions.sh # self-test do script de exceções
 ```
 
-Quando o scaffold existir, a fatia que o criar acrescenta aqui os comandos exatos de instalar, lint, typecheck, testes (unitário, integração, E2E), migrations e ambiente local.
+CI no GitHub Actions (`.github/workflows/`): `check`, `e2e`, `security` e CodeQL, todos exigidos pelo ruleset da `main`.
 
 ## Definição de pronto
 
 Está no [guia de trabalho com IA](okf/howto/ai-workflow.md), seção "Definição de pronto". Não declare nada pronto sem cumprir todos os itens e mostrar a evidência.
-
-No Windows, rode os scripts pelo Git Bash.

@@ -19,7 +19,7 @@
     "test:int": "vitest run --project integration",
     "test:e2e": "playwright test",
     "dup": "jscpd",
-    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm dup && bash ./scripts/validate.sh ./okf",
+    "verify": "pnpm typecheck && pnpm lint && bash ./scripts/lint_exceptions.sh && pnpm test && pnpm dup && bash ./scripts/validate.sh ./okf",
     "test:unit": "vitest run --project unit",
     "prepare": "git config core.hooksPath .githooks || exit 0"
   },

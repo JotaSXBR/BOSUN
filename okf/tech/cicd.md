@@ -3,6 +3,7 @@ type: Pipeline Design
 title: CI/CD
 description: Pipeline enxuto no GitHub Actions — checagens do padrão de qualidade, imagem única por commit, beta automático, stable por tag e rollback por tag.
 tags: [bosun, cicd, github-actions, coolify, supply-chain]
+resource: .github/workflows
 status: draft
 generated:
   by: claude-opus/5.5

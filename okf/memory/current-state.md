@@ -28,7 +28,7 @@ generated:
 
 ## Próximo passo
 
-- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). T1 a T6 concluídas (stack, scaffold, compose local com worker, lint, testes, CI com ruleset na `main`). Próxima: **T7** (fechamento do módulo: comandos no `AGENTS.md`, `resource` dos conceitos, critérios de aceite). Trabalho na branch `slice-00`; PR só depois da última fatia, via `/agent-skills:ship`. Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
+- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Módulo `toolchain` concluído (T1–T7, critérios de aceite com evidência no log). Próximo: **spec do módulo `identity`** com `/agent-skills:spec`, depois do ponto de checagem com o usuário. Trabalho na branch `slice-00`; PR só depois da última fatia, via `/agent-skills:ship`. Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
 0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).
 1. O usuário revisa e aprova o [plano em fatias](../plan/index.md).

@@ -3,6 +3,7 @@ type: Quality Gate
 title: Padrão de qualidade
 description: Limites de lint, complexidade, tamanho, cobertura, duplicação, segurança, dependências e licenças que o CI exige e uma auditoria externa confere.
 tags: [bosun, qualidade, oxlint, auditoria, ci]
+resource: .oxlintrc.json
 status: draft
 generated:
   by: claude-opus/5.5

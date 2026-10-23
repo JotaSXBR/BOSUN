@@ -72,7 +72,7 @@ pnpm test:int       # vitest run --project integration (Postgres e RustFS reais)
 pnpm test:e2e       # playwright test
 pnpm dup            # jscpd
 pnpm db:migrate     # prisma migrate dev
-pnpm verify         # typecheck + lint + test + dup + ./scripts/validate.sh ./okf
+pnpm verify         # typecheck + lint + lint_exceptions + test + dup + ./scripts/validate.sh ./okf
 pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 ```
 
@@ -162,7 +162,7 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
   - Aceite: `ci.yml` com os jobs `check`, `e2e`, `security` (gitleaks, osv-scanner) e CodeQL (o Semgrep saiu: regras do registro sem versão fixa), ações fixadas por SHA e `permissions: contents: read`; job `check` com Postgres de serviço (o `pnpm test` inclui a integração), `playwright install chromium` no job `e2e`; passo que reprova `oxlint-disable` sem `-- motivo` e conta as exceções contra um teto (o oxlint não faz isso); `dependabot.yml`; pre-commit com gitleaks; secret scanning e push protection ligados no GitHub.
   - Verificar: PR de teste verde em até 12 min; três PRs de teste (`any`, função longa, segredo falso) bloqueados.
   - Arquivos: `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `.githooks/pre-commit`, `osv-scanner.toml`, `scripts/lint_exceptions.sh` e o self-test. Sem job `integration` próprio: a integração roda no `check`. Hook git em vez do framework pre-commit, que exigiria Python e Go.
-- [ ] **T7 — Fechamento do módulo**
+- [x] **T7 — Fechamento do módulo**
   - Aceite: comandos exatos no `AGENTS.md` (seção Comandos); `resource` preenchido nos conceitos materializados; os quatro critérios de aceite do `toolchain` com evidência.
   - Verificar: `./scripts/validate.sh ./okf` sem erro; revisão com `/agent-skills:review`.
   - Arquivos: `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.

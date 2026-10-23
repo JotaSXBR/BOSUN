@@ -3,6 +3,7 @@ type: Technology Decision
 title: Stack da aplicação
 description: Opção A aprovada, justificativa, alternativas e pontos em aberto.
 tags: [bosun, stack, nextjs, prisma, better-auth, postgres]
+resource: package.json
 status: draft
 generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:00Z }
 sources:
