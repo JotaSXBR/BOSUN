@@ -8,6 +8,7 @@ Sistema operacional pessoal, web-first e multiusuário. O trabalho atual é defi
 
 ## Comece aqui
 
+- [Perfil OKF BOSUN](okf-profile.md) - Regra de escrita do bundle e do validador.
 - [Método de trabalho](method.md) - Como o projeto é conduzido, como decisões são registradas e como retomar.
 - [Handoff para produto completo](memory/handoff.md) - Estado após as rodadas 1 a 8; aprovações e reconciliação pendentes.
 - [Estado atual](memory/current-state.md) - O que está decidido, aberto e qual é o próximo passo.
