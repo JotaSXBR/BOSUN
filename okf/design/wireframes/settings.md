@@ -46,8 +46,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 **Validar:** personalização; ordem; status resolvedor; exclusão segura.
 
-## Links
+## Relations
 
-- [Papéis e permissões](../../product/role.md)
-- [Caixa de atendimento](../../product/ticket.md)
-- [Índice de wireframes](index.md)
+- details: [Papéis](../../product/role.md)
+- part_of: [Mapa de telas](../screen-map.md)

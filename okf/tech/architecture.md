@@ -13,7 +13,7 @@ generated:
 
 ## Contexto
 
-Um monolito Next.js por instalação, numa VPS dedicada ([Deploy](deploy.md)). Integrações externas: Meta Graph API (Instagram e Facebook), WAHA (WhatsApp), YouTube Data API, Google People API, Google Calendar API, Kiwify (webhook) e o widget do chat do site. Stack em [Stack](stack.md).
+Um monolito Next.js por instalação, numa VPS dedicada ([Deploy](deployment.md)). Integrações externas: Meta Graph API (Instagram e Facebook), WAHA (WhatsApp), YouTube Data API, Google People API, Google Calendar API, Kiwify (webhook) e o widget do chat do site. Stack em [Stack](stack.md).
 
 ## Módulos
 
@@ -74,3 +74,7 @@ Contatos: jobs incrementais com `syncToken` e escrita sequencial com `etag` ([Go
 - governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
 - depends_on: [Stack](stack.md)
 - depends_on: [Modelo de dados](data-model.md)
+- depends_on: [WhatsApp via WAHA/GOWS](whatsapp.md)
+- depends_on: [Google People API](google-people.md)
+- depends_on: [Mídia e RustFS](media.md)
+- depends_on: [Deploy e operação](deployment.md)

@@ -59,7 +59,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 **Validar:** alerta interno; senha temporária; troca forçada; complexidade e confirmação; explicação do motivo.
 
-## Links
+## Relations
 
-- [Autenticação](../../tech/auth.md)
-- [Índice de wireframes](index.md)
+- details: [Autenticação e sessão](../../tech/auth.md)
+- part_of: [Mapa de telas](../screen-map.md)

@@ -94,8 +94,7 @@ sources:
 6. Conflito de etag não sobrescreve alteração concorrente.
 7. Etiqueta removida gera pergunta ao usuário.
 
-## Links
+## Relations
 
-- [Contatos e Google](../product/google-contacts.md)
-- [ADR-106](../decisions/adr-106-contacts.md)
-- [Modelo de dados](data-model.md)
+- governed_by: [ADR-106 — Contatos, CRM e venda](../decisions/adr-106-contacts.md)
+- details: [Google Contatos](../product/google-contacts.md)

@@ -35,3 +35,4 @@ generated:
 - details: [Arquitetura](../tech/architecture.md)
 - details: [Modelo de dados](../tech/data-model.md)
 - details: [LGPD](../product/lgpd.md)
+- details: [Estratégia de testes](../tech/test-strategy.md)

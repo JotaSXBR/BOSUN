@@ -90,3 +90,6 @@ npx -y @mfdaves/okf-mcp@0.9.1 --root ./okf validate
 
 - **Critério de stable:** um doc vira `stable` quando não tem item em aberto que bloqueie o design e cada decisão dele tem ADR. O resto vai para uma seção "Capacidade futura".
 
+## Relations
+
+- governed_by: [Perfil OKF BOSUN](okf-profile.md)

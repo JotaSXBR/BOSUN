@@ -46,7 +46,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 +--------------------------------------------------------------+
 ```
 
-## Links
+## Relations
 
-- [Contatos e Google](../../product/google-contacts.md)
-- [Índice de wireframes](index.md)
+- details: [Contato](../../product/contact.md)
+- part_of: [Mapa de telas](../screen-map.md)

@@ -73,8 +73,7 @@ sources:
 - Objetos grandes podem tornar o backup lento.
 - A retenção de mídia precisa ser consistente com mensagens e auditoria.
 
-## Links
+## Relations
 
-- [ADR-111](../decisions/adr-111-architecture.md)
-- [Deploy](deploy.md)
-- [WhatsApp/WAHA](whatsapp-waha.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- details: [Documento](../product/document.md)

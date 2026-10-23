@@ -50,7 +50,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 +--------------------------------------+
 ```
 
-## Links
+## Relations
 
-- [Caixa de atendimento](../../product/ticket.md)
-- [Índice de wireframes](index.md)
+- details: [Ticket](../../product/ticket.md)
+- part_of: [Mapa de telas](../screen-map.md)

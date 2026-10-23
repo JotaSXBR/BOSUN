@@ -13,7 +13,7 @@ generated:
 
 Uma biblioteca por workspace, navegável, com busca e etiquetas.
 
-- **Arquivo**: upload para o RustFS ([Mídia e RustFS](../tech/media-rustfs.md)); nome, etiquetas, tipo e tamanho. Limite de 100 MB por arquivo e 1 GB por vídeo.
+- **Arquivo**: upload para o RustFS ([Mídia e RustFS](../tech/media.md)); nome, etiquetas, tipo e tamanho. Limite de 100 MB por arquivo e 1 GB por vídeo.
 - **Link**: URL externa com título, descrição e etiquetas; nunca uma cópia da página. Cobre os "links úteis" do time.
 - Usado como mídia do [Post](post.md) e como material de entrega da [Automação](automation.md).
 - Arquivo em uso por post agendado ou por fluxo ativo não pode ser excluído; a tela mostra onde está em uso.

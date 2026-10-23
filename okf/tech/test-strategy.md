@@ -74,8 +74,7 @@ Fluxos críticos:
 - Restauração de backup é validada mensalmente.
 - Testes rodam no CI antes do deploy.
 
-## Links
+## Relations
 
-- [ADR-111](../decisions/adr-111-architecture.md)
-- [Plano](../plan/index.md)
-- [Deploy](deploy.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- details: [Arquitetura](architecture.md)

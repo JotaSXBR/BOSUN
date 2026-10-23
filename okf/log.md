@@ -2,6 +2,7 @@
 
 ## 2026-10-23
 
+- **Migração para o perfil:** verbos de relação e seção `## Relations` em inglês; todos os concepts com relações; renomeados `tech/whatsapp.md`, `tech/media.md`, `tech/deployment.md`, `tech/test-strategy.md` e `design/screen-map.md`. `validate.sh` com 0 erros.
 - **Corte do piloto** (vereditos do usuário em 64 cartões): o produto virou o golden path post → comentário → automação → atendimento → CRM → venda → tarefa → calendário → Meu dia. Adiados em `product/later.md`.
 - **Removidos:** templates, hábitos, OKR, gamificação, Observer, scorecard de prontidão, Item como supertype, links favoritos como módulo, revisão por quatro olhos, pacote de encerramento de mídia, escopo do MVP antigo, roadmap, backlog e plano antigo, memória derivada (handoff, decision-log, session-log, research) e o wireframe de onboarding.
 - **ADRs:** 13 viraram 9 (103 entrou no 101; 110 no 105; 112 no 111; 113 foi para later.md); todos ganharam `domain`.

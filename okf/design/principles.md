@@ -62,7 +62,6 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 - Revisão de acessibilidade.
 - Layout responsivo detalhado.
 
-## Links
+## Relations
 
-- [Telas](screens.md)
-- [Wireframes](wireframes/index.md)
+- details: [Visão](../product/vision.md)

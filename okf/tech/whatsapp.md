@@ -96,8 +96,7 @@ O webhook deve ser autenticado/verificado e **idempotente**.
 6. Webhook repetido não duplica mensagem.
 7. Mídia recebida fica acessível por URL assinada.
 
-## Links
+## Relations
 
-- [Caixa de atendimento](../product/ticket.md)
-- [ADR-107](../decisions/adr-107-service.md)
-- [Mídia/RustFS](media-rustfs.md)
+- governed_by: [ADR-107 — Canais e atendimento](../decisions/adr-107-service.md)
+- details: [Canal](../product/channel.md)

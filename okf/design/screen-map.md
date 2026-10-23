@@ -93,7 +93,7 @@ generated: { by: reference_agent/deepseek-v4.1-flash-free, at: 2026-10-21T00:00:
 
 - Wireframes do produto completo pelo golden path: Meu dia, calendário de Publicações, editor de post, ticket, canvas de fluxo, projeto e Base.
 
-## Links
+## Relations
 
-- [Princípios](principles.md)
-- [Wireframes](wireframes/index.md)
+- depends_on: [Princípios](principles.md)
+- details: [Ticket](../product/ticket.md)

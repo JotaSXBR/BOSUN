@@ -48,3 +48,4 @@ Cada passo deixa **evidência**: registro, status, horário ou auditoria. Passo 
 - depends_on: [Ticket](ticket.md)
 - depends_on: [Venda](sale.md)
 - depends_on: [Meu dia](my-day.md)
+- depends_on: [Onboarding](onboarding.md)

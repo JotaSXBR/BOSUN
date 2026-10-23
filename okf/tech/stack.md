@@ -64,8 +64,7 @@ sources:
 - Valor final da expiração de sessão.
 - Provedor de IA do copiloto.
 
-## Links
+## Relations
 
-- [ADR-111](../decisions/adr-111-architecture.md)
-- [Arquitetura](architecture.md)
-- [Deploy](deploy.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- part_of: [Arquitetura](architecture.md)

@@ -1,5 +1,5 @@
 # Design
 
 - [Princípios](principles.md) - Personalidade, direção visual, UX e acessibilidade.
-- [Telas](screens.md) - Mapa de telas, componentes e tom.
+- [Mapa de telas](screen-map.md) - Telas, navegação, componentes e estados.
 - [Wireframes](wireframes/index.md) - Auth, inbox, contatos e configurações.

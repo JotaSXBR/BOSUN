@@ -117,11 +117,7 @@ sources:
 - Backup diário criptografado para storage externo, restauração testada todo mês.
 - **Cota padrão 50 GB** por instalação, configurável; **100 MB por arquivo** e **1 GB para vídeo** de Publicações; alertas em 80% e 100%; OCR depois.
 
-## Links
+## Relations
 
-- [ADR-111](../decisions/adr-111-architecture.md)
-- [ADR-111](../decisions/adr-111-architecture.md)
-- [ADR-101 — Instalação dedicada por cliente](../decisions/adr-101-product.md)
-- [Planos, hospedagem e cobrança](../product/later.md)
-- [Stack](stack.md)
-- [Mídia/RustFS](media-rustfs.md)
+- governed_by: [ADR-111 — Arquitetura, operação e privacidade](../decisions/adr-111-architecture.md)
+- details: [Arquitetura](architecture.md)
