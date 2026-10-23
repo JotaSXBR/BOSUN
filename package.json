@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "dup": "jscpd",
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm dup && bash ./scripts/validate.sh ./okf",
-    "test:unit": "vitest run --project unit"
+    "test:unit": "vitest run --project unit",
+    "prepare": "git config core.hooksPath .githooks || exit 0"
   },
   "dependencies": {
     "next": "16.4.2",

@@ -62,16 +62,15 @@ Desenhado do zero para a BOSUN: um app Next.js, uma imagem, um compose no Coolif
 
 ## Workflow `ci.yml` (pull request e push na `main`)
 
-`concurrency` cancela a execução anterior do mesmo PR. Jobs em paralelo:
+`concurrency` cancela a execução anterior do mesmo PR (na `main` não cancela). Jobs em paralelo; a integração roda dentro do `check`, sem job próprio:
 
 | Job | Passos | Bloqueia? |
 |---|---|---|
-| `check` | Node pelo `.nvmrc`; `pnpm install --frozen-lockfile` com cache do setup-node; `tsc` (TS 7); `oxlint --deny-warnings`; Vitest com cobertura e limites; jscpd; `./scripts/validate.sh ./okf` | sim |
-| `integration` | Postgres e RustFS como `services`; `prisma migrate deploy`; testes de integração (webhooks com fixtures reais, sync Google, filas) | sim |
+| `check` | Node pelo `.nvmrc`; `pnpm install --frozen-lockfile` com cache do setup-node; `tsc` (TS 7); `oxlint --deny-warnings`; exceções do oxlint com motivo e teto (`scripts/lint_exceptions.sh`); Vitest unitário e de integração com cobertura e limites, contra Postgres de serviço (RustFS entra quando houver teste que o use); jscpd; `./scripts/validate.sh ./okf` | sim |
 | `e2e` | build de produção + Playwright, com serviços externos falsos | sim |
-| `security` | gitleaks (segredos); osv-scanner no `pnpm-lock.yaml`; Semgrep CE (TypeScript + OWASP Top 10) | sim, para achado alto ou crítico |
+| `security` | gitleaks (segredos, histórico inteiro) e osv-scanner no `pnpm-lock.yaml`, cada um por imagem oficial fixada por digest em `.github/<ferramenta>/Dockerfile`, que o Dependabot renova; sem a `gitleaks-action`, que tem licença comercial (reprova qualquer severidade; exceção com prazo no `osv-scanner.toml`) | sim |
 
-Estimativa: de 8 a 12 minutos por execução. No repositório público também entram, de graça, o **CodeQL** (análise de código do GitHub), o **secret scanning com push protection** e os alertas do Dependabot.
+Estimativa: de 8 a 12 minutos por execução. No repositório público também entram, de graça, o **CodeQL** (`security-extended`, a análise estática de segurança do projeto; o Semgrep saiu porque as regras do registro não têm versão fixa), o **secret scanning com push protection** e os alertas do Dependabot.
 
 ## Workflow `release.yml`
 

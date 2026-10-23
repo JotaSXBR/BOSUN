@@ -90,10 +90,9 @@ Todas as 871 regras do Oxlint estão na referência oficial[^oxlint-rules]. Arqu
 
 ## Segurança e dependências
 
-- **Semgrep CE** com as regras de TypeScript e OWASP Top 10: achado alto ou crítico reprova.
-- **gitleaks** no CI e no pre-commit, mais o secret scanning com push protection do GitHub: nenhum segredo no repositório, que é público.
-- **CodeQL** (JavaScript/TypeScript) em todo PR: alerta alto ou crítico reprova.
-- **osv-scanner** no lockfile e **Grype** na imagem: nenhuma vulnerabilidade alta ou crítica sem exceção registrada com prazo. Trivy fica de fora pelo comprometimento de 2026 ([CI/CD](cicd.md)).
+- **CodeQL** `security-extended` (TypeScript e workflows do Actions): achado alto ou crítico reprova pela regra de code scanning do ruleset da `main`.
+- **gitleaks** no CI e no hook de pre-commit (`.githooks/pre-commit`, ativado pelo `pnpm install`), mais o secret scanning com push protection do GitHub: nenhum segredo no repositório, que é público.
+- **osv-scanner** no lockfile: nenhuma vulnerabilidade, de qualquer severidade, sem exceção com motivo e prazo no `osv-scanner.toml`. **Grype** na imagem: nenhuma alta ou crítica sem exceção registrada com prazo. Trivy fica de fora pelo comprometimento de 2026 ([CI/CD](cicd.md)).
 - **SBOM CycloneDX** (Syft) gerado a cada release e guardado com a imagem.
 - **Licenças**: só MIT, Apache-2.0, BSD, ISC e semelhantes nas dependências embutidas na imagem da BOSUN; GPL e AGPL reprovam. Serviços que rodam em container separado (WAHA, RustFS) têm a licença conferida e registrada no ADR-111.
 - Fluxos com auth, sessão, autorização, cifra ou logs seguem o checklist do ASVS nível 2 no `/review`.
@@ -106,7 +105,7 @@ Detalhe dos workflows em [CI/CD](cicd.md).
 2. `oxlint --deny-warnings`.
 3. Testes com cobertura.
 4. jscpd.
-5. Semgrep, CodeQL, gitleaks, osv-scanner.
+5. CodeQL, gitleaks, osv-scanner.
 6. Build da imagem, SBOM e conferência de licenças.
 7. `./scripts/validate.sh ./okf`.
 

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Bloqueia segredo no commit. Ativado pelo `pnpm install` (script prepare).
+set -euo pipefail
+if ! command -v gitleaks >/dev/null; then
+  echo "gitleaks não encontrado; instale (winget install Gitleaks.Gitleaks ou brew install gitleaks)." >&2
+  exit 1
+fi
+exec gitleaks git --pre-commit --staged --redact --no-banner
