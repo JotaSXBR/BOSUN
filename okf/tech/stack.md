@@ -33,6 +33,7 @@ Decidida em 2026-10-23, com base na [revisão da stack](stack-review.md). Fonte 
 - **pg-boss** para jobs no PostgreSQL, sem Redis.
 - **RustFS** para storage compatível com S3 (Apache 2.0).
 - **Oxlint** (com tsgolint) para lint e **Vitest + Playwright** para testes; limites em [Padrão de qualidade](quality-gate.md).
+- **concurrently**, só em desenvolvimento: o `pnpm dev` sobe o `web` e o `worker` juntos. Aprovado em 2026-10-23.
 - **Docker Compose no Coolify**, VPS com CIS Level 1, Tailscale e Cloudflare Tunnel ([Deploy](deployment.md)).
 - Resend fica fora do piloto (o piloto não envia e-mail).
 

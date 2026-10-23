@@ -21,7 +21,6 @@ generated:
 
 ## Em aberto
 
-- Aprovar o [padrão de qualidade](../tech/quality-gate.md) (limites propostos).
 - Confirmar na Fatia 0: campos de sessão no Better Auth (o modelo padrão já traz `ipAddress` e `userAgent`).
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
