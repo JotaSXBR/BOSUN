@@ -2,6 +2,7 @@
 
 ## 2026-10-26
 
+- **I2 do `identity`**: Argon2id (64 MiB/3/4/32), política de senha (12–128 contados em grafemas, lista comum, contexto), auditoria sanitizada e `pnpm bosun admin create` (senha temporária de 72 h só no stdout). A lista comum é curta e escrita à mão, só com senhas de 12+ (as menores já caem no tamanho); anotada como `shortcut:`. `db.ts` usa import relativo para a CLI rodar no Node puro.
 - **Revisão da I1** (code-reviewer): segunda migration com `TwoFactor` único por usuário, `CHECK` de minúsculas em e-mail e usuário e trigger que deixa o `audit_log` só com inserção; `db.ts` exige `DATABASE_URL`; falha de migration no setup da integração sai limpa. Para depois: na I3, `generateId: "uuid"` e `updatedAt`/`windowStartedAt` sem default no SQL cru; no `delivery`, gerar o client do Prisma no build (o `postinstall` quebra num install `--prod`). Token de sessão em claro no banco é o padrão do Better Auth: risco aceito.
 - **I1 do `identity`**: dependências do Better Auth, Prisma (adapter `PrismaPg`, client em `src/generated/prisma`, gerado no `postinstall`), 10 modelos e a primeira migration com índice único parcial do reset; a integração aplica `migrate deploy` no `bosun_test`; portas do compose configuráveis. IDs em UUID: o Better Auth precisa gerar UUID (I3).
 - Plano do `identity`: tarefas I1–I10 na fatia, I8 paralelizável, checkpoint após I5.

@@ -22,7 +22,8 @@
     "verify": "pnpm typecheck && pnpm lint && bash ./scripts/lint_exceptions.sh && pnpm test && pnpm dup && bash ./scripts/validate.sh ./okf",
     "test:unit": "vitest run --project unit",
     "prepare": "git config core.hooksPath .githooks || exit 0",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "bosun": "node --env-file-if-exists=.env.local scripts/bosun.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "2.2.2",

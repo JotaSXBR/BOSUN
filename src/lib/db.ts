@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client.ts";
+import { PrismaClient } from "../generated/prisma/client.ts";
 
 declare global {
   // Um cliente por processo; o hot reload do next dev reaproveita o mesmo.
