@@ -306,7 +306,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: Better Auth configurado (sem `admin`, `disableSignUp`, `username`, cookie `__Secure-`, `cookieCache` off, rate limit no banco); catch-all bloqueia as rotas nativas da lista "Nunca"; `POST /api/auth/login` com mensagem genérica, throttle por conta e IP (`AuthThrottle`) e auditoria; `/login`; `requireSession()` com teto de 7 dias; limite de 5 sessões; logout no cabeçalho.
   - Verificar: unitários do throttle e do teto; integração login certo/errado, throttle após N falhas, sexta sessão, teto absoluto, rotas nativas 404.
   - Arquivos: `src/modules/identity/auth.ts`, `src/modules/identity/session.ts`, `src/modules/identity/throttle.ts`, `src/app/api/auth/`, `src/app/(auth)/login/page.tsx`.
-- [ ] **I4 — Troca forçada de senha**
+- [x] **I4 — Troca forçada de senha**
   - Aceite: layouts `(onboarding)` e `(app)` com `requireReadySession()`; `/change-password` valida a atual, aplica a política, zera `mustChangePassword`/`tempPasswordExpiresAt`, revoga as outras sessões e audita na mesma transação; senha temporária vencida não entra.
   - Verificar: integração da troca (hash novo, antigo falha, outras sessões somem) e da temporária expirada.
   - Arquivos: `src/modules/identity/accounts.ts`, `src/app/(onboarding)/change-password/`, `src/app/(app)/layout.tsx`, `src/app/(onboarding)/layout.tsx`.

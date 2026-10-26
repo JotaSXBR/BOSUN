@@ -1,15 +1,14 @@
 import type { ReactNode } from "react";
-import { requireSession } from "@/modules/identity/guard.ts";
+import { LogoutButton } from "@/app/logout-button.tsx";
+import { requireReadySession } from "@/modules/identity/guard.ts";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const { user } = await requireSession();
+  const { user } = await requireReadySession();
   return (
     <>
       <header>
         <span>{user.name}</span>
-        <form action="/api/auth/logout" method="post">
-          <button type="submit">Sair</button>
-        </form>
+        <LogoutButton />
       </header>
       {children}
     </>

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as loginPost } from "@/app/api/auth/login/route.ts";
+import { POST as passwordPost } from "@/app/api/account/password/route.ts";
 import { POST as logoutPost } from "@/app/api/auth/logout/route.ts";
 import { db } from "@/lib/db.ts";
 import { createAccount } from "@/modules/identity/accounts.ts";
@@ -50,8 +51,25 @@ describe("rotas de login e logout", () => {
     expect((await loginPost(big)).status).toBe(413);
   });
 
+  it("troca de senha: 401 sem sessão, 400 com a mensagem da política, 200 e cookie mantido", async () => {
+    const s = randomUUID().slice(0, 8);
+    const { user, tempPassword } = await createAccount({ username: `t${s}`, email: `t${s}@test.local`, name: "T" }, { type: "operator" });
+    const body = (next: string) => JSON.stringify({ current: tempPassword, next });
+    expect((await passwordPost(request("/api/account/password", { origin: ORIGIN, body: body("cavalo correto bateria grampo") }))).status).toBe(401);
+
+    const res = await loginPost(request("/api/auth/login", { origin: ORIGIN, body: JSON.stringify({ identifier: user.email, password: tempPassword }) }));
+    const cookie = res.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
+    const weak = await passwordPost(request("/api/account/password", { origin: ORIGIN, cookie, body: body("curta") }));
+    expect(weak.status).toBe(400);
+    expect(await weak.json()).toEqual({ error: "A senha nova precisa de 12 caracteres ou mais." });
+    const ok = await passwordPost(request("/api/account/password", { origin: ORIGIN, cookie, body: body("cavalo correto bateria grampo") }));
+    expect(ok.status).toBe(200);
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(1);
+  });
+
   it("origem diferente dá 403 nas duas rotas", async () => {
     expect((await loginPost(request("/api/auth/login", { origin: "https://evil.example", body: "{}" }))).status).toBe(403);
     expect((await logoutPost(request("/api/auth/logout", { origin: "https://evil.example" }))).status).toBe(403);
+    expect((await passwordPost(request("/api/account/password", { origin: "https://evil.example", body: "{}" }))).status).toBe(403);
   });
 });

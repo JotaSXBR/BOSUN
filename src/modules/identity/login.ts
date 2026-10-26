@@ -47,6 +47,13 @@ function signIn(identifier: string, password: string, headers: Headers) {
     : auth.api.signInUsername({ body: { ...body, username: identifier }, headers, returnHeaders: true });
 }
 
+/** Senha temporária (troca forçada pendente) vencida não entra; a pessoa pede outra ao Admin. */
+async function tempPasswordExpired(userId: string): Promise<boolean> {
+  const user = await db.user.findUnique({ where: { id: userId }, select: { mustChangePassword: true, tempPasswordExpiresAt: true } });
+  const expiresAt = user?.tempPasswordExpiresAt?.getTime();
+  return Boolean(user?.mustChangePassword && expiresAt !== undefined && expiresAt < Date.now());
+}
+
 /** Conta a tentativa do IP. Sem IP confiável não há balde (um balde único travaria todo mundo); o da conta continua. */
 async function ipOverLimit(ip: string | null): Promise<boolean> {
   if (!ip) return false;
@@ -73,6 +80,11 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
     await reset(accountKey);
+    if (await tempPasswordExpired(response.user.id)) {
+      // A sessão já foi criada pelo Better Auth: apaga antes de responder, e o cookie não sai.
+      await db.session.deleteMany({ where: { token: response.token } });
+      return { ok: false, status: 401, message: GENERIC };
+    }
     await auditLogin({ actor: { type: "user", id: response.user.id }, action: "auth.login.succeeded" });
     const twoFactorRedirect = "twoFactorRedirect" in response && response.twoFactorRedirect === true;
     return { ok: true, headers: out, twoFactorRedirect };

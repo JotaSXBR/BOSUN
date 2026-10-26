@@ -1,42 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { useJsonForm } from "@/lib/use-json-form.ts";
 
 export function LoginForm() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setPending(true);
-    setError(null);
-    const form = new FormData(event.currentTarget);
-    let res: Response;
-    try {
-      res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ identifier: form.get("identifier"), password: form.get("password") }),
-      });
-    } catch {
-      setError("Sem conexão. Tente de novo.");
-      return;
-    } finally {
-      setPending(false);
-    }
-    const body: unknown = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(body !== null && typeof body === "object" && "error" in body ? String(body.error) : "Não foi possível entrar.");
-      return;
-    }
-    router.push("/");
-    router.refresh();
-  }
+  const { error, pending, onSubmit } = useJsonForm(
+    "/api/auth/login",
+    (form) => ({ data: { identifier: form.get("identifier"), password: form.get("password") } }),
+    () => {
+      router.push("/");
+      router.refresh();
+    },
+  );
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)}>
+    <form onSubmit={onSubmit}>
       <label>
         Usuário ou e-mail
         <input name="identifier" autoComplete="username" required />

@@ -39,8 +39,8 @@ export default defineConfig({
       provider: "v8",
       // worker/ fica fora: index.ts só liga os sinais ao src/lib/worker.ts e migrate.ts roda no db:migrate.
       include: ["src/**/*.{ts,tsx}"],
-      // Páginas, layouts, componentes e o guard (redirect do Next) ficam com o E2E.
-      exclude: ["**/*.test.ts", "src/app/**/*.tsx", "src/modules/identity/guard.ts", "src/generated/**"],
+      // Páginas, layouts, componentes, hooks de React e o guard (redirect do Next) ficam com o E2E.
+      exclude: ["**/*.test.ts", "src/app/**/*.tsx", "src/modules/identity/guard.ts", "src/lib/use-*.ts", "src/generated/**"],
       thresholds: { lines: 80, branches: 80 },
     },
   },

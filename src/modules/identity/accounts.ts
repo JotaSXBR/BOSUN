@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Prisma, type User } from "../../generated/prisma/client.ts";
 import { db } from "../../lib/db.ts";
 import { type AuditActor, writeAudit } from "./audit.ts";
-import { generateTempPassword, hashPassword } from "./password.ts";
+import { type PasswordPolicyError, checkNewPassword, generateTempPassword, hashPassword, verifyPassword } from "./password.ts";
 
 /** Mesma regra na criação e no login (plugin username). */
 export const USERNAME_RE = /^[a-z0-9][a-z0-9._-]{2,31}$/;
@@ -59,4 +59,35 @@ export async function createAccount(input: NewAccount, actor: AuditActor): Promi
     }
     throw err;
   }
+}
+
+const changeSchema = z.object({ current: z.string().min(1).max(1024), next: z.string().min(1).max(1024) });
+
+export type ChangePasswordError = PasswordPolicyError | "wrong_current" | "invalid";
+
+interface CurrentSession {
+  user: { id: string; username?: string | null; email: string };
+  session: { id: string };
+}
+
+/**
+ * Troca a senha de quem está logado: confere a atual, aplica a política, zera a troca forçada,
+ * apaga as outras sessões e audita na mesma transação (ADR-102). null = trocada.
+ */
+export async function changePassword(current: CurrentSession, input: unknown): Promise<ChangePasswordError | null> {
+  const parsed = changeSchema.safeParse(input);
+  if (!parsed.success) return "invalid";
+  const { id: userId, username, email } = current.user;
+  const account = await db.account.findFirst({ where: { userId, providerId: "credential" } });
+  if (!account?.password || !(await verifyPassword(account.password, parsed.data.current))) return "wrong_current";
+  const error = await checkNewPassword(parsed.data.next, { username, email }, account.password);
+  if (error) return error;
+  const passwordHash = await hashPassword(parsed.data.next);
+  await db.$transaction(async (tx) => {
+    await tx.account.update({ where: { id: account.id }, data: { password: passwordHash } });
+    await tx.user.update({ where: { id: userId }, data: { mustChangePassword: false, tempPasswordExpiresAt: null } });
+    await tx.session.deleteMany({ where: { userId, id: { not: current.session.id } } });
+    await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.password.changed", targetType: "user", targetId: userId });
+  });
+  return null;
 }
