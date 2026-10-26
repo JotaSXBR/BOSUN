@@ -302,7 +302,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: Argon2id com os parâmetros da spec; política de senha (12–128, lista comum, contexto, nova ≠ atual); serviço de auditoria só inserção e sem segredo; CLI cria `User` + `Account` com senha temporária de 72 h impressa uma vez, `emailVerified: true`, auditando `auth.account.created`.
   - Verificar: unitários de hash, política e sanitização; integração da CLI create.
   - Arquivos: `src/modules/identity/password.ts`, `src/modules/identity/audit.ts`, `src/modules/identity/accounts.ts`, `scripts/bosun.ts` e os testes.
-- [ ] **I3 — Login e sessão**
+- [x] **I3 — Login e sessão**
   - Aceite: Better Auth configurado (sem `admin`, `disableSignUp`, `username`, cookie `__Secure-`, `cookieCache` off, rate limit no banco); catch-all bloqueia as rotas nativas da lista "Nunca"; `POST /api/auth/login` com mensagem genérica, throttle por conta e IP (`AuthThrottle`) e auditoria; `/login`; `requireSession()` com teto de 7 dias; limite de 5 sessões; logout no cabeçalho.
   - Verificar: unitários do throttle e do teto; integração login certo/errado, throttle após N falhas, sexta sessão, teto absoluto, rotas nativas 404.
   - Arquivos: `src/modules/identity/auth.ts`, `src/modules/identity/session.ts`, `src/modules/identity/throttle.ts`, `src/app/api/auth/`, `src/app/(auth)/login/page.tsx`.

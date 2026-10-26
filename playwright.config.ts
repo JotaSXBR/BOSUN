@@ -9,5 +9,12 @@ export default defineConfig({
   use: { baseURL: `http://localhost:${port}`, trace: "on-first-retry" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   // Build de produção, como o usuário recebe.
-  webServer: { command: `pnpm build && pnpm start -p ${port}`, port, timeout: 180_000, reuseExistingServer: false },
+  webServer: {
+    command: `pnpm build && pnpm start -p ${port}`,
+    port,
+    timeout: 180_000,
+    reuseExistingServer: false,
+    // A origem do login precisa bater com a porta do teste.
+    env: { BETTER_AUTH_URL: `http://localhost:${port}` },
+  },
 });

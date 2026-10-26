@@ -40,10 +40,20 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Valores descartáveis, só do CI; banco próprio do E2E.
+      POSTGRES_PASSWORD: ci-only
+      RUSTFS_ACCESS_KEY: ci-only
+      RUSTFS_SECRET_KEY: ci-only
+      WAHA_API_KEY: ci-only
+      DATABASE_URL: postgresql://bosun:ci-only@localhost:5432/bosun
+      BETTER_AUTH_SECRET: ci-only-secret-with-at-least-32-characters
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { persist-credentials: false }
+      - run: docker compose -f compose.dev.yml up -d --wait postgres
       - uses: ./.github/actions/setup
+      - run: pnpm exec prisma migrate deploy
       # Só o headless shell: a imagem do runner já tem as bibliotecas; o apt do --with-deps levava até 11 min.
       # Cache só gravado pela main; PR apenas lê.
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
