@@ -25,9 +25,13 @@ export function useJsonForm(
     setPending(true);
     setError(null);
     const result = await postJson(url, built.data);
+    // Em sucesso o botão segue desligado até a navegação: um segundo envio falharia.
+    if (result.ok) {
+      onOk(result.body);
+      return;
+    }
     setPending(false);
-    if (result.ok) onOk(result.body);
-    else setError(result.error);
+    setError(result.error);
   }
 
   return { error, pending, onSubmit: (event: FormEvent<HTMLFormElement>) => void submit(event) };

@@ -48,8 +48,17 @@ describe("changePassword (Postgres real)", () => {
     expect(await changePassword(current!, { current: tempPassword, next: tempPassword })).toBe("same_as_current");
     expect(await changePassword(current!, { current: tempPassword, next: "curta" })).toBe("too_short");
     expect(await changePassword(current!, { current: tempPassword, next: `${user.username} e mais coisa` })).toBe("context");
-    expect(await db.session.count({ where: { userId: user.id } })).toBe(2);
+    expect((await login({ identifier: user.email, password: tempPassword }, ip())).ok).toBe(true);
+    expect(await db.auditLog.count({ where: { actorId: user.id, action: "auth.password.change_failed" } })).toBe(1);
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(3);
     expect((await db.user.findUniqueOrThrow({ where: { id: user.id } })).mustChangePassword).toBe(true);
+  });
+
+  it("5 senhas atuais erradas bloqueiam a troca, mesmo com a certa", async () => {
+    const { tempPassword, current } = await signedIn();
+    const wrongChange = () => changePassword(current!, { current: "errada errada errada", next: NEW });
+    await Array.from({ length: 5 }).reduce<Promise<unknown>>((prev) => prev.then(wrongChange), Promise.resolve());
+    expect(await changePassword(current!, { current: tempPassword, next: NEW })).toBe("rate_limited");
   });
 
   it("senha temporária vencida não entra e não deixa sessão", async () => {
@@ -62,5 +71,6 @@ describe("changePassword (Postgres real)", () => {
       message: "Usuário ou senha inválidos",
     });
     expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
+    expect(await db.auditLog.count({ where: { action: "auth.login.failed", data: { path: ["reason"], equals: "temp_expired" } } })).toBeGreaterThan(0);
   });
 });

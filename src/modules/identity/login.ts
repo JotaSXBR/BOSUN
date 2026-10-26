@@ -54,6 +54,14 @@ async function tempPasswordExpired(userId: string): Promise<boolean> {
   return Boolean(user?.mustChangePassword && expiresAt !== undefined && expiresAt < Date.now());
 }
 
+/**
+ * A sessão já foi criada pelo Better Auth: apaga antes de responder, e o cookie não sai.
+ * Filtro por usuário e token string: token ausente nunca vira "apague todas".
+ */
+async function dropExpiredLogin(userId: string, token: unknown): Promise<void> {
+  if (typeof token === "string") await db.session.deleteMany({ where: { userId, token } });
+}
+
 /** Conta a tentativa do IP. Sem IP confiável não há balde (um balde único travaria todo mundo); o da conta continua. */
 async function ipOverLimit(ip: string | null): Promise<boolean> {
   if (!ip) return false;
@@ -79,12 +87,12 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
 
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
-    await reset(accountKey);
     if (await tempPasswordExpired(response.user.id)) {
-      // A sessão já foi criada pelo Better Auth: apaga antes de responder, e o cookie não sai.
-      await db.session.deleteMany({ where: { token: response.token } });
+      await dropExpiredLogin(response.user.id, response.token);
+      await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason: "temp_expired" } });
       return { ok: false, status: 401, message: GENERIC };
     }
+    await reset(accountKey);
     await auditLogin({ actor: { type: "user", id: response.user.id }, action: "auth.login.succeeded" });
     const twoFactorRedirect = "twoFactorRedirect" in response && response.twoFactorRedirect === true;
     return { ok: true, headers: out, twoFactorRedirect };

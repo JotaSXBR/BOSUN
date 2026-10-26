@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Prisma, type User } from "../../generated/prisma/client.ts";
 import { db } from "../../lib/db.ts";
 import { type AuditActor, writeAudit } from "./audit.ts";
+import { reserveAccountAttempt, reset, throttleKey } from "./throttle.ts";
 import { type PasswordPolicyError, checkNewPassword, generateTempPassword, hashPassword, verifyPassword } from "./password.ts";
 
 /** Mesma regra na criação e no login (plugin username). */
@@ -63,7 +64,7 @@ export async function createAccount(input: NewAccount, actor: AuditActor): Promi
 
 const changeSchema = z.object({ current: z.string().min(1).max(1024), next: z.string().min(1).max(1024) });
 
-export type ChangePasswordError = PasswordPolicyError | "wrong_current" | "invalid";
+export type ChangePasswordError = PasswordPolicyError | "wrong_current" | "invalid" | "rate_limited";
 
 interface CurrentSession {
   user: { id: string; username?: string | null; email: string };
@@ -78,16 +79,25 @@ export async function changePassword(current: CurrentSession, input: unknown): P
   const parsed = changeSchema.safeParse(input);
   if (!parsed.success) return "invalid";
   const { id: userId, username, email } = current.user;
+  // Quem tem a sessão (ou um cookie roubado) também não adivinha a senha atual sem limite (ASVS 6.3.1).
+  const throttle = throttleKey("password-change", userId);
+  if ((await reserveAccountAttempt(throttle)).blocked) return "rate_limited";
   const account = await db.account.findFirst({ where: { userId, providerId: "credential" } });
-  if (!account?.password || !(await verifyPassword(account.password, parsed.data.current))) return "wrong_current";
+  if (!account?.password || !(await verifyPassword(account.password, parsed.data.current))) {
+    await writeAudit(db, { actor: { type: "user", id: userId }, action: "auth.password.change_failed", targetType: "user", targetId: userId });
+    return "wrong_current";
+  }
   const error = await checkNewPassword(parsed.data.next, { username, email }, account.password);
   if (error) return error;
   const passwordHash = await hashPassword(parsed.data.next);
   await db.$transaction(async (tx) => {
-    await tx.account.update({ where: { id: account.id }, data: { password: passwordHash } });
+    // Só troca se o hash ainda é o que conferimos: duas trocas simultâneas não passam as duas.
+    const { count } = await tx.account.updateMany({ where: { id: account.id, password: account.password }, data: { password: passwordHash } });
+    if (count !== 1) throw new AccountError("A senha mudou durante a troca. Tente de novo.");
     await tx.user.update({ where: { id: userId }, data: { mustChangePassword: false, tempPasswordExpiresAt: null } });
     await tx.session.deleteMany({ where: { userId, id: { not: current.session.id } } });
     await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.password.changed", targetType: "user", targetId: userId });
   });
+  await reset(throttle);
   return null;
 }
