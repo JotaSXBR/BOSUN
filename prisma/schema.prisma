@@ -92,7 +92,7 @@ model TwoFactor {
   failedVerificationCount Int       @default(0)
   lockedUntil             DateTime?
 
-  @@index([userId])
+  @@unique([userId])
   @@index([secret])
   @@map("twoFactor")
 }

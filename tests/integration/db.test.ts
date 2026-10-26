@@ -25,6 +25,25 @@ describe("schema do identity (Postgres real, banco bosun_test)", () => {
     await expect(db.usedTotpCode.create({ data })).rejects.toThrow();
   });
 
+  it("recusa e-mail ou usuário com maiúsculas", async () => {
+    const id = randomUUID();
+    await expect(db.user.create({ data: { id, name: "T", email: `A${id}@test.local` } })).rejects.toThrow();
+    await expect(db.user.create({ data: { id, name: "T", email: `${id}@test.local`, username: "Maria" } })).rejects.toThrow();
+  });
+
+  it("aceita um só TwoFactor por usuário", async () => {
+    const user = await newUser();
+    const data = () => ({ id: randomUUID(), userId: user.id, secret: "s", backupCodes: "b" });
+    await db.twoFactor.create({ data: data() });
+    await expect(db.twoFactor.create({ data: data() })).rejects.toThrow();
+  });
+
+  it("a auditoria não aceita alteração nem exclusão", async () => {
+    const row = await db.auditLog.create({ data: { actorType: "system", action: "test.event" } });
+    await expect(db.auditLog.update({ where: { id: row.id }, data: { action: "x" } })).rejects.toThrow(/só inserção/);
+    await expect(db.auditLog.delete({ where: { id: row.id } })).rejects.toThrow(/só inserção/);
+  });
+
   it("apagar o usuário apaga as sessões dele", async () => {
     const user = await newUser();
     await db.session.create({

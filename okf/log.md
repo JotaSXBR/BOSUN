@@ -2,6 +2,7 @@
 
 ## 2026-10-26
 
+- **Revisão da I1** (code-reviewer): segunda migration com `TwoFactor` único por usuário, `CHECK` de minúsculas em e-mail e usuário e trigger que deixa o `audit_log` só com inserção; `db.ts` exige `DATABASE_URL`; falha de migration no setup da integração sai limpa. Para depois: na I3, `generateId: "uuid"` e `updatedAt`/`windowStartedAt` sem default no SQL cru; no `delivery`, gerar o client do Prisma no build (o `postinstall` quebra num install `--prod`). Token de sessão em claro no banco é o padrão do Better Auth: risco aceito.
 - **I1 do `identity`**: dependências do Better Auth, Prisma (adapter `PrismaPg`, client em `src/generated/prisma`, gerado no `postinstall`), 10 modelos e a primeira migration com índice único parcial do reset; a integração aplica `migrate deploy` no `bosun_test`; portas do compose configuráveis. IDs em UUID: o Better Auth precisa gerar UUID (I3).
 - Plano do `identity`: tarefas I1–I10 na fatia, I8 paralelizável, checkpoint após I5.
 - Reconciliados ADR-102, `tech/auth.md` e `tech/data-model.md` com as decisões do `identity`.

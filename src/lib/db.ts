@@ -6,6 +6,13 @@ declare global {
   var bosunDb: PrismaClient | undefined;
 }
 
-export const db = globalThis.bosunDb ?? new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
+function createDb(): PrismaClient {
+  const connectionString = process.env.DATABASE_URL;
+  // Sem isto o pg cai em silêncio para PG*/localhost.
+  if (!connectionString) throw new Error("DATABASE_URL não definida");
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+}
+
+export const db = globalThis.bosunDb ?? createDb();
 
 if (process.env.NODE_ENV !== "production") globalThis.bosunDb = db;

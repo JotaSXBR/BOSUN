@@ -297,7 +297,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
 - [x] **I1 — Schema, cliente e banco de teste**
   - Aceite: dependências exatas da spec instaladas; os 10 modelos com índices (únicos e parcial do `PasswordResetRequest`) na primeira migration; `src/lib/db.ts` com `PrismaPg`; a integração roda `prisma migrate deploy` no `bosun_test`; portas do compose configuráveis.
   - Verificar: `pnpm db:migrate`, `pnpm test:int` contra banco limpo; `\d` das tabelas confere com "Modelos".
-  - Arquivos: `package.json`, `prisma/schema.prisma`, `prisma/migrations/`, `src/lib/db.ts`, `tests/integration/setup.ts`, `compose.dev.yml`, `.env.example`.
+  - Arquivos: `package.json`, `prisma/schema.prisma`, `prisma/migrations/`, `src/lib/db.ts`, `tests/integration/global-setup.ts`, `compose.dev.yml`, `.env.example`.
 - [ ] **I2 — Senha, auditoria e `bosun admin create`**
   - Aceite: Argon2id com os parâmetros da spec; política de senha (12–128, lista comum, contexto, nova ≠ atual); serviço de auditoria só inserção e sem segredo; CLI cria `User` + `Account` com senha temporária de 72 h impressa uma vez, `emailVerified: true`, auditando `auth.account.created`.
   - Verificar: unitários de hash, política e sanitização; integração da CLI create.
