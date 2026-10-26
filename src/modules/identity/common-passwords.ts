@@ -1,6 +1,9 @@
-// Senhas comuns com 12+ caracteres (as menores já caem no limite de tamanho), em minúsculas.
-// shortcut: lista curta escrita à mão, não as 3.000 de um vazamento; trocar por uma lista pública com fonte se a piloto pedir.
+// Senhas comuns com 12+ caracteres, em minúsculas. As menores já caem no limite de tamanho.
+// Das 3.000 primeiras do SecLists 10k-most-common (ASVS 6.2.4), nenhuma tem 12+; das 10.000, estas 10 têm
+// (github.com/danielmiessler/SecLists, Passwords/Common-Credentials/10k-most-common.txt, baixada em 2026-10-26).
+// O resto é escrito à mão: variações longas e comuns no Brasil.
 export const COMMON_PASSWORDS: ReadonlySet<string> = new Set([
+  "masterbating", "unbelievable", "businessbabe", "contortionist", "masterbaiting", "masturbation", "pornographic", "scandinavian", "films+pic+galeries", "motherfucker",
   "password1234", "password12345", "password123456", "password!234", "passwordpassword",
   "123456789012", "1234567890123", "12345678901234", "123456123456", "123123123123",
   "111111111111", "000000000000", "121212121212", "112233445566", "987654321098",
