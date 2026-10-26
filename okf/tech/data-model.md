@@ -19,7 +19,7 @@ Nomes em inglês. Toda entidade de negócio tem `id` (cuid), `workspace_id`, `cr
 - `User` (`username`, `email`, `password_hash`, `must_change_password`), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
 - `Invite` (`email`, `role`, `token_hash`, `expires_at`, `accepted_at`).
 - `Workspace`, `Membership` e `Invite` são as tabelas `organization`, `member` e `invitation` do plugin `organization` do Better Auth, com os campos extras acima ([ADR-102](../decisions/adr-102-identity.md)).
-- `Session` ([ADR-102](../decisions/adr-102-identity.md)), `PasswordResetRequest`.
+- `Session` ([ADR-102](../decisions/adr-102-identity.md); revogar apaga a linha), `PasswordResetRequest`, `UsedTotpCode` (`user_id`, código usado, `expires_at`).
 - `AuditLog` (`actor_type`: user | operator | system, `actor_id`, `action`, `target_type`, `target_id`, `data`, `created_at`).
 - `Integration` (`kind`: meta | whatsapp | youtube | google_contacts | google_calendar | kiwify | site_chat, `owner_user_id` opcional, `status`, `encrypted_credentials`, `expires_at`).
 
