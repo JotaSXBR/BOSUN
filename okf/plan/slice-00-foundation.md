@@ -294,7 +294,7 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
 
 Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 → I5 → (I6, I7) → I9 → I10. I8 é independente e pode correr em paralelo desde o início. Checkpoints com o usuário depois de I5 (fluxo de login completo) e antes de I10.
 
-- [ ] **I1 — Schema, cliente e banco de teste**
+- [x] **I1 — Schema, cliente e banco de teste**
   - Aceite: dependências exatas da spec instaladas; os 10 modelos com índices (únicos e parcial do `PasswordResetRequest`) na primeira migration; `src/lib/db.ts` com `PrismaPg`; a integração roda `prisma migrate deploy` no `bosun_test`; portas do compose configuráveis.
   - Verificar: `pnpm db:migrate`, `pnpm test:int` contra banco limpo; `\d` das tabelas confere com "Modelos".
   - Arquivos: `package.json`, `prisma/schema.prisma`, `prisma/migrations/`, `src/lib/db.ts`, `tests/integration/setup.ts`, `compose.dev.yml`, `.env.example`.

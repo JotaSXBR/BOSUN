@@ -2,6 +2,7 @@
 
 ## 2026-10-26
 
+- **I1 do `identity`**: dependências do Better Auth, Prisma (adapter `PrismaPg`, client em `src/generated/prisma`, gerado no `postinstall`), 10 modelos e a primeira migration com índice único parcial do reset; a integração aplica `migrate deploy` no `bosun_test`; portas do compose configuráveis. IDs em UUID: o Better Auth precisa gerar UUID (I3).
 - Plano do `identity`: tarefas I1–I10 na fatia, I8 paralelizável, checkpoint após I5.
 - Reconciliados ADR-102, `tech/auth.md` e `tech/data-model.md` com as decisões do `identity`.
 - Spec do `identity` aprovada: seis decisões, todas como recomendado.

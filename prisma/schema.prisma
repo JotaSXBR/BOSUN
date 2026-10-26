@@ -1,4 +1,178 @@
-// Modelos entram a partir do módulo identity; aqui só a conexão.
+// Modelos do Better Auth (nomes de campo do schema dele) + os nossos do identity.
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id                    String    @id @db.Uuid
+  name                  String
+  email                 String    @unique
+  emailVerified         Boolean   @default(false)
+  image                 String?
+  username              String?   @unique
+  twoFactorEnabled      Boolean   @default(false)
+  mustChangePassword    Boolean   @default(false)
+  tempPasswordExpiresAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  sessions       Session[]
+  accounts       Account[]
+  twoFactors     TwoFactor[]
+  usedTotpCodes  UsedTotpCode[]
+  resetRequests  PasswordResetRequest[] @relation("requester")
+  resolvedResets PasswordResetRequest[] @relation("resolver")
+
+  @@map("user")
+}
+
+model Account {
+  id                    String    @id @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+// Revogar é apagar a linha (ADR-102); updatedAt é o "visto por último".
+model Session {
+  id        String   @id @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@map("session")
+}
+
+model Verification {
+  id         String   @id @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@index([expiresAt])
+  @@map("verification")
+}
+
+// secret e backupCodes chegam cifrados pelo plugin twoFactor.
+model TwoFactor {
+  id                      String    @id @db.Uuid
+  userId                  String    @db.Uuid
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secret                  String
+  backupCodes             String
+  verified                Boolean   @default(false)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
+
+  @@index([userId])
+  @@index([secret])
+  @@map("twoFactor")
+}
+
+model RateLimit {
+  id          String @id @db.Uuid
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+model AuthThrottle {
+  key             String    @id
+  count           Int       @default(0)
+  windowStartedAt DateTime
+  blockedUntil    DateTime?
+  updatedAt       DateTime  @updatedAt
+
+  @@index([updatedAt])
+  @@map("auth_throttle")
+}
+
+model UsedTotpCode {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([userId, codeHash])
+  @@index([expiresAt])
+  @@map("used_totp_code")
+}
+
+enum PasswordResetStatus {
+  pending
+  resolved
+  dismissed
+}
+
+// Um pendente por usuário: índice único parcial na migration (o Prisma não declara).
+model PasswordResetRequest {
+  id               String              @id @default(uuid(7)) @db.Uuid
+  userId           String              @db.Uuid
+  user             User                @relation("requester", fields: [userId], references: [id], onDelete: Cascade)
+  status           PasswordResetStatus @default(pending)
+  requestedAt      DateTime            @default(now())
+  resolvedAt       DateTime?
+  resolvedByUserId String?             @db.Uuid
+  resolvedBy       User?               @relation("resolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([userId])
+  @@map("password_reset_request")
+}
+
+enum AuditActorType {
+  user
+  operator
+  system
+}
+
+// Só inserção; sem FK para manter o histórico depois de apagar contas.
+model AuditLog {
+  id          String         @id @default(uuid(7)) @db.Uuid
+  workspaceId String?        @db.Uuid
+  actorType   AuditActorType
+  actorId     String?        @db.Uuid
+  action      String
+  targetType  String?
+  targetId    String?
+  data        Json           @default("{}")
+  createdAt   DateTime       @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_log")
 }
