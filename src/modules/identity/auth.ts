@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { username } from "better-auth/plugins/username";
 import { db } from "../../lib/db.ts";
+import { USERNAME_RE } from "./accounts.ts";
 import { hashPassword, verifyPassword } from "./password.ts";
 import { authSecret } from "./secret.ts";
 
@@ -51,5 +52,13 @@ export const auth = betterAuth({
   databaseHooks: {
     session: { create: { after: (session) => trimSessions(session.userId) } },
   },
-  plugins: [username({ minUsernameLength: 3, maxUsernameLength: 32, displayUsername: false })],
+  plugins: [
+    username({
+      minUsernameLength: 3,
+      maxUsernameLength: 32,
+      displayUsername: false,
+      // O padrão do plugin recusa hífen; usa a mesma regra da criação de conta.
+      usernameValidator: (u) => USERNAME_RE.test(u),
+    }),
+  ],
 });

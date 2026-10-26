@@ -28,6 +28,9 @@ describe("rotas de login e logout", () => {
     expect(res.status).toBe(200);
     const cookie = res.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
     expect(cookie).toContain("bosun.session_token=");
+    const attrs = res.headers.getSetCookie().find((c) => c.startsWith("bosun.session_token=")) ?? "";
+    expect(attrs).toMatch(/HttpOnly/i);
+    expect(attrs).toMatch(/SameSite=Lax/i);
 
     const out = await logoutPost(request("/api/auth/logout", { origin: ORIGIN, cookie }));
     expect(out.status).toBe(303);
@@ -36,10 +39,15 @@ describe("rotas de login e logout", () => {
   });
 
   it("login errado dá 401 com a mensagem genérica; corpo inválido dá 400", async () => {
-    const wrong = await loginPost(request("/api/auth/login", { origin: ORIGIN, body: JSON.stringify({ identifier: "x@test.local", password: "senha errada longa" }) }));
+    const wrong = await loginPost(request("/api/auth/login", { origin: ORIGIN, body: JSON.stringify({ identifier: `x-${randomUUID()}@test.local`, password: "senha errada longa" }) }));
     expect(wrong.status).toBe(401);
     expect(await wrong.json()).toEqual({ error: "Usuário ou senha inválidos" });
     expect((await loginPost(request("/api/auth/login", { origin: ORIGIN, body: "não é json" }))).status).toBe(400);
+  });
+
+  it("corpo acima de 8 KB dá 413 sem parsear", async () => {
+    const big = request("/api/auth/login", { origin: ORIGIN, body: "x".repeat(9000) });
+    expect((await loginPost(big)).status).toBe(413);
   });
 
   it("origem diferente dá 403 nas duas rotas", async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accountBlockMs, clientIp, ipBlocked, throttleKey } from "./throttle.ts";
+import { accountBlockMs, clientIp, crossesTier, ipBlocked, throttleKey } from "./throttle.ts";
 
 describe("accountBlockMs (falhas por conta em 15 min)", () => {
   it("segue a tabela 5 → 30 s, 10 → 5 min, 20 → 15 min", () => {
@@ -10,6 +10,12 @@ describe("accountBlockMs (falhas por conta em 15 min)", () => {
     expect(accountBlockMs(19)).toBe(300_000);
     expect(accountBlockMs(20)).toBe(900_000);
     expect(accountBlockMs(500)).toBe(900_000);
+  });
+});
+
+describe("crossesTier", () => {
+  it("só nas tentativas que abrem uma faixa nova", () => {
+    expect([4, 5, 6, 9, 10, 11, 19, 20, 21].map(crossesTier)).toEqual([false, true, false, false, true, false, false, true, false]);
   });
 });
 
@@ -34,6 +40,7 @@ describe("throttleKey", () => {
 describe("clientIp", () => {
   it("usa a última entrada do X-Forwarded-For, a que o nosso proxy pôs", () => {
     expect(clientIp(new Headers({ "x-forwarded-for": "6.6.6.6, 10.0.0.1, 203.0.113.9" }))).toBe("203.0.113.9");
-    expect(clientIp(new Headers())).toBe("unknown");
+    expect(clientIp(new Headers())).toBeNull();
+    expect(clientIp(new Headers({ "x-forwarded-for": " " }))).toBeNull();
   });
 });

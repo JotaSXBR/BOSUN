@@ -40,6 +40,9 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 - Trocar de workspace atualiza `active_workspace_id`.
 - Cookies `__Secure-`, `HttpOnly`, `Secure` e `SameSite=Lax`; proteção CSRF nas mutações.
 
+- IP do cliente: a última entrada do `X-Forwarded-For`, a que o Traefik do Coolify acrescenta. Conferir no deploy: a porta da app não fica publicada no host e um `X-Forwarded-For` forjado não chega como última entrada. Com CDN na frente, ler o cabeçalho do CDN com `trustedIPs` no Traefik. Sem IP, o limite por IP não se aplica; o da conta sim.
+- Limite por conta reserva a tentativa antes de verificar a senha (rajada paralela não passa); e-mail e usuário da mesma conta contam separado (risco aceito: dobra as tentativas). Terceiro pode manter a conta bloqueada por até 15 min (risco aceito do desenho).
+
 ## Autorização
 
 - Três papéis fixos por workspace ([Papéis](../product/role.md)), lidos de `Membership` a cada requisição.

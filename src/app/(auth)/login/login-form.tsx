@@ -13,12 +13,19 @@ export function LoginForm() {
     setPending(true);
     setError(null);
     const form = new FormData(event.currentTarget);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ identifier: form.get("identifier"), password: form.get("password") }),
-    });
-    setPending(false);
+    let res: Response;
+    try {
+      res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ identifier: form.get("identifier"), password: form.get("password") }),
+      });
+    } catch {
+      setError("Sem conexão. Tente de novo.");
+      return;
+    } finally {
+      setPending(false);
+    }
     const body: unknown = await res.json().catch(() => ({}));
     if (!res.ok) {
       setError(body !== null && typeof body === "object" && "error" in body ? String(body.error) : "Não foi possível entrar.");

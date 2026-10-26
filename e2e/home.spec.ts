@@ -29,3 +29,9 @@ test("as respostas trazem os cabeçalhos de segurança e não anunciam o framewo
   expect(headers["permissions-policy"]).toBe("camera=(), microphone=(), geolocation=()");
   expect(headers["x-powered-by"]).toBeUndefined();
 });
+
+test("rotas nativas do Better Auth não existem (sem catch-all)", async ({ request }) => {
+  const paths = ["/api/auth/sign-up/email", "/api/auth/sign-in/email", "/api/auth/change-password", "/api/auth/get-session"];
+  const statuses = await Promise.all(paths.map(async (path) => [path, (await request.post(path, { data: {} })).status()]));
+  expect(statuses).toEqual(paths.map((path) => [path, 404]));
+});
