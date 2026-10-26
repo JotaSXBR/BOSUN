@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db.ts";
@@ -47,24 +47,47 @@ describe("createAccount (Postgres real)", () => {
     await expect(createAccount({ ...input, email: "sem-arroba" }, { type: "operator" })).rejects.toThrow(/inválid/);
     await createAccount(input, { type: "operator" });
     await expect(createAccount({ ...input, username: `${input.username}x` }, { type: "operator" })).rejects.toThrow(/já existe/);
+    await expect(createAccount({ ...input, email: `x${input.email}` }, { type: "operator" })).rejects.toThrow(/já existe/);
+    await expect(createAccount({ ...input, name: "Maria\u0000" }, { type: "operator" })).rejects.toThrow(/inválid/);
     expect(await db.user.count({ where: { username: `${input.username}x` } })).toBe(0);
   });
 });
 
+function cli(args: string[]) {
+  const res = spawnSync("node", ["scripts/bosun.ts", ...args], { encoding: "utf8" });
+  return { code: res.status, out: res.stdout, err: res.stderr };
+}
+
+function createArgs(input: ReturnType<typeof uniq>) {
+  return ["admin", "create", "--username", input.username, "--email", input.email, "--name", input.name];
+}
+
 describe("CLI bosun admin create", () => {
-  it("imprime a senha temporária uma vez e cria a conta", () => {
+  it("imprime a senha temporária uma vez, só no stdout, e cria a conta", async () => {
     const input = uniq();
-    const out = execFileSync(
-      "node",
-      ["scripts/bosun.ts", "admin", "create", "--username", input.username, "--email", input.email, "--name", input.name],
-      { encoding: "utf8" },
-    );
+    const { code, out, err } = cli(createArgs(input));
+    expect(code).toBe(0);
+    expect(err).toBe("");
     const match = /Senha temporária \(válida por 72 h\): (\S+)/.exec(out);
     expect(match?.[1]).toMatch(/^[A-Za-z0-9_-]{20}$/);
     expect(out.split(match?.[1] ?? "").length).toBe(2);
+    expect(await db.user.count({ where: { username: input.username } })).toBe(1);
   });
 
-  it("sai com erro e mensagem de uso sem argumentos", () => {
-    expect(() => execFileSync("node", ["scripts/bosun.ts", "admin", "create"], { encoding: "utf8", stdio: "pipe" })).toThrow(/Uso:/);
+  it("conta duplicada sai 1 com mensagem limpa, sem stack nem senha", () => {
+    const input = uniq();
+    cli(createArgs(input));
+    const { code, out, err } = cli(createArgs(input));
+    expect(code).toBe(1);
+    expect(out).toBe("");
+    expect(err.trim()).toBe("Usuário ou e-mail já existe");
+  });
+
+  it("sem argumentos, comando ou opção desconhecidos: uso e saída 1", () => {
+    for (const args of [["admin", "create"], ["admin", "nada"], ["admin", "create", "--senha", "x"]]) {
+      const { code, err } = cli(args);
+      expect(code).toBe(1);
+      expect(err).toContain("Uso:");
+    }
   });
 });

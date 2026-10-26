@@ -8,12 +8,15 @@ import { generateTempPassword, hashPassword } from "./password.ts";
 const TEMP_PASSWORD_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** Erro com mensagem segura para mostrar a quem chamou. */
-export class AccountError extends Error {}
+export class AccountError extends Error {
+  override name = "AccountError";
+}
 
 const newAccountSchema = z.object({
   username: z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9._-]{2,31}$/),
-  email: z.string().trim().toLowerCase().pipe(z.email()),
-  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
+  // Sem caracteres de controle ou invisíveis no nome que aparece na UI e na auditoria.
+  name: z.string().trim().min(1).max(100).regex(/^\P{C}+$/u),
 });
 
 export type NewAccount = z.input<typeof newAccountSchema>;

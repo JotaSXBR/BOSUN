@@ -1,13 +1,36 @@
 import type { Prisma } from "../../generated/prisma/client.ts";
 
 // Qualquer chave com estes pedaços some antes de gravar: auditoria nunca guarda segredo.
-const SECRET_KEY = /pass|secret|token|code|cookie|otp/i;
+// Rede de segurança, não licença: quem chama passa só o necessário. Remove até falso positivo (statusCode).
+const SECRET_KEY = /pass|pwd|secret|token|code|cookie|otp|authorization|bearer|jwt|credential|api.?key|private.?key/i;
+
+export type AuditAction =
+  | "auth.account.created"
+  | "auth.login.failed"
+  | "auth.login.succeeded"
+  | "auth.2fa.challenge"
+  | "auth.2fa.succeeded"
+  | "auth.2fa.failed"
+  | "auth.2fa.replayed"
+  | "auth.2fa.enrolled"
+  | "auth.2fa.reset"
+  | "auth.recovery_code.used"
+  | "auth.password.changed"
+  | "auth.password.temp_issued"
+  | "auth.password.reset_requested"
+  | "auth.session.revoked"
+  | "auth.session.absolute_expired"
+  | "auth.rate_limited"
+  | "auth.logout"
+  | "auth.logout_all"
+  | "auth.step_up.succeeded"
+  | "auth.step_up.failed";
 
 export type AuditActor = { type: "user"; id: string } | { type: "operator" } | { type: "system" };
 
 export interface AuditEvent {
   actor: AuditActor;
-  action: string;
+  action: AuditAction;
   targetType?: string;
   targetId?: string;
   workspaceId?: string;
@@ -16,15 +39,20 @@ export interface AuditEvent {
 
 type AuditWriter = Pick<Prisma.TransactionClient, "auditLog">;
 
-export function sanitizeAuditData(value: unknown): Prisma.InputJsonValue {
+type JsonOut = Prisma.InputJsonValue | null;
+
+export function sanitizeAuditData(value: unknown): JsonOut {
+  if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) return value.map(sanitizeAuditData);
   if (value !== null && typeof value === "object") {
-    const out: Record<string, Prisma.InputJsonValue> = {};
-    for (const [key, v] of Object.entries(value)) if (!SECRET_KEY.test(key)) out[key] = sanitizeAuditData(v);
+    const out: Record<string, JsonOut> = {};
+    for (const [key, v] of Object.entries(value)) {
+      if (v !== undefined && !SECRET_KEY.test(key)) out[key] = sanitizeAuditData(v);
+    }
     return out;
   }
-  // O Json do Prisma não aceita null aninhado; vazio vira "".
-  return value ?? "";
+  if (typeof value === "bigint") return value.toString();
+  return value ?? null;
 }
 
 /** Grava um evento. Passe o `tx` da transação quando o evento acompanha uma mudança de estado. */
@@ -37,7 +65,7 @@ export async function writeAudit(writer: AuditWriter, event: AuditEvent): Promis
       targetType: event.targetType,
       targetId: event.targetId,
       workspaceId: event.workspaceId,
-      data: sanitizeAuditData(event.data ?? {}),
+      data: sanitizeAuditData(event.data ?? {}) ?? {},
     },
   });
 }
