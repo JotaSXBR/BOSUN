@@ -15,23 +15,25 @@ generated:
 
 ## Status
 
+- 2026-10-26: spec do módulo `identity` aprovada na [Fatia 0](../plan/slice-00-foundation.md) (seis decisões, todas como recomendado).
 - 2026-10-23: o produto foi cortado ao golden path da piloto ([Piloto](../product/pilot.md)); o adiado está em [Para depois](../product/later.md).
 - 9 ADRs por domínio, todos em draft. Nada está `stable` até o usuário aprovar.
-- Nenhum código, scaffold, dependência ou migration.
+- Módulo `toolchain` concluído e na `main` (PR #5, merge `84d2edf`). Nenhum modelo do produto, migration ou dependência de autenticação ainda.
 
 ## Em aberto
 
-- Confirmar na Fatia 0: campos de sessão no Better Auth (o modelo padrão já traz `ipAddress` e `userAgent`).
+- Reconciliar o ADR-102, [Autenticação](../tech/auth.md) e [modelo de dados](../tech/data-model.md) com as decisões aprovadas do `identity`.
 - Parâmetro de rastreio da Kiwify que volta no webhook.
 - Iniciar o App Review da Meta e a verificação do app no Google Cloud (risco de prazo).
 
 ## Próximo passo
 
-- **Retomar aqui:** Fatia 0, módulo `toolchain`, spec e tarefas aprovadas (T1–T7). Módulo `toolchain` concluído e na `main` (PR #5, merge `84d2edf`, ship com as três personas). Próximo: **spec do módulo `identity`** com `/agent-skills:spec`; antes, ler as pendências do ship listadas na fatia. Trabalho na branch `slice-00`; na Fatia 0, um PR por módulo, via `/agent-skills:ship`; da Fatia 1 em diante, um PR por fatia. Repositório público criado: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
+- **Retomar aqui:** aplicar as reconciliações aprovadas no ADR-102 e nos conceitos e rodar `/agent-skills:plan` para gerar as tarefas do módulo. Módulo `toolchain` concluído e na `main` (PR #5, merge `84d2edf`, ship com as três personas), PR por módulo na Fatia 0. Repositório público: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
-0. Antes da Fatia 0: entregar ao usuário o prompt do design system novo (ele junta as imagens de referência).
-1. O usuário revisa e aprova o [plano em fatias](../plan/index.md).
-2. Começar a [Fatia 0](../plan/slice-00-foundation.md) e, no mesmo dia, o App Review da Meta e a verificação do Google.
+1. Reconciliar o ADR-102, [Autenticação](../tech/auth.md) e [modelo de dados](../tech/data-model.md) com as decisões aprovadas.
+2. `/agent-skills:plan` do `identity`; depois build, test, review, code-simplify e ship do módulo.
+3. Iniciar o App Review da Meta e a verificação do Google no mesmo dia.
+4. Entregar ao usuário o prompt do design system novo quando ele pedir (ele junta as imagens de referência).
 
 ## Relations
 
