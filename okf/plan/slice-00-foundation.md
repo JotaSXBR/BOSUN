@@ -290,6 +290,52 @@ Grafo: T1 → T2 → (T3, T4, T5) → T6 → T7. T3, T4 e T5 podem correr em par
 
 **Riscos:** TS 7 sem suporte do Prisma ou do Next (mitigado pela T1); regras do Oxlint sem a opção esperada (T1 confere, T4 registra a exceção); repositório no GitHub ainda não criado (necessário na T6: o usuário cria o repositório público).
 
+### identity
+
+Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 → I5 → (I6, I7) → I9 → I10. I8 é independente e pode correr em paralelo desde o início. Checkpoints com o usuário depois de I5 (fluxo de login completo) e antes de I10.
+
+- [ ] **I1 — Schema, cliente e banco de teste**
+  - Aceite: dependências exatas da spec instaladas; os 10 modelos com índices (únicos e parcial do `PasswordResetRequest`) na primeira migration; `src/lib/db.ts` com `PrismaPg`; a integração roda `prisma migrate deploy` no `bosun_test`; portas do compose configuráveis.
+  - Verificar: `pnpm db:migrate`, `pnpm test:int` contra banco limpo; `\d` das tabelas confere com "Modelos".
+  - Arquivos: `package.json`, `prisma/schema.prisma`, `prisma/migrations/`, `src/lib/db.ts`, `tests/integration/setup.ts`, `compose.dev.yml`, `.env.example`.
+- [ ] **I2 — Senha, auditoria e `bosun admin create`**
+  - Aceite: Argon2id com os parâmetros da spec; política de senha (12–128, lista comum, contexto, nova ≠ atual); serviço de auditoria só inserção e sem segredo; CLI cria `User` + `Account` com senha temporária de 72 h impressa uma vez, `emailVerified: true`, auditando `auth.account.created`.
+  - Verificar: unitários de hash, política e sanitização; integração da CLI create.
+  - Arquivos: `src/modules/identity/password.ts`, `src/modules/identity/audit.ts`, `src/modules/identity/accounts.ts`, `scripts/bosun.ts` e os testes.
+- [ ] **I3 — Login e sessão**
+  - Aceite: Better Auth configurado (sem `admin`, `disableSignUp`, `username`, cookie `__Secure-`, `cookieCache` off, rate limit no banco); catch-all bloqueia as rotas nativas da lista "Nunca"; `POST /api/auth/login` com mensagem genérica, throttle por conta e IP (`AuthThrottle`) e auditoria; `/login`; `requireSession()` com teto de 7 dias; limite de 5 sessões; logout no cabeçalho.
+  - Verificar: unitários do throttle e do teto; integração login certo/errado, throttle após N falhas, sexta sessão, teto absoluto, rotas nativas 404.
+  - Arquivos: `src/modules/identity/auth.ts`, `src/modules/identity/session.ts`, `src/modules/identity/throttle.ts`, `src/app/api/auth/`, `src/app/(auth)/login/page.tsx`.
+- [ ] **I4 — Troca forçada de senha**
+  - Aceite: layouts `(onboarding)` e `(app)` com `requireReadySession()`; `/change-password` valida a atual, aplica a política, zera `mustChangePassword`/`tempPasswordExpiresAt`, revoga as outras sessões e audita na mesma transação; senha temporária vencida não entra.
+  - Verificar: integração da troca (hash novo, antigo falha, outras sessões somem) e da temporária expirada.
+  - Arquivos: `src/modules/identity/accounts.ts`, `src/app/(onboarding)/change-password/`, `src/app/(app)/layout.tsx`, `src/app/(onboarding)/layout.tsx`.
+- [ ] **I5 — 2FA: setup, desafio, uso único e recuperação**
+  - Aceite: `/setup/2fa` sem QR (segredo em grupos de 4 e URI); 10 códigos cifrados mostrados uma vez; `/login/2fa` + `/api/auth/2fa/verify|recovery`; `UsedTotpCode` com HMAC rejeita replay inclusive concorrente e revoga a sessão nova; throttle por IP de 50/15 min; auditoria.
+  - Verificar: unitário do replay; integração setup, login com TOTP, replay concorrente, código de recuperação uma vez; E2E do caminho completo (critério 1).
+  - Arquivos: `src/modules/identity/totp.ts`, `src/app/api/auth/2fa/`, `src/app/(auth)/login/2fa/`, `src/app/(onboarding)/setup/2fa/`, `e2e/login.spec.ts`.
+- [ ] **Checkpoint: login completo** — `pnpm verify` e `pnpm test:e2e` verdes; revisão com o usuário antes de seguir.
+- [ ] **I6 — Sessões ativas, sair de todos e step-up**
+  - Aceite: `/security` lista sessões, revoga as outras, sair de todos (inclui a atual) e mostra códigos com sessão fresca; `requireFreshSession()` devolve `SESSION_NOT_FRESH`; `POST /api/auth/step-up` cria sessão nova e apaga a antiga.
+  - Verificar: integração dos critérios 3 e 4.
+  - Arquivos: `src/modules/identity/session.ts`, `src/app/api/auth/step-up/route.ts`, `src/app/(app)/security/`.
+- [ ] **I7 — Pedido de reset, senha temporária e `bosun admin unlock`**
+  - Aceite: `POST /api/auth/password-reset-request` sempre 202 e um pendente por usuário; serviço de senha temporária para o Admin (a UI fica no `workspace`); `unlock` zera senha e `TwoFactor`, revoga sessões, resolve pedidos e audita com ator `operator`.
+  - Verificar: integração do pedido (conta existente e inexistente) e do unlock (critério 6).
+  - Arquivos: `src/modules/identity/accounts.ts`, `src/app/api/auth/password-reset-request/route.ts`, `src/app/(auth)/login/`, `scripts/bosun.ts`.
+- [ ] **I8 — CSP com nonce e fim do `/api/dev`**
+  - Aceite: `src/proxy.ts` com nonce e a política da spec (sem `unsafe-*` em produção); layout raiz dinâmico; `/api/dev/*` e o teste apagados; a integração enfileira direto e confirma o job pelo estado no pg-boss.
+  - Verificar: unitário da CSP prod/dev; E2E com header, console sem violação e `/api/dev/example-job` 404.
+  - Arquivos: `src/proxy.ts`, `src/app/layout.tsx`, `src/app/api/dev/` (apagar), `tests/integration/`, `e2e/home.spec.ts`.
+- [ ] **I9 — Limpeza diária e robustez da fila**
+  - Aceite: job diário apaga `UsedTotpCode`, `AuthThrottle` e `Verification` vencidos; testes de retry, job duplicado e shutdown com job em andamento (timeout de 10 s); banco fora do ar devolve 503 genérico.
+  - Verificar: integração do job e do shutdown; unitário do 503 com dublê.
+  - Arquivos: `worker/index.ts`, `src/modules/identity/cleanup.ts`, `src/lib/worker.ts` e os testes.
+- [ ] **I10 — Fechamento do módulo**
+  - Aceite: job `e2e` do CI sobe Postgres, migra `bosun_e2e`, semeia e roda o login; threshold de 90% ramos/80% linhas em `src/modules/identity/**`; os 10 critérios de aceite do `identity` com evidência; nenhum segredo em log (critério 9).
+  - Verificar: `pnpm verify`, PR com CI verde, `./scripts/validate.sh ./okf`, `/agent-skills:review`.
+  - Arquivos: `.github/workflows/ci.yml`, `vitest.config.ts`, `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.
+
 ## Ao terminar
 
 Acrescente ao `AGENTS.md` os comandos exatos (instalar, lint, typecheck, testes, migrations, ambiente local) e preencha o `resource` dos conceitos que a fatia materializou.

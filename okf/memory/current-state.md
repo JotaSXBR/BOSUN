@@ -30,7 +30,7 @@ generated:
 - **Retomar aqui:** aplicar as reconciliações aprovadas no ADR-102 e nos conceitos e rodar `/agent-skills:plan` para gerar as tarefas do módulo. Módulo `toolchain` concluído e na `main` (PR #5, merge `84d2edf`, ship com as três personas), PR por módulo na Fatia 0. Repositório público: `github.com/JotaSXBR/BOSUN` (branch `main`, secret scanning, push protection e alertas do Dependabot ligados). Design system: o usuário pede no momento oportuno; entregar com pesquisa do Claude Design mais recente, o prompt e como incluir as imagens de referência.
 - Servidor: a mesma VPS do usuário, com Coolify, recebe beta e stable. Domínio do painel, IP do Tailscale e token da API ficam **fora do repositório** (público), só na máquina do usuário e nos environments do GitHub.
 1. Reconciliação do ADR-102 e conceitos: feita em 2026-10-26.
-2. `/agent-skills:plan` do `identity`; depois build, test, review, code-simplify e ship do módulo.
+2. Tarefas I1–I10 do `identity` na fatia (plan de 2026-10-26); próximo: build da I1, depois build, test, review, code-simplify e ship do módulo.
 3. Iniciar o App Review da Meta e a verificação do Google no mesmo dia.
 4. Entregar ao usuário o prompt do design system novo quando ele pedir (ele junta as imagens de referência).
 

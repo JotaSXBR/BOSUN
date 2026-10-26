@@ -2,6 +2,7 @@
 
 ## 2026-10-26
 
+- Plano do `identity`: tarefas I1–I10 na fatia, I8 paralelizável, checkpoint após I5.
 - Reconciliados ADR-102, `tech/auth.md` e `tech/data-model.md` com as decisões do `identity`.
 - Spec do `identity` aprovada: seis decisões, todas como recomendado.
 - **Fatia 0, spec do `identity`** (`/agent-skills:spec`): objetivo, premissas, escopo, 10 decisões técnicas, 9 fluxos, modelos, rotas, segurança, 10 critérios de aceite, testes e limites escritos na [fatia](plan/slice-00-foundation.md); seis perguntas abertas aguardam aprovação antes do `/agent-skills:plan`. Decisões propostas: sem plugin `admin`; cookie `__Secure-`; revogação por exclusão da sessão (motivo no `AuditLog`); 5 sessões concorrentes; senha de 12–128; TOTP de uso único em `UsedTotpCode`; step-up como novo login que revoga a sessão antiga; senha temporária gerada pelo sistema, válida por 72 h; setup 2FA sem QR; `emailVerified: true` e sem bloqueio de conta no piloto. O módulo também fecha as pendências herdadas do `toolchain`: CSP com nonce em `src/proxy.ts`, remoção de `/api/dev/*`, cobertura de 90% de ramos por glob, testes de retry/duplicidade/shutdown, confirmação de job por estado, portas configuráveis do compose e `prisma migrate deploy` na integração e no E2E.
