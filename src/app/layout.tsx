@@ -1,8 +1,11 @@
+import { connection } from "next/server";
 import type { ReactNode } from "react";
 
 export const metadata = { title: "BOSUN" };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+// Dinâmico em toda página: o nonce da CSP muda a cada requisição (proxy.ts).
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  await connection();
   return (
     <html lang="pt-BR">
       <body>{children}</body>

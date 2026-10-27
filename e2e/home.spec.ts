@@ -17,7 +17,7 @@ test("login errado mostra a mensagem genérica", async ({ page }) => {
   await expect(page.locator("form").getByRole("alert")).toHaveText("Usuário ou senha inválidos");
 });
 
-test("a rota de dev fica fechada no build de produção", async ({ request }) => {
+test("a rota de dev não existe", async ({ request }) => {
   const res = await request.post("/api/dev/example-job");
   expect(res.status()).toBe(404);
 });
@@ -64,4 +64,20 @@ test.describe("sem JavaScript (antes da hidratação)", () => {
       await expect(page.getByRole("button", { name: button })).toBeDisabled();
     });
   }
+});
+
+test("CSP com nonce: cabeçalho de produção, scripts rodam e nenhuma violação no console", async ({ page }) => {
+  const violations: string[] = [];
+  page.on("console", (msg) => {
+    if (/Content Security Policy|CSP/i.test(msg.text())) violations.push(msg.text());
+  });
+  const res = await page.goto("/login");
+  const csp = res?.headers()["content-security-policy"] ?? "";
+  expect(csp).toMatch(/script-src 'self' 'nonce-[^']+' 'strict-dynamic'/);
+  expect(csp).not.toMatch(/unsafe-/);
+  // Botão liga = o React hidratou sob a CSP (um erro na política deixaria todos os formulários mortos).
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeEnabled();
+  const other = await page.request.get("/login");
+  expect(other.headers()["content-security-policy"]).not.toBe(csp);
+  expect(violations).toEqual([]);
 });

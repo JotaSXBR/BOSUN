@@ -323,7 +323,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: `POST /api/auth/password-reset-request` sempre 202 e um pendente por usuário; serviço de senha temporária para o Admin (a UI fica no `workspace`); `unlock` zera senha e `TwoFactor`, revoga sessões, resolve pedidos e audita com ator `operator`.
   - Verificar: integração do pedido (conta existente e inexistente) e do unlock (critério 6).
   - Arquivos: `src/modules/identity/recovery.ts`, `src/app/api/auth/password-reset-request/route.ts`, `src/app/(auth)/login/`, `scripts/bosun.ts`.
-- [ ] **I8 — CSP com nonce e fim do `/api/dev`**
+- [x] **I8 — CSP com nonce e fim do `/api/dev`**
   - Aceite: `src/proxy.ts` com nonce e a política da spec (sem `unsafe-*` em produção); layout raiz dinâmico; `/api/dev/*` e o teste apagados; a integração enfileira direto e confirma o job pelo estado no pg-boss.
   - Verificar: unitário da CSP prod/dev; E2E com header, console sem violação e `/api/dev/example-job` 404.
   - Arquivos: `src/proxy.ts`, `src/app/layout.tsx`, `src/app/api/dev/` (apagar), `tests/integration/`, `e2e/home.spec.ts`.

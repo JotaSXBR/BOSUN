@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// Cabeçalhos de segurança básicos em toda resposta. A CSP com nonce entra no módulo identity, junto do login.
+// Cabeçalhos de segurança básicos em toda resposta. A CSP com nonce fica no src/proxy.ts (muda a cada requisição).
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
