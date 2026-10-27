@@ -8,8 +8,9 @@ export function LoginForm() {
   const { error, pending, onSubmit } = useJsonForm(
     "/api/auth/login",
     (form) => ({ data: { identifier: form.get("identifier"), password: form.get("password") } }),
-    () => {
-      router.push("/");
+    (body) => {
+      const challenge = typeof body === "object" && body !== null && "twoFactorRedirect" in body && body.twoFactorRedirect === true;
+      router.push(challenge ? "/login/2fa" : "/");
       router.refresh();
     },
   );

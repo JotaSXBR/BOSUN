@@ -75,12 +75,15 @@ interface CurrentSession {
  * Troca a senha de quem está logado: confere a atual, aplica a política, zera a troca forçada,
  * apaga as outras sessões e audita na mesma transação (ADR-102). null = trocada.
  */
+/** Um só limite para toda conferência da senha atual com sessão aberta (troca de senha, cadastro do 2FA). */
+export const passwordCheckKey = (userId: string) => throttleKey("password-check", userId);
+
 export async function changePassword(current: CurrentSession, input: unknown): Promise<ChangePasswordError | null> {
   const parsed = changeSchema.safeParse(input);
   if (!parsed.success) return "invalid";
   const { id: userId, username, email } = current.user;
   // Quem tem a sessão (ou um cookie roubado) também não adivinha a senha atual sem limite (ASVS 6.3.1).
-  const throttle = throttleKey("password-change", userId);
+  const throttle = passwordCheckKey(userId);
   if ((await reserveAccountAttempt(throttle)).blocked) return "rate_limited";
   const account = await db.account.findFirst({ where: { userId, providerId: "credential" } });
   if (!account?.password || !(await verifyPassword(account.password, parsed.data.current))) {

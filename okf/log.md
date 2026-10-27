@@ -1,5 +1,9 @@
 # Log de atualizações
 
+## 2026-10-27
+
+- **I5 do `identity`**: plugin `twoFactor` do Better Auth (segredo e 10 códigos de recuperação cifrados, desafio de 10 min de uso único, 5 tentativas por desafio, bloqueio de 15 min após 10 falhas na conta). Rotas nossas `/api/auth/2fa/enable`, `/verify` e `/recovery`; telas `/setup/2fa` (segredo em grupos de 4 e URI, sem QR; códigos mostrados uma vez) e `/login/2fa`. Uso único do TOTP em `UsedTotpCode` (HMAC, 120 s, `ON CONFLICT DO NOTHING`): código repetido, inclusive em paralelo, revoga a sessão criada e dá 401. Throttle de 50 por IP em 15 min; a senha do setup usa o mesmo limite da troca de senha (chave `password-check`). `requireReadySession` exige 2FA ativo. Com sessão aberta, só o TOTP de confirmação do setup é aceito (recuperação com sessão daria tentativas sem bloqueio). O teto de 5 sessões saiu do hook de criação: o passo da senha com 2FA cria e apaga uma sessão, e o hook derrubaria a sessão mais antiga só com a senha certa; agora `login.ts` e `totp.ts` cortam depois do login completo. E2E do caminho completo (critério 1) no lugar do E2E da troca de senha.
+
 ## 2026-10-26
 
 - **Revisão da I4** (code-reviewer): troca de senha com throttle por usuário (5 erradas bloqueiam) e auditoria `auth.password.change_failed`; troca só grava se o hash não mudou (corrida); senha temporária vencida é auditada (`reason: temp_expired`) e não zera o contador; exclusão da sessão vencida filtra por usuário e só com token; botão segue desligado após sucesso; E2E do primeiro login com troca forçada (conta criada pela CLI). Regra de 403 para rota de API com troca pendente registrada em `tech/engineering.md` (helper no `workspace`). Ramos do `identity` em 87,9%: a meta de 90% fecha na I10. Fora: leitura do corpo em stream (o limite de 8 KB vale depois do `req.text()` sem Content-Length).

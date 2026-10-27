@@ -16,9 +16,10 @@ export async function requireSession(): Promise<AuthSession> {
   return current;
 }
 
-/** Área principal: além da sessão, a troca forçada de senha já feita (o setup do 2FA entra aqui também). */
+/** Área principal: além da sessão, a troca forçada de senha e o 2FA obrigatório já feitos. */
 export async function requireReadySession(): Promise<AuthSession> {
   const current = await requireSession();
   if (current.user.mustChangePassword) redirect("/change-password");
+  if (!current.user.twoFactorEnabled) redirect("/setup/2fa");
   return current;
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { type AuthSession, resolveSession } from "./session.ts";
 
 /** Mutação só do próprio site (CSRF): Origin igual ao BETTER_AUTH_URL. */
 export function sameOrigin(req: Request): boolean {
@@ -32,4 +33,14 @@ export async function readJson(req: Request): Promise<{ body: unknown } | NextRe
   } catch {
     return { body: null };
   }
+}
+
+/** Mutação autenticada: Origin, sessão (com o teto de 7 dias) e corpo JSON. Devolve o erro pronto quando não passa. */
+export async function readAuthed(req: Request): Promise<{ current: AuthSession; body: unknown } | NextResponse> {
+  if (!sameOrigin(req)) return forbidden();
+  const current = await resolveSession(req.headers);
+  if (!current) return NextResponse.json({ error: "Sessão expirada" }, { status: 401 });
+  const read = await readJson(req);
+  if (read instanceof NextResponse) return read;
+  return { current, body: read.body };
 }

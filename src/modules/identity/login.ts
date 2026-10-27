@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "../../lib/db.ts";
 import { logger } from "../../lib/logger.ts";
 import { type AuditEvent, writeAudit } from "./audit.ts";
-import { auth } from "./auth.ts";
+import { auth, trimSessions } from "./auth.ts";
 import { resolveSession } from "./session.ts";
 import { hmac } from "./secret.ts";
 import { clientIp, crossesTier, hitIp, ipBlocked, reserveAccountAttempt, reset, throttleKey } from "./throttle.ts";
@@ -21,10 +21,10 @@ export type LoginResult =
   | { ok: true; headers: Headers; twoFactorRedirect: boolean }
   | { ok: false; status: 400 | 401 | 429; message: string };
 
-const tooMany = { ok: false, status: 429, message: "Muitas tentativas. Aguarde e tente de novo." } as const;
+export const tooMany = { ok: false, status: 429, message: "Muitas tentativas. Aguarde e tente de novo." } as const;
 
 // Auditoria de login é best-effort (spec): falhar ao gravar não derruba o login.
-async function auditLogin(event: AuditEvent): Promise<void> {
+export async function auditLogin(event: AuditEvent): Promise<void> {
   try {
     await writeAudit(db, event);
   } catch (err) {
@@ -33,7 +33,7 @@ async function auditLogin(event: AuditEvent): Promise<void> {
 }
 
 /** Better Auth lê o IP do X-Forwarded-For; passamos só o IP que o throttle usa, para gravar o mesmo na sessão. */
-function forAuth(headers: Headers, ip: string | null): Headers {
+export function forAuth(headers: Headers, ip: string | null): Headers {
   const out = new Headers(headers);
   out.delete("x-forwarded-for");
   if (ip) out.set("x-forwarded-for", ip);
@@ -87,23 +87,33 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
 
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
+    // Com 2FA o plugin já apagou a sessão e devolve só o cookie de desafio (sem `user`); a sessão nasce no totp.ts.
+    if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) {
+      await reset(accountKey);
+      await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef } });
+      return { ok: true, headers: out, twoFactorRedirect: true };
+    }
     if (await tempPasswordExpired(response.user.id)) {
       await dropExpiredLogin(response.user.id, response.token);
       await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason: "temp_expired" } });
       return { ok: false, status: 401, message: GENERIC };
     }
     await reset(accountKey);
+    await trimSessions(response.user.id);
     await auditLogin({ actor: { type: "user", id: response.user.id }, action: "auth.login.succeeded" });
-    const twoFactorRedirect = "twoFactorRedirect" in response && response.twoFactorRedirect === true;
-    return { ok: true, headers: out, twoFactorRedirect };
+    return { ok: true, headers: out, twoFactorRedirect: false };
   } catch (err) {
-    if (!(err instanceof APIError) || !CREDENTIAL_ERRORS.has(String(err.status))) throw err;
-    await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts } });
-    if (crossesTier(attempts)) {
-      await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "account", identifierRef } });
-    }
-    return { ok: false, status: 401, message: GENERIC };
+    return credentialFailed(err, identifierRef, attempts);
   }
+}
+
+async function credentialFailed(err: unknown, identifierRef: string, attempts: number): Promise<LoginResult> {
+  if (!(err instanceof APIError) || !CREDENTIAL_ERRORS.has(String(err.status))) throw err;
+  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts } });
+  if (crossesTier(attempts)) {
+    await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "account", identifierRef } });
+  }
+  return { ok: false, status: 401, message: GENERIC };
 }
 
 /** Apaga a sessão do cookie e devolve os headers que limpam o cookie. */

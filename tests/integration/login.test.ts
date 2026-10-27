@@ -1,41 +1,14 @@
-import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db.ts";
-import { createAccount } from "@/modules/identity/accounts.ts";
 import { login, logout } from "@/modules/identity/login.ts";
 import { hmac } from "@/modules/identity/secret.ts";
 import { resolveSession } from "@/modules/identity/session.ts";
 import { hitIp, throttleKey } from "@/modules/identity/throttle.ts";
+import { account, cookieFrom, randomIp, req, tag, times } from "./helpers.ts";
 
 afterAll(() => db.$disconnect());
 
-// Tudo aleatório por teste: o bosun_test persiste entre execuções e o throttle dura 15 min.
-const tag = () => randomUUID().slice(0, 8);
-
-async function account(username = `u${tag()}`) {
-  const { user, tempPassword } = await createAccount(
-    { username, email: `${username}@test.local`, name: "Teste" },
-    { type: "operator" },
-  );
-  return { user, password: tempPassword };
-}
-
-const randomIp = () => `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`;
-
-function req(ip: string | null = randomIp()) {
-  return new Headers(ip ? { "x-forwarded-for": ip, "user-agent": "vitest" } : { "user-agent": "vitest" });
-}
-
-// Em sequência de propósito: cada tentativa muda o contador que a próxima lê.
-function times(n: number, fn: () => Promise<unknown>): Promise<unknown> {
-  return Array.from({ length: n }).reduce<Promise<unknown>>((prev) => prev.then(fn), Promise.resolve());
-}
-
 const badLogin = (identifier: string) => () => login({ identifier, password: "senha errada bem longa" }, req());
-
-function cookieFrom(headers: Headers): Headers {
-  return new Headers({ cookie: headers.getSetCookie().map((c) => c.split(";")[0]).join("; ") });
-}
 
 const auditCount = (action: string, ref: string) =>
   db.auditLog.count({ where: { action, data: { path: ["identifierRef"], equals: ref } } });
