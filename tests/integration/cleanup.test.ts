@@ -36,6 +36,13 @@ async function seed() {
       { identifier: `new-${t}`, value: "x", expiresAt: ahead(MIN) },
     ],
   });
+  // Inserir com data antiga é permitido (o trigger só barra alterar e apagar).
+  await db.auditLog.createMany({
+    data: [
+      { actorType: "system", action: "auth.logout", targetId: `old-${t}`, createdAt: ago(200 * 24 * 60 * MIN) },
+      { actorType: "system", action: "auth.logout", targetId: `new-${t}`, createdAt: ago(150 * 24 * 60 * MIN) },
+    ],
+  });
   await db.session.createMany({
     data: [
       { userId: user.id, token: `old-${t}`, expiresAt: ago(1000) },
@@ -46,17 +53,19 @@ async function seed() {
 }
 
 async function survivors(t: string) {
-  const [codes, throttles, verifications, sessions] = await Promise.all([
+  const [codes, throttles, verifications, sessions, audits] = await Promise.all([
     db.usedTotpCode.findMany({ where: { codeHash: { endsWith: t } }, select: { codeHash: true } }),
     db.authThrottle.findMany({ where: { key: { endsWith: t } }, select: { key: true } }),
     db.verification.findMany({ where: { identifier: { endsWith: t } }, select: { identifier: true } }),
     db.session.findMany({ where: { token: { endsWith: t } }, select: { token: true } }),
+    db.auditLog.findMany({ where: { targetId: { endsWith: t } }, select: { targetId: true } }),
   ]);
   return {
     codes: codes.map((c) => c.codeHash).sort(),
     throttles: throttles.map((x) => x.key).sort(),
     verifications: verifications.map((v) => v.identifier).sort(),
     sessions: sessions.map((s) => s.token).sort(),
+    audits: audits.map((a) => a.targetId ?? "").sort(),
   };
 }
 
@@ -70,7 +79,15 @@ describe("limpeza diária (Postgres real)", () => {
       throttles: [`blocked-${t}`, `recent-${t}`],
       verifications: [`new-${t}`],
       sessions: [`new-${t}`],
+      audits: [`new-${t}`],
     });
+  });
+
+  it("o banco recusa apagar ou alterar auditoria dentro dos 6 meses", async () => {
+    const t = tag();
+    const row = await db.auditLog.create({ data: { actorType: "system", action: "auth.logout", targetId: `keep-${t}`, createdAt: ago(150 * 24 * 60 * MIN) } });
+    await expect(db.auditLog.delete({ where: { id: row.id } })).rejects.toThrow();
+    await expect(db.auditLog.update({ where: { id: row.id }, data: { action: "x" } })).rejects.toThrow();
   });
 
   it("o worker cria a fila real com retry e agenda às 3h17 de São Paulo; roda o job e barra duplicado", async () => {

@@ -18,7 +18,7 @@ export async function startWorker(): Promise<PgBoss> {
   await boss.work(CLEANUP_QUEUE, async () => {
     try {
       const r = await cleanupExpired();
-      logger.info("worker", `limpeza: ${r.usedTotpCodes} códigos, ${r.throttles} limites, ${r.verifications} desafios, ${r.sessions} sessões`);
+      logger.info("worker", `limpeza: ${r.usedTotpCodes} códigos, ${r.throttles} limites, ${r.verifications} desafios, ${r.sessions} sessões, ${r.auditLogs} eventos de auditoria`);
     } catch (err) {
       // Sinal entre as novas tentativas; o pg-boss não loga falha de job.
       logger.error("worker", "limpeza falhou", err);
