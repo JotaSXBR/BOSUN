@@ -44,3 +44,28 @@ export async function readAuthed(req: Request): Promise<{ current: AuthSession; 
   if (read instanceof NextResponse) return read;
   return { current, body: read.body };
 }
+
+/** Rota da área principal: como `readAuthed`, mas recusa quem ainda não trocou a senha ou não ligou o 2FA. */
+export async function readReady(req: Request): Promise<{ current: AuthSession; body: unknown } | NextResponse> {
+  const read = await readAuthed(req);
+  if (read instanceof NextResponse) return read;
+  const { mustChangePassword, twoFactorEnabled } = read.current.user;
+  if (mustChangePassword || !twoFactorEnabled) return NextResponse.json({ error: "Conclua o primeiro acesso." }, { status: 403 });
+  return read;
+}
+
+/** Ação sensível com sessão de mais de 10 min (ADR-102): a tela pede senha e código e repete. */
+export function notFresh(): NextResponse {
+  return NextResponse.json({ error: "Confirme a senha e o código para continuar.", code: "SESSION_NOT_FRESH" }, { status: 403 });
+}
+
+/** Set-Cookie de uma resposta do Better Auth como cabeçalho Cookie de uma chamada seguinte no servidor. */
+export function cookieHeader(from: Headers): string {
+  return from.getSetCookie().map((c) => c.split(";")[0]).join("; ");
+}
+
+/** Mutação por <form> HTML (sem JSON): Origin e sessão. Devolve o erro pronto quando não passa. */
+export async function formSession(req: Request): Promise<AuthSession | NextResponse> {
+  if (!sameOrigin(req)) return forbidden();
+  return (await resolveSession(req.headers)) ?? NextResponse.redirect(new URL("/login", process.env.BETTER_AUTH_URL), 303);
+}

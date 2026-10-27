@@ -22,3 +22,38 @@ export async function resolveSession(headers: Headers): Promise<AuthSession | nu
   });
   return null;
 }
+
+export const FRESH_MS = 10 * 60 * 1000;
+
+/** Sessão recente (ADR-102): criada há até 10 min. Fora disso, ação sensível pede o step-up. */
+export function isFresh(current: AuthSession): boolean {
+  return Date.now() - current.session.createdAt.getTime() <= FRESH_MS;
+}
+
+/** Sessões da própria pessoa para a tela de segurança; o token nunca sai daqui. */
+export function listSessions(userId: string) {
+  return db.session.findMany({
+    where: { userId },
+    select: { id: true, userAgent: true, ipAddress: true, createdAt: true, updatedAt: true },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  });
+}
+
+/** Encerra as outras sessões da pessoa e audita na mesma transação. Devolve quantas caíram. */
+export async function revokeOtherSessions(current: AuthSession): Promise<number> {
+  const { id: userId } = current.user;
+  return db.$transaction(async (tx) => {
+    const { count } = await tx.session.deleteMany({ where: { userId, id: { not: current.session.id } } });
+    await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.session.revoked", targetType: "user", targetId: userId, data: { scope: "others", count } });
+    return count;
+  });
+}
+
+/** Sair de todos: apaga todas as sessões da pessoa, inclusive a atual. */
+export async function revokeAllSessions(current: AuthSession): Promise<void> {
+  const { id: userId } = current.user;
+  await db.$transaction(async (tx) => {
+    const { count } = await tx.session.deleteMany({ where: { userId } });
+    await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.logout_all", targetType: "user", targetId: userId, data: { count } });
+  });
+}

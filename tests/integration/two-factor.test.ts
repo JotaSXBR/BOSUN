@@ -6,42 +6,9 @@ import { resolveSession } from "@/modules/identity/session.ts";
 import { hitIp, throttleKey } from "@/modules/identity/throttle.ts";
 import { enrollTotp, markTotpUsed, verifySecondFactor } from "@/modules/identity/totp.ts";
 import { totpCode } from "../totp.ts";
-import { account, cookieFrom, randomIp, req } from "./helpers.ts";
+import { account, challenge, cookieFrom, enrolled, nextCode, randomIp, readyToEnroll, req } from "./helpers.ts";
 
 afterAll(() => db.$disconnect());
-
-/** Sessão aberta de uma conta com a troca de senha já feita (o setup do 2FA vem depois dela). */
-async function readyToEnroll() {
-  const { user, password } = await account();
-  await db.user.update({ where: { id: user.id }, data: { mustChangePassword: false, tempPasswordExpiresAt: null } });
-  const res = await login({ identifier: user.email, password }, req());
-  if (!res.ok) throw new Error("login falhou");
-  const cookie = cookieFrom(res.headers);
-  const current = await resolveSession(cookie);
-  if (!current) throw new Error("sem sessão");
-  return { user, password, cookie, current };
-}
-
-async function enrolled() {
-  const ready = await readyToEnroll();
-  const enroll = await enrollTotp(ready.current, { password: ready.password }, ready.cookie);
-  if (!enroll.ok) throw new Error("setup falhou");
-  const secret = enroll.secret.replaceAll(" ", "");
-  const confirm = await verifySecondFactor("totp", { code: totpCode(secret) }, ready.cookie);
-  return { ...ready, enroll, secret, confirm };
-}
-
-/** Login com senha numa conta com 2FA: devolve o cookie de desafio (com o mesmo IP). */
-async function challenge(email: string, password: string): Promise<Headers> {
-  const ip = randomIp();
-  const res = await login({ identifier: email, password }, req(ip));
-  if (!res.ok || !res.twoFactorRedirect) throw new Error("sem desafio");
-  expect(await resolveSession(cookieFrom(res.headers, req(ip)))).toBeNull();
-  return cookieFrom(res.headers, req(ip));
-}
-
-// O código do setup já foi usado; o seguinte (aceito pela janela de ±30 s) é outro.
-const nextCode = (secret: string) => totpCode(secret, Date.now() + 30_000);
 
 const sessions = (userId: string) => db.session.count({ where: { userId } });
 
@@ -90,7 +57,9 @@ describe("setup do 2FA (Postgres real)", () => {
 describe("login com 2FA (Postgres real)", () => {
   it("a senha só abre o desafio; o TOTP cria a sessão e audita", async () => {
     const { user, password, secret } = await enrolled();
-    const res = await verifySecondFactor("totp", { code: nextCode(secret) }, await challenge(user.email, password));
+    const cookie = await challenge(user.email, password);
+    expect(await resolveSession(cookie)).toBeNull();
+    const res = await verifySecondFactor("totp", { code: nextCode(secret) }, cookie);
     if (!res.ok) throw new Error("TOTP recusado");
     expect((await resolveSession(cookieFrom(res.headers)))?.user.id).toBe(user.id);
     expect(await db.auditLog.count({ where: { actorId: user.id, action: "auth.2fa.succeeded" } })).toBe(1);

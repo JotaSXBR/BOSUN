@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CodeForm } from "@/app/code-form.tsx";
+import { CodesList } from "@/app/codes-list.tsx";
 import { useJsonForm } from "@/lib/use-json-form.ts";
 
 interface Enrollment {
@@ -43,13 +44,7 @@ function RecoveryCodes({ codes }: { codes: string[] }) {
     <section aria-labelledby="codes-title">
       <h2 id="codes-title">Guarde os códigos de recuperação</h2>
       <p>Cada código entra uma vez, se você perder o celular. Eles não aparecem de novo nesta tela.</p>
-      <ul aria-label="Códigos de recuperação">
-        {codes.map((code) => (
-          <li key={code}>
-            <code>{code}</code>
-          </li>
-        ))}
-      </ul>
+      <CodesList codes={codes} />
       <button
         type="button"
         onClick={() => {

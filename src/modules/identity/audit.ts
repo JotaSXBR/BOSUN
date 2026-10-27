@@ -15,6 +15,7 @@ export type AuditAction =
   | "auth.2fa.enrolled"
   | "auth.2fa.reset"
   | "auth.recovery_code.used"
+  | "auth.recovery_code.viewed"
   | "auth.password.changed"
   | "auth.password.change_failed"
   | "auth.password.temp_issued"
