@@ -21,6 +21,8 @@ function createAccount(): { email: string; tempPassword: string } {
 
 async function signIn(page: Page, email: string, password: string) {
   await page.goto("/login");
+  // Digitar antes da hidratação perde o texto; o botão liga quando o React assume.
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeEnabled();
   await page.getByLabel("Usuário ou e-mail").fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();

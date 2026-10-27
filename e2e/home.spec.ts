@@ -9,6 +9,7 @@ test("sem sessão, a página inicial leva ao login", async ({ page }) => {
 
 test("login errado mostra a mensagem genérica", async ({ page }) => {
   await page.goto("/login");
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeEnabled();
   // Endereço novo a cada execução: o throttle da conta persiste no banco e bloquearia na sexta rodada.
   await page.getByLabel("Usuário ou e-mail").fill(`ninguem-${Date.now()}@example.com`);
   await page.getByLabel("Senha").fill("senha errada bem longa");
@@ -39,10 +40,28 @@ test("rotas nativas do Better Auth não existem (sem catch-all)", async ({ reque
 
 test("esqueci a senha registra o pedido com a mesma resposta para qualquer conta", async ({ page }) => {
   await page.goto("/login");
-  await expect(page.getByRole("link", { name: "Esqueci a senha" })).toHaveAttribute("href", "/login/forgot");
-  // Espera a hidratação: um clique antes dela faz o envio nativo do <form>, que só recarrega a página.
-  await page.goto("/login/forgot", { waitUntil: "networkidle" });
+  await page.getByRole("link", { name: "Esqueci a senha" }).click();
+  // Digitar antes da hidratação perde o texto; o botão liga quando o React assume.
+  await expect(page.getByRole("button", { name: "Pedir uma senha nova" })).toBeEnabled();
   await page.getByLabel("Usuário ou e-mail").fill("ninguem@test.local");
   await page.getByRole("button", { name: "Pedir uma senha nova" }).click();
   await expect(page.getByRole("status")).toHaveText(/Se a conta existir, o pedido foi registrado/);
+});
+
+test.describe("sem JavaScript (antes da hidratação)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  // Regressão: o envio nativo por GET punha a senha na URL. Os formulários usam POST e o botão só liga com o React.
+  for (const [path, button] of [
+    ["/login", "Entrar"],
+    ["/login/forgot", "Pedir uma senha nova"],
+    ["/login/2fa", "Confirmar"],
+  ] as const) {
+    test(`${path}: formulário POST e botão desligado`, async ({ page }) => {
+      await page.goto(path);
+      const form = page.locator("form").filter({ has: page.getByRole("button", { name: button }) });
+      await expect(form).toHaveAttribute("method", "post");
+      await expect(page.getByRole("button", { name: button })).toBeDisabled();
+    });
+  }
 });

@@ -6,7 +6,8 @@ import { login } from "@/modules/identity/login.ts";
 import { issueTempPassword, requestPasswordReset, unlockAccount } from "@/modules/identity/recovery.ts";
 import { hmac } from "@/modules/identity/secret.ts";
 import { hitIp, throttleKey } from "@/modules/identity/throttle.ts";
-import { account, enrolled, randomIp, req, tag } from "./helpers.ts";
+import { TEMP_PASSWORD_TTL_MS } from "@/modules/identity/accounts.ts";
+import { account, enrolled, randomIp, req, tag, times } from "./helpers.ts";
 
 const ORIGIN = "http://localhost:3000";
 
@@ -46,6 +47,17 @@ describe("pedido de reset (Postgres real)", () => {
     expect(JSON.stringify(logged)).not.toContain(ghost);
   });
 
+  it("mais de 3 pedidos do mesmo identificador em 15 min não gravam nada (mesmo sem IP)", async () => {
+    const { user } = await account();
+    await Promise.all(Array.from({ length: 5 }, () => requestPasswordReset({ identifier: user.email }, req(null))));
+    expect(await db.auditLog.count({ where: { targetId: user.id, action: "auth.password.reset_requested" } })).toBe(3);
+  });
+
+  it("corpo inválido também dá 202", async () => {
+    const res = await resetPost(new Request(`${ORIGIN}/api/auth/password-reset-request`, { method: "POST", headers: { origin: ORIGIN }, body: "{" }));
+    expect(res.status).toBe(202);
+  });
+
   it("mais de 100 pedidos do mesmo IP param", async () => {
     const ip = randomIp();
     await Promise.all(Array.from({ length: 100 }, () => hitIp(throttleKey("reset-ip", ip))));
@@ -69,16 +81,44 @@ describe("senha temporária e unlock (Postgres real)", () => {
     expect(await db.auditLog.count({ where: { actorId: admin.id, action: "auth.password.temp_issued", targetId: user.id } })).toBe(1);
   });
 
+});
+
+describe("senha temporária pela Admin (Postgres real)", () => {
+  it("pela Admin o 2FA fica, a senha vale 72 h e quem estava bloqueada entra", async () => {
+    const { user: admin } = await account();
+    const { user, password } = await enrolled();
+    await times(6, () => login({ identifier: user.email, password: "senha errada bem longa" }, req()));
+    expect(await login({ identifier: user.email, password }, req())).toMatchObject({ status: 429 });
+    const temp = await issueTempPassword(user.id, { type: "user", id: admin.id }, { reason: "esqueceu\u2028a senha" });
+    const after = await db.user.findUnique({ where: { id: user.id } });
+    expect(after?.twoFactorEnabled).toBe(true);
+    expect(await db.twoFactor.count({ where: { userId: user.id } })).toBe(1);
+    const ttl = (after?.tempPasswordExpiresAt?.getTime() ?? 0) - Date.now();
+    expect(Math.abs(ttl - TEMP_PASSWORD_TTL_MS)).toBeLessThan(60_000);
+    expect(await login({ identifier: user.email, password: temp }, req())).toMatchObject({ ok: true, twoFactorRedirect: true });
+    const audit = await db.auditLog.findFirst({ where: { targetId: user.id, action: "auth.password.temp_issued" } });
+    expect(audit?.data).toEqual({ reason: "esqueceu a senha" });
+  });
+
+  it("conta sem senha local: nada muda (a transação desfaz)", async () => {
+    const { user, password } = await account();
+    await login({ identifier: user.email, password }, req());
+    await db.account.deleteMany({ where: { userId: user.id } });
+    await expect(issueTempPassword(user.id, { type: "operator" })).rejects.toThrow("Conta sem senha local.");
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(1);
+    expect(await db.auditLog.count({ where: { targetId: user.id, action: "auth.password.temp_issued" } })).toBe(0);
+  });
+
   it("unlock zera o 2FA, revoga sessões e audita com ator operator; o login volta sem desafio", async () => {
     const { user, secret } = await enrolled();
     expect(secret).not.toBe("");
-    const temp = await unlockAccount(user.email, "perdeu o celular");
+    const temp = await unlockAccount(user.email, "perdeu o celular", "ops@vps");
     expect(await db.twoFactor.count({ where: { userId: user.id } })).toBe(0);
     expect(await db.user.findUnique({ where: { id: user.id } })).toMatchObject({ twoFactorEnabled: false, mustChangePassword: true });
     expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
     const audits = await db.auditLog.findMany({ where: { targetId: user.id, actorType: "operator", action: { in: ["auth.password.temp_issued", "auth.2fa.reset"] } } });
     expect(audits).toHaveLength(2);
-    expect(audits[0]?.data).toMatchObject({ reason: "perdeu o celular" });
+    expect(audits[0]?.data).toEqual({ reason: "perdeu o celular", operator: "ops@vps" });
     expect(await login({ identifier: user.email, password: temp }, req())).toMatchObject({ ok: true, twoFactorRedirect: false });
   });
 
@@ -88,10 +128,12 @@ describe("senha temporária e unlock (Postgres real)", () => {
     expect(ok.status).toBe(0);
     expect(ok.stdout).toMatch(/Senha temporária \(válida por 72 h\): \S{20}/);
     const audit = await db.auditLog.findFirst({ where: { targetId: user.id, action: "auth.password.temp_issued" } });
-    expect(audit?.data).toEqual({ reason: "teste  de linha" });
-    const missing = spawnSync("node", ["scripts/bosun.ts", "admin", "unlock", `nada-${tag()}@test.local`], { encoding: "utf8" });
+    expect(audit?.data).toMatchObject({ reason: "teste de linha" });
+    expect(audit?.data).toMatchObject({ operator: expect.stringMatching(/@/) });
+    const missing = spawnSync("node", ["scripts/bosun.ts", "admin", "unlock", `nada-${tag()}@test.local`, "--reason", "x"], { encoding: "utf8" });
     expect(missing.status).toBe(1);
     expect(missing.stderr).toContain("Conta não encontrada.");
     expect(spawnSync("node", ["scripts/bosun.ts", "admin", "unlock"], { encoding: "utf8" }).stderr).toContain("Informe um e-mail.");
+    expect(spawnSync("node", ["scripts/bosun.ts", "admin", "unlock", user.email], { encoding: "utf8" }).stderr).toContain("Informe o motivo");
   });
 });

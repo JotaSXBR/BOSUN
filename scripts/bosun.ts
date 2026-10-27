@@ -1,10 +1,11 @@
 // CLI de operação na VPS: `pnpm bosun admin create|unlock ...`. Nunca recebe senha por argumento.
+import { hostname, userInfo } from "node:os";
 import { parseArgs } from "node:util";
 import { logger } from "../src/lib/logger.ts";
 
 const USAGE = `Uso:
   pnpm bosun admin create --username <usuário> --email <e-mail> --name "<nome>"
-  pnpm bosun admin unlock <e-mail> [--reason "<motivo>"]`;
+  pnpm bosun admin unlock <e-mail> --reason "<motivo>"`;
 
 class UsageError extends Error {}
 
@@ -35,12 +36,14 @@ async function adminUnlock(args: string[]): Promise<void> {
   const { values, positionals } = parseArgs({ args, allowPositionals: true, options: { reason: { type: "string" } } });
   const [email, ...extra] = positionals;
   if (!email || extra.length > 0) throw new UsageError("Informe um e-mail.");
-  // Texto livre na auditoria: uma linha, sem controle, até 200 caracteres.
-  const reason = values.reason?.replace(/\p{C}+/gu, " ").trim().slice(0, 200) || undefined;
+  // Zerar o 2FA sem motivo não fica bem auditado: o motivo é obrigatório (limpo no serviço).
+  if (!values.reason?.trim()) throw new UsageError("Informe o motivo com --reason.");
+  const { username } = userInfo();
+  const operatorRef = `${username}@${hostname()}`;
   const { db } = await import("../src/lib/db.ts");
   const { unlockAccount } = await import("../src/modules/identity/recovery.ts");
   try {
-    const tempPassword = await unlockAccount(email, reason);
+    const tempPassword = await unlockAccount(email, values.reason, operatorRef);
     process.stdout.write(
       `Conta desbloqueada: ${email}\nSenha temporária (válida por 72 h): ${tempPassword}\n` +
         "Sessões encerradas e 2FA zerado: no próximo login a pessoa troca a senha e configura o 2FA de novo.\n",
