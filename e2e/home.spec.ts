@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { cspViolations } from "./csp.ts";
 
 test("sem sessão, a página inicial leva ao login", async ({ page }) => {
   await page.goto("/");
@@ -67,10 +68,7 @@ test.describe("sem JavaScript (antes da hidratação)", () => {
 });
 
 test("CSP com nonce: cabeçalho de produção, scripts rodam e nenhuma violação no console", async ({ page }) => {
-  const violations: string[] = [];
-  page.on("console", (msg) => {
-    if (/Content Security Policy|CSP/i.test(msg.text())) violations.push(msg.text());
-  });
+  const violations = cspViolations(page);
   const res = await page.goto("/login");
   const csp = res?.headers()["content-security-policy"] ?? "";
   expect(csp).toMatch(/script-src 'self' 'nonce-[^']+' 'strict-dynamic'/);

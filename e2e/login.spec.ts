@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { expect, type Page, test } from "@playwright/test";
 import { totpCode } from "../tests/totp.ts";
+import { cspViolations } from "./csp.ts";
 
 const PASSWORD = "cavalo correto bateria grampo";
 
@@ -37,10 +38,7 @@ const home = (page: Page) => expect(page.getByRole("heading", { level: 1, name: 
 
 test("primeiro acesso: senha temporária → troca → setup do 2FA → login com TOTP e com código de recuperação", async ({ page }) => {
   // CSP em toda página do caminho (login, troca, setup, home, 2FA, segurança): nenhuma violação no console.
-  const violations: string[] = [];
-  page.on("console", (msg) => {
-    if (/Content Security Policy|CSP/i.test(msg.text())) violations.push(msg.text());
-  });
+  const violations = cspViolations(page);
   const { email, tempPassword } = createAccount();
   await signIn(page, email, tempPassword);
 
