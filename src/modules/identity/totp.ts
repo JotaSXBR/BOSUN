@@ -4,6 +4,7 @@ import { db } from "../../lib/db.ts";
 import { passwordCheckKey } from "./accounts.ts";
 import { writeAudit } from "./audit.ts";
 import { auth, trimSessions } from "./auth.ts";
+import { challengeStillValid } from "./challenge.ts";
 import { auditLogin, forAuth, tempPasswordExpired, tooMany } from "./login.ts";
 import { hmac } from "./secret.ts";
 import { type AuthSession, resolveSession } from "./session.ts";
@@ -132,9 +133,17 @@ interface Verified {
   out: Headers;
   /** Step-up: a sessão antiga sai antes do teto de 5, para não derrubar outro dispositivo. */
   replacing?: string;
+  /** Cookies da requisição (o desafio), para conferir a versão da credencial. */
+  headers: Headers;
 }
 
-async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out, replacing }: Verified): Promise<VerifyResult> {
+/** Motivo para não deixar a sessão nascer: senha temporária vencida ou credencial trocada depois do desafio. */
+async function blockedReason(userId: string, headers: Headers): Promise<string | null> {
+  if (await tempPasswordExpired(userId)) return "temp_expired";
+  return (await challengeStillValid(userId, headers)) ? null : "credentials_reset";
+}
+
+async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out, replacing, headers }: Verified): Promise<VerifyResult> {
   const actor = { type: "user", id: userId } as const;
   if (kind === "totp" && !(await markTotpUsed(userId, code))) {
     await dropSession(userId, token);
@@ -142,9 +151,10 @@ async function loginConfirmed(kind: SecondFactor, code: string, { userId, token,
     await auditLogin({ actor, action: "auth.2fa.replayed" });
     return INVALID_CODE;
   }
-  if (await tempPasswordExpired(userId)) {
+  const reason = await blockedReason(userId, headers);
+  if (reason) {
     await dropSession(userId, token);
-    await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", targetType: "user", targetId: userId, data: { reason: "temp_expired" } });
+    await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", targetType: "user", targetId: userId, data: { reason } });
     return INVALID_CODE;
   }
   if (replacing) await db.session.deleteMany({ where: { id: replacing, userId } });
@@ -184,7 +194,7 @@ export async function verifySecondFactor(kind: SecondFactor, input: unknown, hea
     const { headers: out, response } = await callPlugin(kind, code, forAuth(headers, ip));
     return setupKey
       ? await setupConfirmed(response.user.id, code, out, setupKey)
-      : await loginConfirmed(kind, code, { userId: response.user.id, token: response.token, out, replacing });
+      : await loginConfirmed(kind, code, { userId: response.user.id, token: response.token, out, replacing, headers });
   } catch (err) {
     return pluginFailed(err, current?.user.id);
   }

@@ -5,6 +5,7 @@ import { logger } from "../../lib/logger.ts";
 import { type AuditEvent, writeAudit } from "./audit.ts";
 import { credentialsVersion } from "./accounts.ts";
 import { auth, trimSessions } from "./auth.ts";
+import { bindChallenge } from "./challenge.ts";
 import { resolveSession } from "./session.ts";
 import { hmac } from "./secret.ts";
 import { clientIp, crossesTier, hitIp, ipBlocked, reserveAccountAttempt, reset, throttleKey } from "./throttle.ts";
@@ -121,7 +122,9 @@ const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> =
 /** Senha certa numa conta com 2FA. Reset no meio do caminho: o cookie de desafio não sai. */
 async function challengeIssued(out: Headers, attempt: Attempt): Promise<LoginResult> {
   // Recusado: o cookie de desafio fica em `out` e não sai.
-  if (!(await credentialsUnchanged(attempt))) return refused(attempt, "credentials_reset");
+  if (attempt.version === null || !(await credentialsUnchanged(attempt))) return refused(attempt, "credentials_reset");
+  // A confirmação do 2FA confere se a senha ainda é a desta versão (troca entre o desafio e a sessão).
+  await bindChallenge(out, attempt.version);
   await reset(attempt.accountKey);
   await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } });
   return { ok: true, headers: out, twoFactorRedirect: true };

@@ -168,6 +168,20 @@ describe("corrida login × senha temporária (Postgres real)", () => {
     expect(res).toMatchObject({ ok: false, status: 401 });
   });
 
+  it("troca de senha entre o código aceito e a sessão criada: a sessão não nasce", async () => {
+    const { user, password, secret } = await enrolled();
+    const cookie = await challenge(user.email, password);
+    const original = auth.api.verifyTOTP.bind(auth.api);
+    vi.spyOn(auth.api, "verifyTOTP").mockImplementation(async (...args: Parameters<typeof auth.api.verifyTOTP>) => {
+      const result = await original(...args);
+      await db.user.update({ where: { id: user.id }, data: { credentialsVersion: { increment: 1 } } });
+      return result;
+    });
+    const before = await db.session.count({ where: { userId: user.id } });
+    expect(await verifySecondFactor("totp", { code: nextCode(secret) }, cookie)).toMatchObject({ status: 401 });
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(before);
+  });
+
   it("um desafio de 2FA pendente para de valer quando a Admin emite a senha", async () => {
     const { user: admin } = await account();
     const { user, password, secret } = await enrolled();
