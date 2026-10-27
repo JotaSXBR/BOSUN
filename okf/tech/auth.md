@@ -1,7 +1,7 @@
 ---
 type: Security Spec
 title: Autenticação e sessão
-description: Login com Argon2id, convite, senha temporária pelo Admin, unlock pela CLI, sessão revogável e papéis fixos.
+description: Login com Argon2id, convite, senha temporária gerada para o Admin, unlock pela CLI, sessão revogável e papéis fixos.
 tags: [bosun, auth, sessão, segurança]
 status: draft
 generated:
@@ -26,7 +26,7 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 ## Senha esquecida ou troca
 
 1. Na tela de login, "esqueci a senha" cria um `PasswordResetRequest` e avisa o Admin dentro do produto.
-2. O Admin define uma **senha temporária**; a BOSUN marca `must_change_password`.
+2. O Admin pede e a BOSUN gera uma **senha temporária**, mostrada uma vez e válida por 72 h; marca `must_change_password`.
 3. No próximo login, a pessoa define uma senha nova, diferente da atual (comparação pelo hash).
 4. Tudo é auditado; trocar a senha revoga as outras sessões.
 5. Último recurso: `bosun admin unlock <email>` na VPS, com senha temporária, troca forçada e auditoria com ator **operador**.
@@ -34,11 +34,14 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 ## Sessão
 
 - **Better Auth** com sessão no banco; uma linha em `Session` por login (conferir na Fatia 0 como mapear os campos do ADR-102 no modelo de sessão do Better Auth).
-- Toda rota autenticada resolve a sessão no banco e verifica revogada e expirada.
+- Toda rota autenticada resolve a sessão no banco e verifica expiração; revogar apaga a linha. No máximo 5 sessões por pessoa. Senha de 12 a 128. TOTP de uso único (`UsedTotpCode`); step-up é novo login que revoga a sessão antiga. Setup 2FA sem QR no piloto; contas nascem com `emailVerified: true` e não há bloqueio de conta.
 - **12 h sem atividade** derrubam a sessão, com teto absoluto de 7 dias; segundo fator TOTP obrigatório para todos; sessão recente (10 min) para ações sensíveis ([ADR-102](../decisions/adr-102-identity.md) itens 6 e 11). `last_seen_at` atualizado no máximo a cada 5 min.
 - Sair de todos, trocar a senha e remover do workspace revogam as sessões. Mudança de papel não revoga.
 - Trocar de workspace atualiza `active_workspace_id`.
-- Cookies `HttpOnly`, `Secure` e `SameSite=Lax`; proteção CSRF nas mutações.
+- Cookies `__Secure-`, `HttpOnly`, `Secure` e `SameSite=Lax`; proteção CSRF nas mutações.
+
+- IP do cliente: a última entrada do `X-Forwarded-For`, a que o Traefik do Coolify acrescenta. Conferir no deploy: a porta da app não fica publicada no host e um `X-Forwarded-For` forjado não chega como última entrada. Com CDN na frente, ler o cabeçalho do CDN com `trustedIPs` no Traefik. Sem IP, o limite por IP não se aplica; o da conta sim.
+- Limite por conta reserva a tentativa antes de verificar a senha (rajada paralela não passa); e-mail e usuário da mesma conta contam separado (risco aceito: dobra as tentativas). Terceiro pode manter a conta bloqueada por até 15 min (risco aceito do desenho).
 
 ## Autorização
 
@@ -49,6 +52,8 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 ## Auditoria
 
 Login e logout, falhas relevantes, convites e remoções, mudança de papel, troca e reset de senha, revogação de sessão e ações sensíveis listadas no [ADR-111](../decisions/adr-111-architecture.md).
+
+- **CSP:** `src/proxy.ts` gera o nonce de toda página (inclusive prefetch); `/api/*` recebe `default-src 'none'; frame-ancestors 'none'`. Nunca liberar `'unsafe-inline'` em `style-src` em produção: componente que renderize `style=""` no servidor (shadcn, Radix, `next/image`) precisa do nonce ou de classe CSS.
 
 ## Relations
 

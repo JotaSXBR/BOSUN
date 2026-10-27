@@ -20,3 +20,4 @@ coverage/
 *.p12
 .coolify-secrets*
 .devin/
+src/generated/

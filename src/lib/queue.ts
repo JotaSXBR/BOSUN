@@ -2,6 +2,8 @@ import { PgBoss } from "pg-boss";
 import { logger } from "./logger.ts";
 
 export const EXAMPLE_QUEUE = "example";
+/** Limpeza diária do `identity` (idempotente): 3 novas tentativas com espera crescente a partir de 1 min. */
+export const CLEANUP_QUEUE = "identity.cleanup";
 
 /**
  * "sender": só envia (web). Sem manutenção nem DDL, para rodar com o papel mínimo do banco.
@@ -22,7 +24,10 @@ async function connect(role: QueueRole): Promise<PgBoss> {
   boss.on("error", (err) => logger.error("queue", "erro do pg-boss", err));
   try {
     await boss.start();
-    if (full) await boss.createQueue(EXAMPLE_QUEUE);
+    if (full) {
+      await boss.createQueue(EXAMPLE_QUEUE);
+      await boss.createQueue(CLEANUP_QUEUE, { retryLimit: 3, retryDelay: 60, retryBackoff: true });
+    }
     return boss;
   } catch (err) {
     await boss.stop().catch(() => undefined);

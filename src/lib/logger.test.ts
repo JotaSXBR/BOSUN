@@ -29,6 +29,12 @@ describe("logger", () => {
     expect(error).toHaveBeenCalledWith("[webhook] falhou [admin] login ok (Error: a b c)");
   });
 
+  it("separadores de linha Unicode (U+2028/2029, NEL) também viram espaço", () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    logger.info("x", "a b c\u0085d");
+    expect(info).toHaveBeenCalledWith("[x] a b c d");
+  });
+
   it("corta a mensagem do erro em 300 caracteres", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     logger.error("queue", "erro", new Error("x".repeat(500)));

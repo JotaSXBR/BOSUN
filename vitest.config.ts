@@ -19,6 +19,8 @@ const testUrl = testDatabaseUrl();
 export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
+    // Segredo só de teste quando o .env.local não define um.
+    env: { BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? "test-only-secret-with-at-least-32-chars" },
     projects: [
       { extends: true, test: { name: "unit", include: ["src/**/*.test.ts", "worker/**/*.test.ts"] } },
       {
@@ -37,9 +39,10 @@ export default defineConfig({
       provider: "v8",
       // worker/ fica fora: index.ts só liga os sinais ao src/lib/worker.ts e migrate.ts roda no db:migrate.
       include: ["src/**/*.{ts,tsx}"],
-      // Páginas e layout ficam com o E2E.
-      exclude: ["**/*.test.ts", "src/app/**/page.tsx", "src/app/**/layout.tsx", "src/generated/**"],
-      thresholds: { lines: 80, branches: 80 },
+      // Páginas, layouts, componentes, hooks de React e o guard (redirect do Next) ficam com o E2E.
+      exclude: ["**/*.test.ts", "src/app/**/*.tsx", "src/lib/use-*.ts", "src/generated/**"],
+      // Auth é o código mais sensível: piso maior (spec do identity, critério 8).
+      thresholds: { lines: 80, branches: 80, "src/modules/identity/**": { lines: 80, branches: 90 } },
     },
   },
 });

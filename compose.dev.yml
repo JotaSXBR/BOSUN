@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: bosun
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina no .env.local}
       POSTGRES_DB: bosun
-    ports: ["127.0.0.1:5432:5432"]
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5432}:5432"]
     volumes: [postgres:/var/lib/postgresql]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bosun"]
@@ -18,13 +18,13 @@ services:
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:?defina no .env.local}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:?defina no .env.local}
-    ports: ["127.0.0.1:9000:9000"]
+    ports: ["127.0.0.1:${RUSTFS_PORT:-9000}:9000"]
     volumes: [rustfs:/data]
   waha:
     image: devlikeapro/waha:gows-2026.9.2@sha256:1ae3c6a994ee97e5039bf41103193d7bf9175f1a31db73ba89bdeed6277901bc
     environment:
       WAHA_API_KEY: ${WAHA_API_KEY:?defina no .env.local}
-    ports: ["127.0.0.1:3001:3000"]
+    ports: ["127.0.0.1:${WAHA_PORT:-3001}:3000"]
     volumes: [waha:/app/.sessions]
 volumes:
   postgres:

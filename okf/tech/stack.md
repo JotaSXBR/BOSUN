@@ -27,8 +27,8 @@ Decidida em 2026-10-23, com base na [revisão da stack](stack-review.md). Fonte 
 
 - **Next.js full-stack (App Router) + TypeScript 7** (compilador nativo; `next build` com `experimental.useTypeScriptCli`).
 - **Dois processos da mesma imagem:** `web` (Next.js) e `worker` (pg-boss), com o mesmo código.
-- **PostgreSQL + Prisma 7**.
-- **Better Auth** com sessão no banco (tabela `Session`) e revogação ([ADR-102](../decisions/adr-102-identity.md)).
+- **PostgreSQL 18+ e Prisma 7**. O 18 é obrigatório: o throttle do login usa `RETURNING old/new`; o worker e a migração recusam subir abaixo disso.
+- **Better Auth** 1.7.12 com sessão no banco (tabela `Session`) e revogação, plugins `username` e `twoFactor`, sem rota catch-all: a UI só fala com as nossas rotas, que chamam `auth.api` no servidor ([ADR-102](../decisions/adr-102-identity.md)).
 - **Tailwind CSS + shadcn/ui**.
 - **pg-boss** para jobs no PostgreSQL, sem Redis.
 - **RustFS** para storage compatível com S3 (Apache 2.0).
