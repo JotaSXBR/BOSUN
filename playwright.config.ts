@@ -5,8 +5,9 @@ const port = 3100;
 // O .env.local do dev (no CI, as variáveis já vêm do job); nada é sobrescrito.
 try {
   process.loadEnvFile(".env.local");
-} catch {
-  // sem .env.local: CI
+} catch (err) {
+  // Sem .env.local é o CI; arquivo malformado tem de parar o teste, não cair num banco padrão.
+  if (!(err instanceof Error && "code" in err && err.code === "ENOENT")) throw err;
 }
 
 // Banco próprio do E2E. O servidor, os testes e a CLI (que herdam este env) gravam no bosun_e2e.

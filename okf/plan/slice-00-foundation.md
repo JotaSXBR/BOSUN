@@ -341,15 +341,15 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
 Conferida em 2026-10-27 (`pnpm verify` com 146 testes, E2E com 11, `./scripts/validate.sh ./okf` sem erro):
 
 1. Primeiro acesso completo: `e2e/login.spec.ts` (CLI cria a conta → senha temporária → troca → setup do 2FA com 10 códigos → logout → login com TOTP → login com código de recuperação), sobre o build de produção e o banco `bosun_e2e`.
-2. Mensagem genérica, throttle por conta e por IP, auditoria, contador no banco: `tests/integration/login.test.ts`, `e2e/home.spec.ts` ("login errado").
+2. Mensagem genérica, throttle por conta e por IP, auditoria: `tests/integration/login.test.ts`, `e2e/home.spec.ts` ("login errado"). O contador sobrevive a reinício por construção: fica na tabela `auth_throttle`, não em memória.
 3. Sessão (12 h, 7 dias, sair de todos, troca de senha revoga as outras, sexta sessão): `tests/integration/sessions.test.ts`, `login.test.ts`, `password-change.test.ts`.
 4. Sessão recente e step-up: `tests/integration/sessions.test.ts` (`SESSION_NOT_FRESH`, step-up troca a sessão, 10 min no limite, códigos novos).
 5. TOTP de uso único, inclusive concorrente: `tests/integration/two-factor.test.ts`; versão da credencial presa ao desafio: `challenge.test.ts`.
 6. `bosun admin unlock`: `tests/integration/recovery.test.ts` (2FA zerado, sessões revogadas, ator `operator`, 72 h, motivo obrigatório).
 7. CSP com nonce, sem `unsafe-*` em produção, `/api/dev` inexistente: `src/proxy.test.ts`, `e2e/home.spec.ts`.
 8. `pnpm verify` sai 0; `src/modules/identity/**` com piso de 90% de ramos e 80% de linhas no `vitest.config.ts` (hoje 92%); integração no `bosun_test`; o job `e2e` do CI sobe o Postgres e o Playwright cria e migra o `bosun_e2e`, semeia pela CLI e roda o login.
-9. Nenhum segredo em log, auditoria ou erro HTTP: `tests/integration/no-secrets.test.ts` (senha, temporária, TOTP, códigos de recuperação, token de sessão e `BETTER_AUTH_SECRET`).
-10. Tabelas e índices na migration: `tests/integration/db.test.ts`; consultas do `identity` filtram pelo usuário ou pela sessão (revisões das tarefas).
+9. Nenhum segredo em log, auditoria ou erro HTTP: `tests/integration/no-secrets.test.ts` confere console, respostas de erro e auditoria, inclusive com o banco caindo no meio do login (senha, temporária, TOTP, códigos de recuperação, token de sessão cru e assinado, `BETTER_AUTH_SECRET`); a mutação que grava o token na auditoria faz o teste falhar.
+10. Restrições do schema que importam para a segurança (pedido pendente único, TOTP único, minúsculas, `TwoFactor` único, auditoria só inserção, cascata de sessão): `tests/integration/db.test.ts`; as migrations aplicam sem erro no `bosun_test` e no `bosun_e2e`. Escopo: `no-secrets.test.ts` prova que listar e encerrar sessões não alcançam outra conta; o resto das consultas foi conferido nas revisões de cada tarefa (manual).
 
 ## Ao terminar
 

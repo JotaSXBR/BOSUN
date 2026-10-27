@@ -39,9 +39,10 @@ describe("caminhos de erro do login (Postgres real)", () => {
 
   it("auditoria que falha não derruba o login (best-effort, vai para o logger)", async () => {
     const { user, password } = await account();
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     vi.spyOn(db.auditLog, "create").mockRejectedValue(new Error("auditoria fora"));
     expect((await login({ identifier: user.email, password }, req())).ok).toBe(true);
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("auditoria auth.login.succeeded falhou"));
   });
 });
 
