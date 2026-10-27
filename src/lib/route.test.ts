@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { globSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import { Prisma } from "../generated/prisma/client.ts";
+import { Prisma, PrismaClient } from "../generated/prisma/client.ts";
 import { guarded, isDbUnavailable } from "./route.ts";
 
 const unreachable = () => new Prisma.PrismaClientKnownRequestError("Can't reach database server", { code: "P1001", clientVersion: "7" });
@@ -24,5 +27,27 @@ describe("guarded (banco fora do ar)", () => {
   it("sem erro, devolve a resposta da rota", async () => {
     const res = await guarded(async () => new Response("ok"))();
     expect(await res.text()).toBe("ok");
+  });
+});
+
+describe("erros reais com o banco fora do ar", () => {
+  it("consulta do Prisma (P1001) e consulta crua pelo adapter (P2010) contam como indisponível", async () => {
+    const down = new PrismaClient({ adapter: new PrismaPg({ connectionString: "postgresql://u:p@127.0.0.1:1/nada" }) });
+    const errors = await Promise.all([
+      down.user.count().catch((err: unknown) => err),
+      down.$queryRaw`SELECT 1`.catch((err: unknown) => err),
+    ]);
+    await down.$disconnect();
+    expect(errors.map((err) => isDbUnavailable(err))).toEqual([true, true]);
+  });
+});
+
+describe("todas as rotas passam por guarded", () => {
+  it("nenhuma rota de API exporta POST sem o 503", () => {
+    const files = [...globSync("src/app/api/**/route.ts"), "src/app/api/auth/2fa/handler.ts"];
+    // verify e recovery usam secondFactorRoute, que é guarded (o handler.ts está na lista).
+    const unguarded = files.filter((f) => !/guarded\(|secondFactorRoute\(/.test(readFileSync(f, "utf8")));
+    expect(files.length).toBeGreaterThan(5);
+    expect(unguarded).toEqual([]);
   });
 });

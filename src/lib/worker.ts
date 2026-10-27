@@ -7,6 +7,7 @@ import { CLEANUP_QUEUE, EXAMPLE_QUEUE, getQueue } from "./queue.ts";
 const CLEANUP_CRON = "17 3 * * *";
 // Tempo para o job em andamento terminar no SIGTERM antes de o pg-boss desistir dele.
 export const SHUTDOWN_TIMEOUT_MS = 10_000;
+export const CLEANUP_SCHEDULE = { cron: CLEANUP_CRON, tz: "America/Sao_Paulo" } as const;
 
 /** Registra os handlers do worker. Só o id vai para log: payload real não (engineering.md). */
 export async function startWorker(): Promise<PgBoss> {
@@ -15,10 +16,16 @@ export async function startWorker(): Promise<PgBoss> {
     if (job) logger.info("worker", `job ${job.id} concluído`);
   });
   await boss.work(CLEANUP_QUEUE, async () => {
-    const removed = await cleanupExpired();
-    logger.info("worker", `limpeza: ${removed.usedTotpCodes} códigos, ${removed.throttles} limites, ${removed.verifications} desafios`);
+    try {
+      const r = await cleanupExpired();
+      logger.info("worker", `limpeza: ${r.usedTotpCodes} códigos, ${r.throttles} limites, ${r.verifications} desafios, ${r.sessions} sessões`);
+    } catch (err) {
+      // Sinal entre as novas tentativas; o pg-boss não loga falha de job.
+      logger.error("worker", "limpeza falhou", err);
+      throw err;
+    }
   });
-  await boss.schedule(CLEANUP_QUEUE, CLEANUP_CRON, null, { tz: "America/Sao_Paulo" });
+  await boss.schedule(CLEANUP_QUEUE, CLEANUP_SCHEDULE.cron, null, { tz: CLEANUP_SCHEDULE.tz });
   logger.info("worker", "aguardando jobs");
   return boss;
 }

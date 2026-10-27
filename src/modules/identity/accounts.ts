@@ -81,12 +81,12 @@ export function findUserId(identifier: string): Promise<{ id: string } | null> {
  * e de novo no fim: se mudou, a senha conferida pode ser a antiga e o login não vira sessão. Sem relógio: se a troca
  * commitar depois da segunda leitura, a limpeza de sessões pós-commit dela pega a sessão já criada.
  */
-export async function credentialsVersion(identifier: string): Promise<number | null> {
+export async function credentialsOf(identifier: string): Promise<{ id: string; version: number } | null> {
   const user = await db.user.findFirst({
     where: identifier.includes("@") ? { email: identifier } : { username: identifier },
-    select: { credentialsVersion: true },
+    select: { id: true, credentialsVersion: true },
   });
-  return user?.credentialsVersion ?? null;
+  return user ? { id: user.id, version: user.credentialsVersion } : null;
 }
 
 /** Um só limite para toda conferência da senha atual com sessão aberta (troca de senha, cadastro do 2FA). */
@@ -117,6 +117,8 @@ export async function changePassword(current: CurrentSession, input: unknown): P
     if (count !== 1) throw new AccountError("A senha mudou durante a troca. Tente de novo.");
     await tx.user.update({ where: { id: userId }, data: { mustChangePassword: false, tempPasswordExpiresAt: null, credentialsVersion: { increment: 1 } } });
     await tx.session.deleteMany({ where: { userId, id: { not: current.session.id } } });
+    // Desafio de 2FA pendente (senha antiga já conferida) não completa mais o login.
+    await tx.verification.deleteMany({ where: { value: userId, identifier: { startsWith: "2fa-" } } });
     await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.password.changed", targetType: "user", targetId: userId });
   });
   await reset(throttle);

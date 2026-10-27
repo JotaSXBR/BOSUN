@@ -10,6 +10,10 @@ import { authSecret } from "./secret.ts";
 export const SESSION_IDLE_S = 12 * 60 * 60;
 export const MAX_SESSIONS = 5;
 
+const SECURE_COOKIES = process.env.NODE_ENV === "production";
+/** Nome exato do cookie de desafio do plugin (prefixo `bosun`; `__Secure-` em produção). */
+export const TWO_FACTOR_COOKIE = `${SECURE_COOKIES ? "__Secure-" : ""}bosun.two_factor`;
+
 /** Mantém só as 5 sessões mais novas do usuário, numa instrução (ADR-102). */
 export async function trimSessions(userId: string): Promise<void> {
   await db.$executeRaw`
@@ -49,7 +53,7 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: "bosun",
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies: SECURE_COOKIES,
     database: { generateId: "uuid" },
   },
   // Sem hook de criação de sessão para o teto de 5: o passo da senha com 2FA cria e apaga uma sessão,

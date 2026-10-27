@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "../../lib/db.ts";
 import { logger } from "../../lib/logger.ts";
 import { type AuditEvent, writeAudit } from "./audit.ts";
-import { credentialsVersion } from "./accounts.ts";
+import { credentialsOf } from "./accounts.ts";
 import { auth, trimSessions } from "./auth.ts";
 import { bindChallenge } from "./challenge.ts";
 import { resolveSession } from "./session.ts";
@@ -88,13 +88,17 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
   if (blocked) return tooMany;
 
   // Antes de conferir a senha: se a credencial trocar durante o login, ele não vira sessão nem desafio.
-  const version = await credentialsVersion(identifier);
+  const credentials = await credentialsOf(identifier);
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
-    const attempt = { identifier, identifierRef, attempts, accountKey, version };
+    const attempt = { identifier, identifierRef, attempts, accountKey, credentials };
     // Com 2FA o plugin já apagou a sessão e devolve só o cookie de desafio (sem `user`); a sessão nasce no totp.ts.
     if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) return challengeIssued(out, attempt);
-    return sessionCreated(response.user.id, response.token, out, attempt);
+    // Falha depois de o Better Auth criar a sessão: ela não fica órfã (o cookie não sai).
+    return await sessionCreated(response.user.id, response.token, out, attempt).catch(async (err: unknown) => {
+      await dropExpiredLogin(response.user.id, response.token).catch(() => undefined);
+      throw err;
+    });
   } catch (err) {
     return credentialFailed(err, identifierRef, attempts);
   }
@@ -105,12 +109,13 @@ interface Attempt {
   identifierRef: string;
   attempts: number;
   accountKey: string;
-  version: number | null;
+  credentials: { id: string; version: number } | null;
 }
 
 /** A senha conferida ainda é a atual? Conta que não existia na primeira leitura falha fechado. */
 async function credentialsUnchanged(attempt: Attempt): Promise<boolean> {
-  return attempt.version !== null && (await credentialsVersion(attempt.identifier)) === attempt.version;
+  const now = await credentialsOf(attempt.identifier);
+  return attempt.credentials !== null && now?.id === attempt.credentials.id && now.version === attempt.credentials.version;
 }
 
 const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> => {
@@ -122,9 +127,9 @@ const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> =
 /** Senha certa numa conta com 2FA. Reset no meio do caminho: o cookie de desafio não sai. */
 async function challengeIssued(out: Headers, attempt: Attempt): Promise<LoginResult> {
   // Recusado: o cookie de desafio fica em `out` e não sai.
-  if (attempt.version === null || !(await credentialsUnchanged(attempt))) return refused(attempt, "credentials_reset");
+  if (attempt.credentials === null || !(await credentialsUnchanged(attempt))) return refused(attempt, "credentials_reset");
   // A confirmação do 2FA confere se a senha ainda é a desta versão (troca entre o desafio e a sessão).
-  await bindChallenge(out, attempt.version);
+  await bindChallenge(out, attempt.credentials.id, attempt.credentials.version);
   await reset(attempt.accountKey);
   await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } });
   return { ok: true, headers: out, twoFactorRedirect: true };

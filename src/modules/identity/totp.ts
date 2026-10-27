@@ -192,9 +192,13 @@ export async function verifySecondFactor(kind: SecondFactor, input: unknown, hea
   if (setupKey && (await reserveAccountAttempt(setupKey)).blocked) return tooMany;
   try {
     const { headers: out, response } = await callPlugin(kind, code, forAuth(headers, ip));
-    return setupKey
-      ? await setupConfirmed(response.user.id, code, out, setupKey)
-      : await loginConfirmed(kind, code, { userId: response.user.id, token: response.token, out, replacing, headers });
+    if (setupKey) return await setupConfirmed(response.user.id, code, out, setupKey);
+    const verified = { userId: response.user.id, token: response.token, out, replacing, headers };
+    // Falha depois de o plugin criar a sessão (banco caindo, cookie estranho): a sessão não fica órfã.
+    return await loginConfirmed(kind, code, verified).catch(async (err: unknown) => {
+      await dropSession(verified.userId, verified.token).catch(() => undefined);
+      throw err;
+    });
   } catch (err) {
     return pluginFailed(err, current?.user.id);
   }
