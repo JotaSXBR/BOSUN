@@ -314,7 +314,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: `/setup/2fa` sem QR (segredo em grupos de 4 e URI); 10 códigos cifrados mostrados uma vez; `/login/2fa` + `/api/auth/2fa/verify|recovery`; `UsedTotpCode` com HMAC rejeita replay inclusive concorrente e revoga a sessão nova; throttle por IP de 50/15 min; auditoria.
   - Verificar: unitário do replay; integração setup, login com TOTP, replay concorrente, código de recuperação uma vez; E2E do caminho completo (critério 1).
   - Arquivos: `src/modules/identity/totp.ts`, `src/app/api/auth/2fa/`, `src/app/(auth)/login/2fa/`, `src/app/(onboarding)/setup/2fa/`, `e2e/login.spec.ts`.
-- [ ] **Checkpoint: login completo** — `pnpm verify` e `pnpm test:e2e` verdes; revisão com o usuário antes de seguir.
+- [x] **Checkpoint: login completo** — `pnpm verify` e `pnpm test:e2e` verdes; revisão com o usuário antes de seguir.
 - [ ] **I6 — Sessões ativas, sair de todos e step-up**
   - Aceite: `/security` lista sessões, revoga as outras, sair de todos (inclui a atual) e mostra códigos com sessão fresca; `requireFreshSession()` devolve `SESSION_NOT_FRESH`; `POST /api/auth/step-up` cria sessão nova e apaga a antiga.
   - Verificar: integração dos critérios 3 e 4.
