@@ -48,7 +48,7 @@ function signIn(identifier: string, password: string, headers: Headers) {
 }
 
 /** Senha temporária (troca forçada pendente) vencida não entra; a pessoa pede outra ao Admin. */
-async function tempPasswordExpired(userId: string): Promise<boolean> {
+export async function tempPasswordExpired(userId: string): Promise<boolean> {
   const user = await db.user.findUnique({ where: { id: userId }, select: { mustChangePassword: true, tempPasswordExpiresAt: true } });
   const expiresAt = user?.tempPasswordExpiresAt?.getTime();
   return Boolean(user?.mustChangePassword && expiresAt !== undefined && expiresAt < Date.now());

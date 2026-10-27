@@ -61,6 +61,19 @@ describe("setup do 2FA (Postgres real)", () => {
     expect(await db.auditLog.count({ where: { actorId: user.id, action: "auth.2fa.enrolled" } })).toBe(1);
   });
 
+  it("ao ligar o 2FA, as outras sessões (só com senha) caem", async () => {
+    const ready = await readyToEnroll();
+    const other = await login({ identifier: ready.user.email, password: ready.password }, req());
+    if (!other.ok) throw new Error("login falhou");
+    const enroll = await enrollTotp(ready.current, { password: ready.password }, ready.cookie);
+    if (!enroll.ok) throw new Error("setup falhou");
+    const confirm = await verifySecondFactor("totp", { code: totpCode(enroll.secret.replaceAll(" ", "")) }, ready.cookie);
+    if (!confirm.ok) throw new Error("confirmação falhou");
+    expect(await resolveSession(cookieFrom(other.headers))).toBeNull();
+    expect((await resolveSession(cookieFrom(confirm.headers)))?.user.id).toBe(ready.user.id);
+    expect(await sessions(ready.user.id)).toBe(1);
+  });
+
   it("recusa senha errada, troca de senha pendente e quem já tem 2FA", async () => {
     const ready = await readyToEnroll();
     expect(await enrollTotp(ready.current, { password: "senha errada bem longa" }, ready.cookie)).toMatchObject({ status: 400 });
@@ -93,6 +106,15 @@ describe("login com 2FA (Postgres real)", () => {
     expect(results.filter((r) => !r.ok && r.status === 401)).toHaveLength(1);
     expect(await sessions(user.id)).toBe(before + 1);
     expect(await db.auditLog.count({ where: { actorId: user.id, action: "auth.2fa.replayed" } })).toBe(1);
+  });
+
+  it("senha temporária vencida não entra nem com o TOTP certo", async () => {
+    const { user, password, secret } = await enrolled();
+    await db.user.update({ where: { id: user.id }, data: { mustChangePassword: true, tempPasswordExpiresAt: new Date(Date.now() - 1000) } });
+    const cookie = await challenge(user.email, password);
+    const before = await sessions(user.id);
+    expect(await verifySecondFactor("totp", { code: nextCode(secret) }, cookie)).toMatchObject({ status: 401 });
+    expect(await sessions(user.id)).toBe(before);
   });
 
   it("código de recuperação entra uma vez", async () => {
