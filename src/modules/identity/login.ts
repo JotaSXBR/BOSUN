@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "../../lib/db.ts";
 import { logger } from "../../lib/logger.ts";
 import { type AuditEvent, writeAudit } from "./audit.ts";
+import { credentialsResetSince, findUserId } from "./accounts.ts";
 import { auth, trimSessions } from "./auth.ts";
 import { resolveSession } from "./session.ts";
 import { hmac } from "./secret.ts";
@@ -85,26 +86,55 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
   const { attempts, blocked } = await reserveAccountAttempt(accountKey);
   if (blocked) return tooMany;
 
+  // Antes de conferir a senha: se uma senha temporária for emitida durante o login, ele não vira sessão.
+  const startedAt = new Date();
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
+    const attempt = { identifier, identifierRef, attempts, accountKey, startedAt };
     // Com 2FA o plugin já apagou a sessão e devolve só o cookie de desafio (sem `user`); a sessão nasce no totp.ts.
-    if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) {
-      await reset(accountKey);
-      await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef } });
-      return { ok: true, headers: out, twoFactorRedirect: true };
-    }
-    if (await tempPasswordExpired(response.user.id)) {
-      await dropExpiredLogin(response.user.id, response.token);
-      await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason: "temp_expired" } });
-      return { ok: false, status: 401, message: GENERIC };
-    }
-    await reset(accountKey);
-    await trimSessions(response.user.id);
-    await auditLogin({ actor: { type: "user", id: response.user.id }, action: "auth.login.succeeded" });
-    return { ok: true, headers: out, twoFactorRedirect: false };
+    if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) return challengeIssued(out, attempt);
+    return sessionCreated(response.user.id, response.token, out, attempt);
   } catch (err) {
     return credentialFailed(err, identifierRef, attempts);
   }
+}
+
+interface Attempt {
+  identifier: string;
+  identifierRef: string;
+  attempts: number;
+  accountKey: string;
+  startedAt: Date;
+}
+
+const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> => {
+  const { identifierRef, attempts } = attempt;
+  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason } });
+  return { ok: false, status: 401, message: GENERIC };
+};
+
+/** Senha certa numa conta com 2FA. Reset no meio do caminho: o cookie de desafio não sai. */
+async function challengeIssued(out: Headers, attempt: Attempt): Promise<LoginResult> {
+  const user = await findUserId(attempt.identifier);
+  if (user && (await credentialsResetSince(user.id, attempt.startedAt))) return refused(attempt, "credentials_reset");
+  await reset(attempt.accountKey);
+  await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } });
+  return { ok: true, headers: out, twoFactorRedirect: true };
+}
+
+async function sessionCreated(userId: string, token: unknown, out: Headers, attempt: Attempt): Promise<LoginResult> {
+  if (await tempPasswordExpired(userId)) {
+    await dropExpiredLogin(userId, token);
+    return refused(attempt, "temp_expired");
+  }
+  if (await credentialsResetSince(userId, attempt.startedAt)) {
+    await dropExpiredLogin(userId, token);
+    return refused(attempt, "credentials_reset");
+  }
+  await reset(attempt.accountKey);
+  await trimSessions(userId);
+  await auditLogin({ actor: { type: "user", id: userId }, action: "auth.login.succeeded" });
+  return { ok: true, headers: out, twoFactorRedirect: false };
 }
 
 async function credentialFailed(err: unknown, identifierRef: string, attempts: number): Promise<LoginResult> {

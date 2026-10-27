@@ -7,7 +7,8 @@ import { issueTempPassword, requestPasswordReset, unlockAccount } from "@/module
 import { hmac } from "@/modules/identity/secret.ts";
 import { hitIp, throttleKey } from "@/modules/identity/throttle.ts";
 import { TEMP_PASSWORD_TTL_MS } from "@/modules/identity/accounts.ts";
-import { account, enrolled, randomIp, req, tag, times } from "./helpers.ts";
+import { verifySecondFactor } from "@/modules/identity/totp.ts";
+import { account, challenge, enrolled, nextCode, randomIp, req, tag, times } from "./helpers.ts";
 
 const ORIGIN = "http://localhost:3000";
 
@@ -135,5 +136,35 @@ describe("senha temporária pela Admin (Postgres real)", () => {
     expect(missing.stderr).toContain("Conta não encontrada.");
     expect(spawnSync("node", ["scripts/bosun.ts", "admin", "unlock"], { encoding: "utf8" }).stderr).toContain("Informe um e-mail.");
     expect(spawnSync("node", ["scripts/bosun.ts", "admin", "unlock", user.email], { encoding: "utf8" }).stderr).toContain("Informe o motivo");
+  });
+});
+
+describe("corrida login × senha temporária (Postgres real)", () => {
+  // Simula o reset caindo durante o login: o marco fica depois do início da tentativa.
+  const resetDuringLogin = (userId: string) => db.user.update({ where: { id: userId }, data: { credentialsResetAt: new Date(Date.now() + 5000) } });
+
+  it("login que começou antes do reset não vira sessão", async () => {
+    const { user, password } = await account();
+    await resetDuringLogin(user.id);
+    expect(await login({ identifier: user.email, password }, req())).toMatchObject({ ok: false, status: 401 });
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
+  });
+
+  it("com 2FA, o desafio não sai; e um desafio pendente para de valer quando a Admin emite a senha", async () => {
+    const { user: admin } = await account();
+    const { user, password, secret } = await enrolled();
+    const pendingChallenge = await challenge(user.email, password);
+    await issueTempPassword(user.id, { type: "user", id: admin.id });
+    expect(await verifySecondFactor("totp", { code: nextCode(secret) }, pendingChallenge)).toMatchObject({ status: 401 });
+    expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
+    await resetDuringLogin(user.id);
+    expect(await login({ identifier: user.email, password }, req())).toMatchObject({ ok: false, status: 401 });
+  });
+
+  it("unlock marca a data para o aviso no setup do 2FA", async () => {
+    const { user } = await enrolled();
+    await unlockAccount(user.email, "perdeu o celular", "ops@vps");
+    const after = await db.user.findUnique({ where: { id: user.id } });
+    expect(Math.abs((after?.twoFactorResetAt?.getTime() ?? 0) - Date.now())).toBeLessThan(60_000);
   });
 });

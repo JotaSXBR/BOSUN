@@ -16,7 +16,7 @@ Nomes em inglês. Toda entidade de negócio tem `id` (cuid), `workspace_id`, `cr
 ## Fundação
 
 - `Environment` (1 por instalação), `Workspace` (`name`, `timezone`).
-- `User` (`username`, `email`, `password_hash`, `must_change_password`), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
+- `User` (`username`, `email`, `password_hash`, `must_change_password`, `credentials_reset_at` — última senha temporária; login iniciado antes dela não vira sessão —, `two_factor_reset_at` — último `unlock`, para o aviso no setup do 2FA), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
 - `Invite` (`email`, `role`, `token_hash`, `expires_at`, `accepted_at`).
 - `Workspace`, `Membership` e `Invite` são as tabelas `organization`, `member` e `invitation` do plugin `organization` do Better Auth, com os campos extras acima ([ADR-102](../decisions/adr-102-identity.md)).
 - `Session` ([ADR-102](../decisions/adr-102-identity.md); revogar apaga a linha), `PasswordResetRequest`, `UsedTotpCode` (`user_id`, código usado, `expires_at`).

@@ -36,6 +36,8 @@ export const auth = betterAuth({
     additionalFields: {
       mustChangePassword: { type: "boolean", defaultValue: false, input: false },
       tempPasswordExpiresAt: { type: "date", required: false, input: false },
+      credentialsResetAt: { type: "date", required: false, input: false },
+      twoFactorResetAt: { type: "date", required: false, input: false },
     },
   },
   session: {

@@ -146,7 +146,7 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 
 **Modelos** (campos principais; o resto segue o schema do Better Auth):
 
-- `User` (`id` UUID, `name`, `email` único, `emailVerified`, `image`, `username` único, `twoFactorEnabled`, `mustChangePassword`, `tempPasswordExpiresAt`, `createdAt`, `updatedAt`). `email` e `username` em minúsculas; `username` valida `^[a-z0-9][a-z0-9._-]{2,31}$`. `displayUsername` desligado.
+- `User` (`id` UUID, `name`, `email` único, `emailVerified`, `image`, `username` único, `twoFactorEnabled`, `mustChangePassword`, `tempPasswordExpiresAt`, `credentialsResetAt`, `twoFactorResetAt`, `createdAt`, `updatedAt`). `email` e `username` em minúsculas; `username` valida `^[a-z0-9][a-z0-9._-]{2,31}$`. `displayUsername` desligado.
 - `Account` (`id`, `accountId`, `providerId`, `userId`, `password`, tokens OAuth nulos, `createdAt`, `updatedAt`); a senha fica no `Account` de `providerId = "credential"`, nunca no `User`.
 - `Session` (`id`, `token` único, `userId`, `expiresAt`, `createdAt`, `updatedAt`, `ipAddress`, `userAgent`). `updatedAt` é o "visto por último" (no máximo a cada 5 min); não há `revoked_at`/`revoked_reason`. `activeOrganizationId` entra com o plugin do `workspace`.
 - `Verification` (`id`, `identifier`, `value`, `expiresAt`, `createdAt`, `updatedAt`): desafios 2FA e contadores do plugin.

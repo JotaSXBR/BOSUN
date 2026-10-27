@@ -71,6 +71,20 @@ interface CurrentSession {
   session: { id: string };
 }
 
+/** Usuário pelo e-mail ou pelo nome de usuário (a mesma regra do login). */
+export function findUserId(identifier: string): Promise<{ id: string } | null> {
+  return db.user.findFirst({ where: identifier.includes("@") ? { email: identifier } : { username: identifier }, select: { id: true } });
+}
+
+/**
+ * Houve senha temporária emitida depois de `since`? Um login que conferiu a senha antiga antes do reset
+ * e termina depois dele não vira sessão (fecha a corrida login × reset).
+ */
+export async function credentialsResetSince(userId: string, since: Date): Promise<boolean> {
+  const user = await db.user.findUnique({ where: { id: userId }, select: { credentialsResetAt: true } });
+  return Boolean(user?.credentialsResetAt && user.credentialsResetAt >= since);
+}
+
 /** Um só limite para toda conferência da senha atual com sessão aberta (troca de senha, cadastro do 2FA). */
 export const passwordCheckKey = (userId: string) => throttleKey("password-check", userId);
 

@@ -18,6 +18,10 @@ model User {
   twoFactorEnabled      Boolean   @default(false)
   mustChangePassword    Boolean   @default(false)
   tempPasswordExpiresAt DateTime?
+  /// Última senha temporária emitida: login que começou antes disso não vira sessão.
+  credentialsResetAt    DateTime?
+  /// Último `admin unlock`: o setup do 2FA avisa a pessoa.
+  twoFactorResetAt      DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
