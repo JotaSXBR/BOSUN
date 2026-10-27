@@ -36,6 +36,11 @@ async function signOut(page: Page) {
 const home = (page: Page) => expect(page.getByRole("heading", { level: 1, name: "BOSUN" })).toBeVisible();
 
 test("primeiro acesso: senha temporária → troca → setup do 2FA → login com TOTP e com código de recuperação", async ({ page }) => {
+  // CSP em toda página do caminho (login, troca, setup, home, 2FA, segurança): nenhuma violação no console.
+  const violations: string[] = [];
+  page.on("console", (msg) => {
+    if (/Content Security Policy|CSP/i.test(msg.text())) violations.push(msg.text());
+  });
   const { email, tempPassword } = createAccount();
   await signIn(page, email, tempPassword);
 
@@ -57,6 +62,10 @@ test("primeiro acesso: senha temporária → troca → setup do 2FA → login co
   const recovery = (await codes.first().textContent()) ?? "";
   await page.getByRole("button", { name: "Já guardei, continuar" }).click();
   await home(page);
+
+  // Cookie de sessão de produção: __Secure-, HttpOnly, Secure, SameSite=Lax, Path=/, só do host (sem Domain).
+  const cookie = (await page.context().cookies()).find((c) => c.name.endsWith("session_token"));
+  expect(cookie).toMatchObject({ name: "__Secure-bosun.session_token", httpOnly: true, secure: true, sameSite: "Lax", path: "/", domain: "localhost" });
 
   await signOut(page);
   await signIn(page, email, PASSWORD);
@@ -82,4 +91,5 @@ test("primeiro acesso: senha temporária → troca → setup do 2FA → login co
   await expect(page.getByRole("list", { name: "Códigos de recuperação" }).locator("code")).toHaveCount(10);
   await page.getByRole("button", { name: "Sair de todos os dispositivos" }).click();
   await expect(page).toHaveURL(/\/login$/);
+  expect(violations).toEqual([]);
 });

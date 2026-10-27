@@ -110,8 +110,8 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 
 **Escopo:**
 - Dependências exatas: `better-auth@1.7.12`, `@node-rs/argon2@2.2.2`, `@prisma/client@7.10.1`, `@prisma/adapter-pg@7.10.1` (com `pg`) e `zod@4.6.7`. O client do Prisma é gerado em `src/generated/prisma` e instanciado com `PrismaPg` em `src/lib/db.ts`.
-- Prisma: `User`, `Account`, `Session`, `Verification`, `TwoFactor`, `RateLimit`, `PasswordResetRequest`, `AuthThrottle`, `UsedTotpCode` e `AuditLog`; a primeira migration nasce aqui. `Organization`, `Member` e `Invitation` ficam para o `workspace`.
-- Better Auth: e-mail/senha com `disableSignUp`, `username()` sem `displayUsername`, `twoFactor()` e `nextCookies()` por último; Argon2id no `password.hash`/`verify`; rate limit com `storage: "database"`; cookies `__Secure-`; sessão de 12 h com `updateAge` de 5 min, `freshAge` de 10 min e teto absoluto de 7 dias conferido por nós.
+- Prisma: `User`, `Account`, `Session`, `Verification`, `TwoFactor`, `PasswordResetRequest`, `AuthThrottle`, `UsedTotpCode` e `AuditLog`; a primeira migration nasce aqui. `Organization`, `Member` e `Invitation` ficam para o `workspace`.
+- Better Auth: e-mail/senha com `disableSignUp`, `username()` sem `displayUsername`, `twoFactor()`; Argon2id no `password.hash`/`verify`; sem rota catch-all (a UI só fala com as nossas rotas, que chamam `auth.api` no servidor, então o rate limit nativo não entra em jogo e o throttle é o nosso, `AuthThrottle`); cookies `__Secure-`; sessão de 12 h com `updateAge` de 5 min, `freshAge` de 10 min e teto absoluto de 7 dias conferido por nós.
 - Fluxos: primeiro acesso, login por usuário ou e-mail, desafio 2FA, código de recuperação, setup obrigatório de 2FA, troca forçada, pedido de reset, senha temporária pelo Admin, unlock pela CLI, sessão/recentidade, sessões ativas, logout e sair de todos.
 - Rotas e telas: login, desafio 2FA, troca de senha, setup 2FA e segurança (sessões e códigos de recuperação); o layout autenticado tem logout visível.
 - CLI: `bosun admin create` e `bosun admin unlock`, em `scripts/bosun.ts`, rodando no mesmo container da aplicação.
@@ -136,7 +136,7 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 
 1. **Primeiro acesso (CLI).** `pnpm bosun admin create --username <u> --email <e> --name "<nome>"` cria `User` + `Account` (`providerId: "credential"`) com Argon2id, `emailVerified: true`, `mustChangePassword: true` e senha temporária de 72 h. Imprime a senha uma vez e o endereço de login. O `workspace` depois torna essa conta Admin do primeiro workspace; até lá, o login cai numa página mínima.
 2. **Login.** `POST /api/auth/login` recebe `{ identifier, password }`; se tiver `@`, chama `auth.api.signInEmail`; senão, `auth.api.signInUsername`. O wrapper aplica o throttle por conta e por IP, registra falha genérica ("Usuário ou senha inválidos"), não revela se a conta existe e, em sucesso, encaminha os cookies do Better Auth. Com 2FA ligado, a resposta é `{ twoFactorRedirect: true }` e o cookie de desafio; sem 2FA, a sessão já é criada.
-3. **Desafio 2FA.** A tela `/login/2fa` envia o código para `POST /api/auth/2fa/verify` (TOTP) ou `/api/auth/2fa/recovery` (código de recuperação). O wrapper valida o desafio, aplica o uso único do TOTP, encaminha o cookie de sessão e audita. O desafio vale 10 min e é de uso único; o lockout do plugin é 10 falhas em 15 min. As rotas nativas `/two-factor/verify-*` e `/two-factor/disable` ficam bloqueadas no catch-all.
+3. **Desafio 2FA.** A tela `/login/2fa` envia o código para `POST /api/auth/2fa/verify` (TOTP) ou `/api/auth/2fa/recovery` (código de recuperação). O wrapper valida o desafio, aplica o uso único do TOTP, encaminha o cookie de sessão e audita. O desafio vale 10 min e é de uso único; o lockout do plugin é 10 falhas em 15 min. Não há rota nativa exposta (sem catch-all).
 4. **Setup obrigatório de 2FA.** Depois da troca de senha, `/setup/2fa` pede a senha, chama `twoFactor.enable` (segredo cifrado e 10 códigos cifrados), mostra o segredo/URI, pede o primeiro código e usa a rota acima para confirmar. O plugin marca `twoFactorEnabled`, rotaciona a sessão e os 10 códigos são mostrados uma vez. Recomeçar substitui o segredo não verificado.
 5. **Troca forçada de senha.** `/change-password` pede a senha atual (temporária) e a nova. O serviço nosso verifica a atual, aplica a política, grava o novo hash, zera `mustChangePassword`/`tempPasswordExpiresAt`, revoga as outras sessões e audita. A rota nativa `/change-password` fica bloqueada.
 6. **Esqueceu a senha.** `/login` tem "Esqueci a senha"; `POST /api/auth/password-reset-request` responde 202 sempre (exceto 429 com mais de 100 pedidos do IP em 15 min; acima de 3 pedidos do mesmo identificador, 202 sem gravar nada) e, se a conta existir, cria um `PasswordResetRequest` pendente (um por usuário, índice único parcial). O Admin vê o pedido na UI do `workspace` (próximo módulo) e dispara a senha temporária pelo serviço do `identity`; a UI mostra a senha uma vez.
@@ -151,7 +151,6 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 - `Session` (`id`, `token` único, `userId`, `expiresAt`, `createdAt`, `updatedAt`, `ipAddress`, `userAgent`). `updatedAt` é o "visto por último" (no máximo a cada 5 min); não há `revoked_at`/`revoked_reason`. `activeOrganizationId` entra com o plugin do `workspace`.
 - `Verification` (`id`, `identifier`, `value`, `expiresAt`, `createdAt`, `updatedAt`): desafios 2FA e contadores do plugin.
 - `TwoFactor` (`id`, `userId`, `secret` cifrado, `backupCodes` cifrados, `verified`, `failedVerificationCount`, `lockedUntil`).
-- `RateLimit` (`id`, `key` único, `count`, `lastRequest` bigint): rate limit do Better Auth no banco.
 - `AuthThrottle` (`key` PK, `count`, `windowStartedAt`, `blockedUntil`, `updatedAt`): throttle nosso por conta e por IP; incremento atômico.
 - `UsedTotpCode` (`id`, `userId`, `codeHash`, `expiresAt`, `createdAt`); único `(userId, codeHash)` e índice em `expiresAt`.
 - `PasswordResetRequest` (`id`, `userId`, `status`: pending | resolved | dismissed, `requestedAt`, `resolvedAt`, `resolvedByUserId`, `createdAt`, `updatedAt`); um pendente por usuário por índice único parcial.
@@ -160,13 +159,13 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 **Rotas e telas:**
 
 - Públicas: `/login`, `/login/2fa`; `POST /api/auth/login`, `/api/auth/2fa/verify`, `/api/auth/2fa/recovery`, `/api/auth/password-reset-request`.
-- Autenticadas: `/change-password`, `/setup/2fa`, `/security`; `POST /api/auth/step-up`; `GET /api/auth/session` (a nossa, com o teto de 7 dias); o catch-all `/api/auth/[...all]` só expõe o que a UI usa e bloqueia as rotas nativas de credencial/2FA listadas.
+- Autenticadas: `/change-password`, `/setup/2fa`, `/security`; `POST /api/auth/step-up`, `/api/auth/2fa/enable`, `/api/auth/logout`, `/api/auth/logout-all`, `/api/account/password`, `/api/account/recovery-codes`, `/api/account/sessions/revoke-others`. Sem catch-all `/api/auth/[...all]`: nenhuma rota nativa do Better Auth existe (E2E confere o 404).
 - Layout: `(auth)` público, `(onboarding)` exige sessão mas aceita `mustChangePassword`/2FA pendente, `(app)` exige `requireReadySession()`. O `proxy.ts` cuida só da CSP e do nonce; nenhuma decisão de autorização nele.
 - CLI: `pnpm bosun admin create ...` e `pnpm bosun admin unlock ...`; o script importa o serviço do `identity`, abre o Prisma, executa e fecha; imprime a senha temporária só em stdout, nunca em log.
 
 **Segurança e limites operacionais:**
 
-- **Throttle do login:** falhas por conta em 15 min: 5 → 30 s de espera; 10 → 5 min; 20 → 15 min; sucesso zera. Por IP: 100 tentativas em 15 min. O `RateLimit` do Better Auth protege o resto do catch-all (100 req/min por IP) e sobrevive a reinício.
+- **Throttle do login:** falhas por conta em 15 min: 5 → 30 s de espera; 10 → 5 min; 20 → 15 min; sucesso zera. Por IP: 100 tentativas em 15 min. Contadores no banco (`AuthThrottle`), então sobrevivem a reinício. Um bloqueio em curso não é estendido: a faixa seguinte vale na primeira tentativa depois que ele vence.
 - **Throttle do 2FA:** lockout nativo do plugin em 10 falhas/15 min por conta; por IP, 50 tentativas/15 min na nossa rota. O desafio de 10 min é de uso único.
 - **Cookies/CSRF:** `__Secure-bosun.session_token` em produção (sem `Domain`), `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`; `bosun.session_token` em dev. `cookieCache` desligado. Mutações nossas exigem `Origin` do `BETTER_AUTH_URL` e JSON; as Server Actions usam a checagem do Next; o Better Auth valida `trustedOrigins`.
 - **Senha:** Argon2id com 64 MiB, 3 iterações, 4 lanes e 32 bytes; medir no VPS e baixar para 32 MiB/3 se passar de 500 ms. `type=password`, colar e gerenciador de senhas permitidos; sem normalização.
@@ -197,7 +196,7 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 **Limites:**
 
 - Sempre: autorização e sessão no servidor; `workspace_id` em toda consulta de negócio (quando a tabela existir); auditar ação sensível; conferir a doc da versão do Better Auth antes de configurar; rodar o validador e os testes.
-- Perguntar antes: trocar a versão do Better Auth, mudar duração de sessão, afrouxar rate limit ou política de senha, adicionar fator de autenticação, criar rota nativa nova no catch-all, mexer no segredo que cifra o 2FA.
+- Perguntar antes: trocar a versão do Better Auth, mudar duração de sessão, afrouxar rate limit ou política de senha, adicionar fator de autenticação, expor rota nativa do Better Auth (criar catch-all), mexer no segredo que cifra o 2FA.
 - Nunca: confiar em permissão do cliente; logar segredo, senha, código ou token; guardar senha em texto; deixar `/sign-up`, `/forget-password`, `/reset-password`, `/change-password`, `/set-password`, `/two-factor/verify-*`, `/two-factor/disable`, `/get-session` ou `/admin/*` nativos abertos; rodar a CLI com senha em argumento.
 
 **Pendências herdadas do `toolchain` (fecham aqui):**
@@ -303,7 +302,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Verificar: unitários de hash, política e sanitização; integração da CLI create.
   - Arquivos: `src/modules/identity/password.ts`, `src/modules/identity/audit.ts`, `src/modules/identity/accounts.ts`, `scripts/bosun.ts` e os testes.
 - [x] **I3 — Login e sessão**
-  - Aceite: Better Auth configurado (sem `admin`, `disableSignUp`, `username`, cookie `__Secure-`, `cookieCache` off, rate limit no banco); catch-all bloqueia as rotas nativas da lista "Nunca"; `POST /api/auth/login` com mensagem genérica, throttle por conta e IP (`AuthThrottle`) e auditoria; `/login`; `requireSession()` com teto de 7 dias; limite de 5 sessões; logout no cabeçalho.
+  - Aceite: Better Auth configurado (sem `admin`, `disableSignUp`, `username`, cookie `__Secure-`, `cookieCache` off); sem catch-all, nenhuma rota nativa exposta; `POST /api/auth/login` com mensagem genérica, throttle por conta e IP (`AuthThrottle`) e auditoria; `/login`; `requireSession()` com teto de 7 dias; limite de 5 sessões; logout no cabeçalho.
   - Verificar: unitários do throttle e do teto; integração login certo/errado, throttle após N falhas, sexta sessão, teto absoluto, rotas nativas 404.
   - Arquivos: `src/modules/identity/auth.ts`, `src/modules/identity/session.ts`, `src/modules/identity/throttle.ts`, `src/app/api/auth/`, `src/app/(auth)/login/page.tsx`.
 - [x] **I4 — Troca forçada de senha**
@@ -338,7 +337,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
 
 ### Evidência dos critérios de aceite do `identity`
 
-Conferida em 2026-10-27 (`pnpm verify` com 146 testes, E2E com 11, `./scripts/validate.sh ./okf` sem erro):
+Conferida em 2026-10-27 (`pnpm verify` com 159 testes, E2E com 11, `./scripts/validate.sh ./okf` sem erro):
 
 1. Primeiro acesso completo: `e2e/login.spec.ts` (CLI cria a conta → senha temporária → troca → setup do 2FA com 10 códigos → logout → login com TOTP → login com código de recuperação), sobre o build de produção e o banco `bosun_e2e`.
 2. Mensagem genérica, throttle por conta e por IP, auditoria: `tests/integration/login.test.ts`, `e2e/home.spec.ts` ("login errado"). O contador sobrevive a reinício por construção: fica na tabela `auth_throttle`, não em memória.

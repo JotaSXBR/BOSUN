@@ -33,7 +33,9 @@ generated:
     - Senha de **12 a 128** caracteres.
     - Setup do 2FA **sem QR** no piloto (segredo e URI em texto); o QR entra com o design system.
     - Provisionamento com `emailVerified: true` (não há canal de e-mail) e **sem bloqueio nem desativação de conta** no piloto; tirar o acesso é remover do workspace e revogar as sessões. Decidido em 2026-10-26.
-    - **Limite de tentativas** no login e no código (`rateLimit` do Better Auth, guardado no banco).
+    - **Limite de tentativas** no login e no código: throttle nosso no banco (`AuthThrottle`, por conta e por IP) e o bloqueio do plugin no 2FA. Sem rota catch-all, o `rateLimit` nativo do Better Auth não é usado.
+    - **Registro de acesso:** os eventos de login, 2FA e step-up gravam o IP na auditoria, guardada 6 meses (Marco Civil, art. 15). O IP é dado pessoal com essa finalidade e esse prazo (decidido em 2026-10-27).
+    - **Trocar a senha** fora do primeiro acesso pede sessão recente; a troca forçada do primeiro acesso não, porque vem logo após o login (decidido em 2026-10-27).
     - **Argon2id** por `@node-rs/argon2` no `password.hash`/`verify` (o padrão do Better Auth é scrypt).
     - Alvo: **OWASP ASVS 5.0 nível 2** na autenticação e na sessão; os itens exatos entram na spec da Fatia 0.
 12. **Workspace, membro e convite usam o plugin `organization` do Better Auth** (organização = workspace, `member` = Membership, `invitation` = Invite, `activeOrganizationId` = `active_workspace_id`). Os três papéis são os papéis do plugin. **Sem o plugin `admin`** (sem banimento nem impersonation): a CLI cria contas pela API do servidor e a revogação apaga sessões. Decidido em 2026-10-23, revisto em 2026-10-26.

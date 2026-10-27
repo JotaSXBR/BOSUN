@@ -11,15 +11,22 @@ generated:
 
 # Modelo de dados
 
-Nomes em inglês. Toda entidade de negócio tem `id` (cuid), `workspace_id`, `created_at` e `updated_at`. Mudança estrutural edita este doc e o [ADR-111](../decisions/adr-111-architecture.md).
+Nomes em inglês. Toda entidade de negócio tem `id` (UUID v7, `@default(uuid(7))`), `workspace_id`, `created_at` e `updated_at`. Mudança estrutural edita este doc e o [ADR-111](../decisions/adr-111-architecture.md).
 
 ## Fundação
 
 - `Environment` (1 por instalação), `Workspace` (`name`, `timezone`).
-- `User` (`username`, `email`, `password_hash`, `must_change_password`, `credentials_version` — sobe a cada troca de senha ou senha temporária; o login que leu outra versão não vira sessão —, `two_factor_reset_at` — último `unlock`, para o aviso no setup do 2FA), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
+- `User` (`username` e `email` únicos e em minúsculas, `email_verified`, `two_factor_enabled`, `must_change_password`, `temp_password_expires_at`, `credentials_version` — sobe a cada troca de senha ou senha temporária; o login que leu outra versão não vira sessão —, `two_factor_reset_at` — último `unlock`, para o aviso no setup do 2FA), `Membership` (`user_id`, `workspace_id`, `role`: `admin` | `member` | `viewer`).
 - `Invite` (`email`, `role`, `token_hash`, `expires_at`, `accepted_at`).
 - `Workspace`, `Membership` e `Invite` são as tabelas `organization`, `member` e `invitation` do plugin `organization` do Better Auth, com os campos extras acima ([ADR-102](../decisions/adr-102-identity.md)).
-- `Session` ([ADR-102](../decisions/adr-102-identity.md); revogar apaga a linha), `PasswordResetRequest`, `UsedTotpCode` (`user_id`, código usado, `expires_at`).
+- Tabelas do `identity` (Better Auth + nossas), [ADR-102](../decisions/adr-102-identity.md):
+  - `Account` (`provider_id` = `credential`, `password` com o hash Argon2id; a senha mora aqui, não no `User`).
+  - `Session` (`token`, `expires_at` deslizante de 12 h, `ip_address`, `user_agent`, `created_at` para o teto de 7 dias e a sessão recente; revogar apaga a linha).
+  - `Verification` (desafios do 2FA, tentativas por desafio e o vínculo `bosun-cv-<id>` com a versão da credencial; vencidos saem na limpeza diária).
+  - `TwoFactor` (único por usuário; `secret` e `backup_codes` cifrados pelo plugin com o `BETTER_AUTH_SECRET`, `verified`, `failed_verification_count`, `locked_until`).
+  - `AuthThrottle` (`key` em HMAC, `count`, `window_started_at`, `blocked_until`): throttle por conta e por IP.
+  - `UsedTotpCode` (`user_id`, `code_hash` em HMAC, `expires_at`; único por usuário e código): uso único do TOTP.
+  - `PasswordResetRequest` (`status`: pending | resolved | dismissed; um pendente por usuário, índice parcial).
 - `AuditLog` (`actor_type`: user | operator | system, `actor_id`, `action`, `target_type`, `target_id`, `data`, `created_at`). Só inserção; retenção de 6 meses (Marco Civil, art. 15), garantida por trigger e apagada pela limpeza diária.
 - `Integration` (`kind`: meta | whatsapp | youtube | google_contacts | google_calendar | kiwify | site_chat, `owner_user_id` opcional, `status`, `encrypted_credentials`, `expires_at`).
 
