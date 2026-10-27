@@ -9,6 +9,7 @@ describe("createShutdown", () => {
     const exit = vi.fn();
     createShutdown({ stop }, exit)();
     await vi.waitFor(() => expect(exit).toHaveBeenCalledWith(0));
+    expect(stop).toHaveBeenCalledWith({ graceful: true, timeout: 10_000 });
   });
 
   it("ignora o segundo sinal", async () => {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { guarded } from "@/lib/route.ts";
 import { type ChangePasswordError, changePassword } from "@/modules/identity/accounts.ts";
 import { readAuthed } from "@/modules/identity/http.ts";
 
@@ -13,10 +14,10 @@ const MESSAGES: Record<ChangePasswordError, string> = {
   rate_limited: "Muitas tentativas. Aguarde e tente de novo.",
 };
 
-export async function POST(req: Request): Promise<NextResponse> {
+export const POST = guarded(async (req: Request): Promise<NextResponse> => {
   const read = await readAuthed(req);
   if (read instanceof NextResponse) return read;
   const error = await changePassword(read.current, read.body);
   if (error) return NextResponse.json({ error: MESSAGES[error] }, { status: error === "rate_limited" ? 429 : 400 });
   return NextResponse.json({ ok: true });
-}
+});

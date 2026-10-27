@@ -327,7 +327,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: `src/proxy.ts` com nonce e a política da spec (sem `unsafe-*` em produção); layout raiz dinâmico; `/api/dev/*` e o teste apagados; a integração enfileira direto e confirma o job pelo estado no pg-boss.
   - Verificar: unitário da CSP prod/dev; E2E com header, console sem violação e `/api/dev/example-job` 404.
   - Arquivos: `src/proxy.ts`, `src/app/layout.tsx`, `src/app/api/dev/` (apagar), `tests/integration/`, `e2e/home.spec.ts`.
-- [ ] **I9 — Limpeza diária e robustez da fila**
+- [x] **I9 — Limpeza diária e robustez da fila**
   - Aceite: job diário apaga `UsedTotpCode`, `AuthThrottle` e `Verification` vencidos; testes de retry, job duplicado e shutdown com job em andamento (timeout de 10 s); banco fora do ar devolve 503 genérico.
   - Verificar: integração do job e do shutdown; unitário do 503 com dublê.
   - Arquivos: `worker/index.ts`, `src/modules/identity/cleanup.ts`, `src/lib/worker.ts` e os testes.

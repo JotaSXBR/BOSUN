@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { forbidden, readJson, sameOrigin, withCookies } from "@/modules/identity/http.ts";
+import { guarded } from "@/lib/route.ts";
+import { readPublic, withCookies } from "@/modules/identity/http.ts";
 import { login } from "@/modules/identity/login.ts";
 
-export async function POST(req: Request): Promise<NextResponse> {
-  if (!sameOrigin(req)) return forbidden();
-  const read = await readJson(req);
+export const POST = guarded(async (req: Request): Promise<NextResponse> => {
+  const read = await readPublic(req);
   if (read instanceof NextResponse) return read;
   const result = await login(read.body, req.headers);
   if (!result.ok) return NextResponse.json({ error: result.message }, { status: result.status });
   return withCookies(NextResponse.json({ twoFactorRedirect: result.twoFactorRedirect }), result.headers);
-}
+});

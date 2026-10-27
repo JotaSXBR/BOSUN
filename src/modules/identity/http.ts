@@ -86,3 +86,9 @@ export async function formSession(req: Request): Promise<AuthSession | NextRespo
   // Primeiro acesso pendente: a página inicial manda para a troca de senha ou o setup do 2FA.
   return isReady(current) ? current : NextResponse.redirect(new URL("/", process.env.BETTER_AUTH_URL), 303);
 }
+
+/** Mutação pública (sem sessão): Origin e corpo JSON. Devolve o erro pronto quando não passa. */
+export async function readPublic(req: Request): Promise<{ body: unknown } | NextResponse> {
+  if (!sameOrigin(req)) return forbidden();
+  return readJson(req);
+}
