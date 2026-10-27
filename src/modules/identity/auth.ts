@@ -11,8 +11,13 @@ export const SESSION_IDLE_S = 12 * 60 * 60;
 export const MAX_SESSIONS = 5;
 
 const SECURE_COOKIES = process.env.NODE_ENV === "production";
-/** Nome exato do cookie de desafio do plugin (prefixo `bosun`; `__Secure-` em produção). */
-export const TWO_FACTOR_COOKIE = `${SECURE_COOKIES ? "__Secure-" : ""}bosun.two_factor`;
+
+/** Nome exato do cookie de desafio do plugin (prefixo `bosun`; `__Secure-` com cookies seguros). */
+export function twoFactorCookieName(secure: boolean): string {
+  return `${secure ? "__Secure-" : ""}bosun.two_factor`;
+}
+
+export const TWO_FACTOR_COOKIE = twoFactorCookieName(SECURE_COOKIES);
 
 /** Mantém só as 5 sessões mais novas do usuário, numa instrução (ADR-102). */
 export async function trimSessions(userId: string): Promise<void> {

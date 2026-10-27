@@ -4,7 +4,8 @@ import { type AuthSession, isFresh, resolveSession } from "./session.ts";
 /** Mutação só do próprio site (CSRF): Origin igual ao BETTER_AUTH_URL. */
 export function sameOrigin(req: Request): boolean {
   const expected = process.env.BETTER_AUTH_URL;
-  return Boolean(expected) && req.headers.get("origin") === new URL(expected ?? "").origin;
+  if (!expected) return false;
+  return req.headers.get("origin") === new URL(expected).origin;
 }
 
 export function forbidden(): NextResponse {

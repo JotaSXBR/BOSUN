@@ -12,6 +12,13 @@ const ACCOUNT_TIERS = [
 
 export type ThrottleScope = keyof typeof IP_LIMIT;
 
+/** INSERT ... RETURNING sempre devolve uma linha; sem ela, é defeito nosso (falha alto, não conta 1 em silêncio). */
+export function onlyRow<T>(rows: T[]): T {
+  const [row] = rows;
+  if (row === undefined || rows.length !== 1) throw new Error("throttle: esperava uma linha");
+  return row;
+}
+
 export function accountBlockMs(attempts: number): number {
   return ACCOUNT_TIERS.find((t) => attempts >= t.from)?.ms ?? 0;
 }
@@ -50,7 +57,7 @@ export async function hitIp(key: string): Promise<number> {
               THEN now() ELSE auth_throttle."windowStartedAt" END,
       "updatedAt" = now()
     RETURNING count`;
-  return rows[0]?.count ?? 1;
+  return onlyRow(rows).count;
 }
 
 /**
@@ -77,8 +84,8 @@ export async function reserveAccountAttempt(key: string): Promise<{ attempts: nu
         ELSE auth_throttle."blockedUntil" END,
       "updatedAt" = now()
     RETURNING new.count, coalesce(old."blockedUntil" > now(), false) AS blocked`;
-  const row = rows[0];
-  return { attempts: row?.count ?? 1, blocked: row?.blocked ?? false };
+  const row = onlyRow(rows);
+  return { attempts: row.count, blocked: row.blocked };
 }
 
 export async function reset(key: string): Promise<void> {

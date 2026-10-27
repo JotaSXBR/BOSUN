@@ -41,7 +41,8 @@ export default defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       // Páginas, layouts, componentes, hooks de React e o guard (redirect do Next) ficam com o E2E.
       exclude: ["**/*.test.ts", "src/app/**/*.tsx", "src/modules/identity/guard.ts", "src/lib/use-*.ts", "src/generated/**"],
-      thresholds: { lines: 80, branches: 80 },
+      // Auth é o código mais sensível: piso maior (spec do identity, critério 8).
+      thresholds: { lines: 80, branches: 80, "src/modules/identity/**": { lines: 80, branches: 90 } },
     },
   },
 });
