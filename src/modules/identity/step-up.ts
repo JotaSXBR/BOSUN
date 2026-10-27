@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "../../lib/db.ts";
 import { cookieHeader } from "./http.ts";
 import { auditLogin, login } from "./login.ts";
 import type { AuthSession } from "./session.ts";
@@ -20,7 +19,7 @@ function withCookie(headers: Headers, cookie: string | null): Headers {
 
 /**
  * Step-up (ADR-102, decisão 7): refaz o login com senha e segundo fator pelos mesmos caminhos do login
- * (throttle, uso único do TOTP, auditoria), e a sessão antiga é apagada. Código com hífen = recuperação.
+ * (throttle, uso único do TOTP, auditoria), e a sessão antiga é apagada antes do teto de 5 sessões. Código com hífen = recuperação.
  */
 export async function stepUp(current: AuthSession, input: unknown, headers: Headers): Promise<StepUpResult> {
   const parsed = schema.safeParse(input);
@@ -33,12 +32,11 @@ export async function stepUp(current: AuthSession, input: unknown, headers: Head
     return password.ok ? INVALID : { ...password, message: password.status === 429 ? password.message : INVALID.message };
   }
   const kind = parsed.data.code.includes("-") ? "recovery" : "totp";
-  const second = await verifySecondFactor(kind, { code: parsed.data.code }, withCookie(headers, cookieHeader(password.headers)));
+  const second = await verifySecondFactor(kind, { code: parsed.data.code }, withCookie(headers, cookieHeader(password.headers)), current.session.id);
   if (!second.ok) {
     await auditLogin({ actor, action: "auth.step_up.failed", data: { step: kind } });
     return second.status === 429 ? second : INVALID;
   }
-  await db.session.deleteMany({ where: { id: current.session.id, userId: current.user.id } });
   await auditLogin({ actor, action: "auth.step_up.succeeded" });
   return { ok: true, headers: second.headers };
 }

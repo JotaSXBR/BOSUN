@@ -33,7 +33,8 @@ export function isFresh(current: AuthSession): boolean {
 /** Sessões da própria pessoa para a tela de segurança; o token nunca sai daqui. */
 export function listSessions(userId: string) {
   return db.session.findMany({
-    where: { userId },
+    // Só as que ainda valem: a linha vencida (12 h sem uso ou 7 dias) fica no banco até alguém usar o cookie.
+    where: { userId, expiresAt: { gt: new Date() }, createdAt: { gt: new Date(Date.now() - ABSOLUTE_MAX_MS) } },
     select: { id: true, userAgent: true, ipAddress: true, createdAt: true, updatedAt: true },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
@@ -44,6 +45,7 @@ export async function revokeOtherSessions(current: AuthSession): Promise<number>
   const { id: userId } = current.user;
   return db.$transaction(async (tx) => {
     const { count } = await tx.session.deleteMany({ where: { userId, id: { not: current.session.id } } });
+    if (count === 0) return 0;
     await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.session.revoked", targetType: "user", targetId: userId, data: { scope: "others", count } });
     return count;
   });

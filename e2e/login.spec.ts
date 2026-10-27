@@ -72,11 +72,12 @@ test("primeiro acesso: senha temporária → troca → setup do 2FA → login co
   await page.getByRole("button", { name: "Entrar com o código" }).click();
   await home(page);
 
-  // Sessão recém-criada: ver os códigos não pede step-up; o usado já não aparece.
+  // Sessão recém-criada: gerar códigos novos só pede a senha (sem step-up).
   await page.getByRole("link", { name: "Segurança" }).click();
   await expect(page.getByRole("cell", { name: /\(esta sessão\)/ })).toBeVisible();
-  await page.getByRole("button", { name: "Ver os códigos que ainda valem" }).click();
-  await expect(page.getByRole("list", { name: "Códigos de recuperação" }).locator("code")).toHaveCount(9);
+  await page.getByLabel("Senha").fill(PASSWORD);
+  await page.getByRole("button", { name: "Gerar códigos novos" }).click();
+  await expect(page.getByRole("list", { name: "Códigos de recuperação" }).locator("code")).toHaveCount(10);
   await page.getByRole("button", { name: "Sair de todos os dispositivos" }).click();
   await expect(page).toHaveURL(/\/login$/);
 });

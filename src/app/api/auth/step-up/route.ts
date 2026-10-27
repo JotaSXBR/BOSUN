@@ -7,5 +7,5 @@ export async function POST(req: Request): Promise<NextResponse> {
   if (read instanceof NextResponse) return read;
   const result = await stepUp(read.current, read.body, req.headers);
   if (!result.ok) return NextResponse.json({ error: result.message }, { status: result.status });
-  return withCookies(NextResponse.json({ ok: true }), result.headers);
+  return withCookies(NextResponse.json({ ok: true }, { headers: { "cache-control": "no-store" } }), result.headers);
 }

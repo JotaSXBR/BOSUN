@@ -141,8 +141,8 @@ pnpm services:up    # docker compose com o .env.local: postgres, rustfs, waha
 5. **Troca forçada de senha.** `/change-password` pede a senha atual (temporária) e a nova. O serviço nosso verifica a atual, aplica a política, grava o novo hash, zera `mustChangePassword`/`tempPasswordExpiresAt`, revoga as outras sessões e audita. A rota nativa `/change-password` fica bloqueada.
 6. **Esqueceu a senha.** `/login` tem "Esqueci a senha"; `POST /api/auth/password-reset-request` responde 202 sempre e, se a conta existir, cria um `PasswordResetRequest` pendente (um por usuário, índice único parcial). O Admin vê o pedido na UI do `workspace` (próximo módulo) e dispara a senha temporária pelo serviço do `identity`; a UI mostra a senha uma vez.
 7. **Unlock pela CLI.** `pnpm bosun admin unlock <email> [--reason "<texto>"]` gera a senha temporária, zera o `TwoFactor` (segredo e códigos), revoga todas as sessões, resolve pedidos pendentes e audita com ator `operator`. É o último recurso quando o celular e os códigos foram perdidos.
-8. **Sessão e recentidade.** Toda rota/página autenticada usa `requireSession()`; o layout `(app)` chama `requireReadySession()` e redireciona para troca de senha ou setup 2FA. O teto de 7 dias é conferido sobre `createdAt`; passou, a sessão é excluída e auditada. Ações sensíveis usam `requireFreshSession()` (10 min) e o step-up do item 7 das decisões.
-9. **Sessões ativas e logout.** `/security` lista as sessões (dispositivo, IP, criada, visto por último), permite revogar as outras, sair de todos e ver os códigos de recuperação (senha + sessão fresca). O logout fica visível no cabeçalho de toda página autenticada; "sair de todos" revoga inclusive a atual, apaga o cookie e volta ao login.
+8. **Sessão e recentidade.** Toda rota/página autenticada usa `requireSession()`; o layout `(app)` chama `requireReadySession()` e redireciona para troca de senha ou setup 2FA. O teto de 7 dias é conferido sobre `createdAt`; passou, a sessão é excluída e auditada. Ações sensíveis usam `readFresh()` (o `requireFreshSession()` das rotas: 10 min) e o step-up do item 7 das decisões.
+9. **Sessões ativas e logout.** `/security` lista as sessões (dispositivo, IP, criada, visto por último), permite revogar as outras, sair de todos e gerar códigos de recuperação novos (senha + sessão fresca; os anteriores deixam de valer). As rotas de formulário exigem o primeiro acesso concluído; encerrar sessões não pede sessão recente (ação defensiva). O logout fica visível no cabeçalho de toda página autenticada; "sair de todos" revoga inclusive a atual, apaga o cookie e volta ao login.
 
 **Modelos** (campos principais; o resto segue o schema do Better Auth):
 
@@ -316,7 +316,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Arquivos: `src/modules/identity/totp.ts`, `src/app/api/auth/2fa/`, `src/app/(auth)/login/2fa/`, `src/app/(onboarding)/setup/2fa/`, `e2e/login.spec.ts`.
 - [x] **Checkpoint: login completo** — `pnpm verify` e `pnpm test:e2e` verdes; revisão com o usuário antes de seguir.
 - [x] **I6 — Sessões ativas, sair de todos e step-up**
-  - Aceite: `/security` lista sessões, revoga as outras, sair de todos (inclui a atual) e mostra códigos com sessão fresca; `requireFreshSession()` devolve `SESSION_NOT_FRESH`; `POST /api/auth/step-up` cria sessão nova e apaga a antiga.
+  - Aceite: `/security` lista sessões, revoga as outras, sair de todos (inclui a atual) e gera códigos novos com senha + sessão fresca; `readFresh()` devolve `SESSION_NOT_FRESH`; `POST /api/auth/step-up` cria sessão nova e apaga a antiga.
   - Verificar: integração dos critérios 3 e 4.
   - Arquivos: `src/modules/identity/session.ts`, `src/app/api/auth/step-up/route.ts`, `src/app/(app)/security/`.
 - [ ] **I7 — Pedido de reset, senha temporária e `bosun admin unlock`**

@@ -13,6 +13,7 @@ export type SecondFactor = "totp" | "recovery";
 
 type Failure = { ok: false; status: 400 | 401 | 409 | 429; message: string };
 export type EnrollResult = { ok: true; secret: string; uri: string; recoveryCodes: string[] } | Failure;
+export type CodesResult = { ok: true; recoveryCodes: string[] } | Failure;
 export type VerifyResult = { ok: true; headers: Headers } | Failure;
 
 const INVALID_CODE: Failure = { ok: false, status: 401, message: "Código inválido ou expirado. Se persistir, entre de novo." };
@@ -48,16 +49,39 @@ export async function enrollTotp(current: AuthSession, input: unknown, headers: 
   if (!parsed.success) return { ok: false, status: 400, message: "Digite a sua senha." };
   const { id: userId, mustChangePassword, twoFactorEnabled } = current.user;
   if (mustChangePassword || twoFactorEnabled) return { ok: false, status: 409, message: "O 2FA não pode ser configurado agora." };
+  return withPasswordCheck(userId, "enroll_password", async () => {
+    const res = await auth.api.enableTwoFactor({ body: { password: parsed.data.password }, headers });
+    if (res.method !== "totp") throw new Error("2FA: método inesperado");
+    return { ok: true, secret: groupSecret(res.totpURI), uri: res.totpURI, recoveryCodes: res.backupCodes } as const;
+  });
+}
+
+/**
+ * Códigos de recuperação novos (senha + sessão recente, conferida na rota): os 10 anteriores deixam de valer
+ * e os novos aparecem uma vez. Ninguém relê os códigos já guardados.
+ */
+export async function regenerateRecoveryCodes(current: AuthSession, input: unknown, headers: Headers): Promise<CodesResult> {
+  const parsed = passwordSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, status: 400, message: "Digite a sua senha." };
+  const userId = current.user.id;
+  return withPasswordCheck(userId, "regenerate_password", async () => {
+    const res = await auth.api.generateBackupCodes({ body: { password: parsed.data.password }, headers });
+    await writeAudit(db, { actor: { type: "user", id: userId }, action: "auth.recovery_code.regenerated", targetType: "user", targetId: userId });
+    return { ok: true, recoveryCodes: res.backupCodes } as const;
+  });
+}
+
+/** Confere a senha atual pelo plugin, no mesmo limite da troca de senha; senha errada é auditada. */
+async function withPasswordCheck<T>(userId: string, step: string, run: () => Promise<T>): Promise<T | Failure> {
   const throttle = passwordCheckKey(userId);
   if ((await reserveAccountAttempt(throttle)).blocked) return tooMany;
   try {
-    const res = await auth.api.enableTwoFactor({ body: { password: parsed.data.password }, headers });
+    const result = await run();
     await reset(throttle);
-    if (res.method !== "totp") throw new Error("2FA: método inesperado");
-    return { ok: true, secret: groupSecret(res.totpURI), uri: res.totpURI, recoveryCodes: res.backupCodes };
+    return result;
   } catch (err) {
     if (!(err instanceof APIError) || err.body?.code !== "INVALID_PASSWORD") throw err;
-    await writeAudit(db, { actor: { type: "user", id: userId }, action: "auth.2fa.failed", data: { step: "enroll_password" } });
+    await writeAudit(db, { actor: { type: "user", id: userId }, action: "auth.2fa.failed", data: { step } });
     return { ok: false, status: 400, message: "A senha não confere." };
   }
 }
@@ -106,9 +130,11 @@ interface Verified {
   userId: string;
   token: unknown;
   out: Headers;
+  /** Step-up: a sessão antiga sai antes do teto de 5, para não derrubar outro dispositivo. */
+  replacing?: string;
 }
 
-async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out }: Verified): Promise<VerifyResult> {
+async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out, replacing }: Verified): Promise<VerifyResult> {
   const actor = { type: "user", id: userId } as const;
   if (kind === "totp" && !(await markTotpUsed(userId, code))) {
     await dropSession(userId, token);
@@ -121,6 +147,7 @@ async function loginConfirmed(kind: SecondFactor, code: string, { userId, token,
     await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", targetType: "user", targetId: userId, data: { reason: "temp_expired" } });
     return INVALID_CODE;
   }
+  if (replacing) await db.session.deleteMany({ where: { id: replacing, userId } });
   await trimSessions(userId);
   await auditLogin({ actor, action: kind === "totp" ? "auth.2fa.succeeded" : "auth.recovery_code.used" });
   await auditLogin({ actor, action: "auth.login.succeeded" });
@@ -143,7 +170,7 @@ async function pluginFailed(err: unknown, userId: string | undefined): Promise<F
  * Segundo fator: no login (cookie de desafio) cria a sessão; no setup (sessão aberta) confirma o TOTP,
  * e o plugin liga o 2FA e troca a sessão. Com sessão o plugin não bloqueia a conta: o limite é nosso, por usuário.
  */
-export async function verifySecondFactor(kind: SecondFactor, input: unknown, headers: Headers): Promise<VerifyResult> {
+export async function verifySecondFactor(kind: SecondFactor, input: unknown, headers: Headers, replacing?: string): Promise<VerifyResult> {
   const parsed = codeSchema.safeParse(input);
   if (!parsed.success) return INVALID_CODE;
   const code = parsed.data.code.replace(/\s+/g, "");
@@ -157,7 +184,7 @@ export async function verifySecondFactor(kind: SecondFactor, input: unknown, hea
     const { headers: out, response } = await callPlugin(kind, code, forAuth(headers, ip));
     return setupKey
       ? await setupConfirmed(response.user.id, code, out, setupKey)
-      : await loginConfirmed(kind, code, { userId: response.user.id, token: response.token, out });
+      : await loginConfirmed(kind, code, { userId: response.user.id, token: response.token, out, replacing });
   } catch (err) {
     return pluginFailed(err, current?.user.id);
   }

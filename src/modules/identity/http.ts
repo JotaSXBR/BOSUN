@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { type AuthSession, resolveSession } from "./session.ts";
+import { type AuthSession, isFresh, resolveSession } from "./session.ts";
 
 /** Mutação só do próprio site (CSRF): Origin igual ao BETTER_AUTH_URL. */
 export function sameOrigin(req: Request): boolean {
@@ -49,9 +49,23 @@ export async function readAuthed(req: Request): Promise<{ current: AuthSession; 
 export async function readReady(req: Request): Promise<{ current: AuthSession; body: unknown } | NextResponse> {
   const read = await readAuthed(req);
   if (read instanceof NextResponse) return read;
-  const { mustChangePassword, twoFactorEnabled } = read.current.user;
-  if (mustChangePassword || !twoFactorEnabled) return NextResponse.json({ error: "Conclua o primeiro acesso." }, { status: 403 });
+  if (!isReady(read.current)) return NextResponse.json({ error: "Conclua o primeiro acesso." }, { status: 403 });
   return read;
+}
+
+/** Primeiro acesso concluído: senha trocada e 2FA ligado (mesma regra do `requireReadySession`). */
+function isReady(current: AuthSession): boolean {
+  return !current.user.mustChangePassword && current.user.twoFactorEnabled === true;
+}
+
+/**
+ * Ação sensível (o `requireFreshSession()` da spec): `readReady` + sessão recente de 10 min.
+ * Fora disso, 403 `SESSION_NOT_FRESH` e a tela faz o step-up.
+ */
+export async function readFresh(req: Request): Promise<{ current: AuthSession; body: unknown } | NextResponse> {
+  const read = await readReady(req);
+  if (read instanceof NextResponse || isFresh(read.current)) return read;
+  return notFresh();
 }
 
 /** Ação sensível com sessão de mais de 10 min (ADR-102): a tela pede senha e código e repete. */
@@ -64,8 +78,11 @@ export function cookieHeader(from: Headers): string {
   return from.getSetCookie().map((c) => c.split(";")[0]).join("; ");
 }
 
-/** Mutação por <form> HTML (sem JSON): Origin e sessão. Devolve o erro pronto quando não passa. */
+/** Mutação por <form> HTML (sem JSON): Origin, sessão e primeiro acesso concluído. Devolve o erro pronto quando não passa. */
 export async function formSession(req: Request): Promise<AuthSession | NextResponse> {
   if (!sameOrigin(req)) return forbidden();
-  return (await resolveSession(req.headers)) ?? NextResponse.redirect(new URL("/login", process.env.BETTER_AUTH_URL), 303);
+  const current = await resolveSession(req.headers);
+  if (!current) return NextResponse.redirect(new URL("/login", process.env.BETTER_AUTH_URL), 303);
+  // Primeiro acesso pendente: a página inicial manda para a troca de senha ou o setup do 2FA.
+  return isReady(current) ? current : NextResponse.redirect(new URL("/", process.env.BETTER_AUTH_URL), 303);
 }
