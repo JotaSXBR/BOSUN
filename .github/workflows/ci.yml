@@ -53,7 +53,7 @@ jobs:
         with: { persist-credentials: false }
       - run: docker compose -f compose.dev.yml up -d --wait postgres
       - uses: ./.github/actions/setup
-      - run: pnpm exec prisma migrate deploy
+      # O globalSetup do Playwright cria e migra o bosun_e2e; os testes semeiam as contas pela CLI.
       # Só o headless shell: a imagem do runner já tem as bibliotecas; o apt do --with-deps levava até 11 min.
       # Cache só gravado pela main; PR apenas lê.
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

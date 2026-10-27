@@ -331,10 +331,25 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: job diário apaga `UsedTotpCode`, `AuthThrottle` e `Verification` vencidos; testes de retry, job duplicado e shutdown com job em andamento (timeout de 10 s); banco fora do ar devolve 503 genérico.
   - Verificar: integração do job e do shutdown; unitário do 503 com dublê.
   - Arquivos: `worker/index.ts`, `src/modules/identity/cleanup.ts`, `src/lib/worker.ts` e os testes.
-- [ ] **I10 — Fechamento do módulo**
+- [x] **I10 — Fechamento do módulo**
   - Aceite: job `e2e` do CI sobe Postgres, migra `bosun_e2e`, semeia e roda o login; threshold de 90% ramos/80% linhas em `src/modules/identity/**`; os 10 critérios de aceite do `identity` com evidência; nenhum segredo em log (critério 9).
   - Verificar: `pnpm verify`, PR com CI verde, `./scripts/validate.sh ./okf`, `/agent-skills:review`.
   - Arquivos: `.github/workflows/ci.yml`, `vitest.config.ts`, `AGENTS.md`, `okf/tech/stack.md`, `okf/log.md`, esta fatia.
+
+### Evidência dos critérios de aceite do `identity`
+
+Conferida em 2026-10-27 (`pnpm verify` com 146 testes, E2E com 11, `./scripts/validate.sh ./okf` sem erro):
+
+1. Primeiro acesso completo: `e2e/login.spec.ts` (CLI cria a conta → senha temporária → troca → setup do 2FA com 10 códigos → logout → login com TOTP → login com código de recuperação), sobre o build de produção e o banco `bosun_e2e`.
+2. Mensagem genérica, throttle por conta e por IP, auditoria, contador no banco: `tests/integration/login.test.ts`, `e2e/home.spec.ts` ("login errado").
+3. Sessão (12 h, 7 dias, sair de todos, troca de senha revoga as outras, sexta sessão): `tests/integration/sessions.test.ts`, `login.test.ts`, `password-change.test.ts`.
+4. Sessão recente e step-up: `tests/integration/sessions.test.ts` (`SESSION_NOT_FRESH`, step-up troca a sessão, 10 min no limite, códigos novos).
+5. TOTP de uso único, inclusive concorrente: `tests/integration/two-factor.test.ts`; versão da credencial presa ao desafio: `challenge.test.ts`.
+6. `bosun admin unlock`: `tests/integration/recovery.test.ts` (2FA zerado, sessões revogadas, ator `operator`, 72 h, motivo obrigatório).
+7. CSP com nonce, sem `unsafe-*` em produção, `/api/dev` inexistente: `src/proxy.test.ts`, `e2e/home.spec.ts`.
+8. `pnpm verify` sai 0; `src/modules/identity/**` com piso de 90% de ramos e 80% de linhas no `vitest.config.ts` (hoje 92%); integração no `bosun_test`; o job `e2e` do CI sobe o Postgres e o Playwright cria e migra o `bosun_e2e`, semeia pela CLI e roda o login.
+9. Nenhum segredo em log, auditoria ou erro HTTP: `tests/integration/no-secrets.test.ts` (senha, temporária, TOTP, códigos de recuperação, token de sessão e `BETTER_AUTH_SECRET`).
+10. Tabelas e índices na migration: `tests/integration/db.test.ts`; consultas do `identity` filtram pelo usuário ou pela sessão (revisões das tarefas).
 
 ## Ao terminar
 

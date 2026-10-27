@@ -91,7 +91,7 @@ pnpm dup              # jscpd, limite de 3%
 pnpm test:unit        # unitário, sem banco
 pnpm test:int         # integração, precisa do services:up
 pnpm test             # unitário + integração com cobertura; precisa do services:up
-pnpm test:e2e         # Playwright sobre o build de produção
+pnpm test:e2e         # Playwright sobre o build de produção, no banco bosun_e2e (criado e migrado sozinho)
 
 # Os mesmos checks do job check do CI (menos os self-tests dos scripts); precisa do services:up
 pnpm verify
