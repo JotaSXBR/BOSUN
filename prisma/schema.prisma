@@ -101,15 +101,6 @@ model TwoFactor {
   @@map("twoFactor")
 }
 
-model RateLimit {
-  id          String @id @default(uuid(7)) @db.Uuid
-  key         String @unique
-  count       Int
-  lastRequest BigInt
-
-  @@map("rateLimit")
-}
-
 model AuthThrottle {
   key             String    @id
   count           Int       @default(0)

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { cookieHeader } from "./http.ts";
 import { auditLogin, login } from "./login.ts";
 import type { AuthSession } from "./session.ts";
+import { clientIp } from "./throttle.ts";
 import { verifySecondFactor } from "./totp.ts";
 
 export type StepUpResult = { ok: true; headers: Headers } | { ok: false; status: 400 | 401 | 409 | 429; message: string };
@@ -25,18 +26,19 @@ export async function stepUp(current: AuthSession, input: unknown, headers: Head
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { ok: false, status: 400, message: "Digite a senha e o código." };
   const actor = { type: "user", id: current.user.id } as const;
+  const ip = clientIp(headers);
   const password = await login({ identifier: current.user.email, password: parsed.data.password }, withCookie(headers, null));
   // requireReady garante 2FA ligado, então senha certa sempre volta com desafio.
   if (!password.ok || !password.twoFactorRedirect) {
-    await auditLogin({ actor, action: "auth.step_up.failed", data: { step: "password" } });
+    await auditLogin({ actor, action: "auth.step_up.failed", data: { step: "password" } }, ip);
     return password.ok ? INVALID : { ...password, message: password.status === 429 ? password.message : INVALID.message };
   }
   const kind = parsed.data.code.includes("-") ? "recovery" : "totp";
   const second = await verifySecondFactor(kind, { code: parsed.data.code }, withCookie(headers, cookieHeader(password.headers)), current.session.id);
   if (!second.ok) {
-    await auditLogin({ actor, action: "auth.step_up.failed", data: { step: kind } });
+    await auditLogin({ actor, action: "auth.step_up.failed", data: { step: kind } }, ip);
     return second.status === 429 ? second : INVALID;
   }
-  await auditLogin({ actor, action: "auth.step_up.succeeded" });
+  await auditLogin({ actor, action: "auth.step_up.succeeded" }, ip);
   return { ok: true, headers: second.headers };
 }

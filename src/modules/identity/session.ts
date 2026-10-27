@@ -51,11 +51,14 @@ export async function revokeOtherSessions(current: AuthSession): Promise<number>
   });
 }
 
-/** Sair de todos: apaga todas as sessões da pessoa, inclusive a atual. */
-export async function revokeAllSessions(current: AuthSession): Promise<void> {
+/** Sair de todos: apaga todas as sessões da pessoa, inclusive a atual, e devolve os cabeçalhos que limpam o cookie. */
+export async function revokeAllSessions(current: AuthSession, headers: Headers): Promise<Headers> {
   const { id: userId } = current.user;
   await db.$transaction(async (tx) => {
     const { count } = await tx.session.deleteMany({ where: { userId } });
     await writeAudit(tx, { actor: { type: "user", id: userId }, action: "auth.logout_all", targetType: "user", targetId: userId, data: { count } });
   });
+  // A sessão já não existe; o signOut só devolve os Set-Cookie que limpam o cookie.
+  const { headers: cleared } = await auth.api.signOut({ headers, returnHeaders: true });
+  return cleared;
 }

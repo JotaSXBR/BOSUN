@@ -80,16 +80,6 @@ CREATE TABLE "twoFactor" (
 );
 
 -- CreateTable
-CREATE TABLE "rateLimit" (
-    "id" UUID NOT NULL,
-    "key" TEXT NOT NULL,
-    "count" INTEGER NOT NULL,
-    "lastRequest" BIGINT NOT NULL,
-
-    CONSTRAINT "rateLimit_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "auth_throttle" (
     "key" TEXT NOT NULL,
     "count" INTEGER NOT NULL DEFAULT 0,
@@ -169,9 +159,6 @@ CREATE INDEX "twoFactor_userId_idx" ON "twoFactor"("userId");
 
 -- CreateIndex
 CREATE INDEX "twoFactor_secret_idx" ON "twoFactor"("secret");
-
--- CreateIndex
-CREATE UNIQUE INDEX "rateLimit_key_key" ON "rateLimit"("key");
 
 -- CreateIndex
 CREATE INDEX "auth_throttle_updatedAt_idx" ON "auth_throttle"("updatedAt");

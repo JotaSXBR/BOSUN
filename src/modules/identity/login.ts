@@ -25,10 +25,14 @@ export type LoginResult =
 
 export const tooMany = { ok: false, status: 429, message: "Muitas tentativas. Aguarde e tente de novo." } as const;
 
-// Auditoria de login é best-effort (spec): falhar ao gravar não derruba o login.
-export async function auditLogin(event: AuditEvent): Promise<void> {
+/**
+ * Auditoria de login é best-effort (spec): falhar ao gravar não derruba o login.
+ * `ip` entra no evento: registro de acesso (IP + data e hora) guardado 6 meses (Marco Civil, art. 15; ADR-102).
+ */
+export async function auditLogin(event: AuditEvent, ip?: string | null): Promise<void> {
+  const withIp = ip ? { ...event, data: { ...event.data, ip } } : event;
   try {
-    await writeAudit(db, event);
+    await writeAudit(db, withIp);
   } catch (err) {
     logger.error("identity", `auditoria ${event.action} falhou`, err);
   }
@@ -69,7 +73,7 @@ async function ipOverLimit(ip: string | null): Promise<boolean> {
   if (!ip) return false;
   const attempts = await hitIp(throttleKey("login-ip", ip));
   // Audita só a primeira recusa da janela: requisição sem login não enche a auditoria.
-  if (attempts === 101) await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "ip" } });
+  if (attempts === 101) await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "ip" } }, ip);
   return ipBlocked(attempts, "login");
 }
 
@@ -91,7 +95,7 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
   const credentials = await credentialsOf(identifier);
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
-    const attempt = { identifier, identifierRef, attempts, accountKey, credentials };
+    const attempt = { identifier, identifierRef, attempts, accountKey, credentials, ip };
     // Com 2FA o plugin já apagou a sessão e devolve só o cookie de desafio (sem `user`); a sessão nasce no totp.ts.
     if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) return challengeIssued(out, attempt);
     // Falha depois de o Better Auth criar a sessão: ela não fica órfã (o cookie não sai).
@@ -100,7 +104,7 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
       throw err;
     });
   } catch (err) {
-    return credentialFailed(err, identifierRef, attempts);
+    return credentialFailed(err, identifierRef, attempts, ip);
   }
 }
 
@@ -110,6 +114,7 @@ interface Attempt {
   attempts: number;
   accountKey: string;
   credentials: { id: string; version: number } | null;
+  ip: string | null;
 }
 
 /** A senha conferida ainda é a atual? Conta que não existia na primeira leitura falha fechado. */
@@ -119,8 +124,8 @@ async function credentialsUnchanged(attempt: Attempt): Promise<boolean> {
 }
 
 const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> => {
-  const { identifierRef, attempts } = attempt;
-  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason } });
+  const { identifierRef, attempts, ip } = attempt;
+  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts, reason } }, ip);
   return { ok: false, status: 401, message: GENERIC };
 };
 
@@ -131,7 +136,7 @@ async function challengeIssued(out: Headers, attempt: Attempt): Promise<LoginRes
   // A confirmação do 2FA confere se a senha ainda é a desta versão (troca entre o desafio e a sessão).
   await bindChallenge(out, attempt.credentials.id, attempt.credentials.version);
   await reset(attempt.accountKey);
-  await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } });
+  await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } }, attempt.ip);
   return { ok: true, headers: out, twoFactorRedirect: true };
 }
 
@@ -146,15 +151,15 @@ async function sessionCreated(userId: string, token: unknown, out: Headers, atte
   }
   await reset(attempt.accountKey);
   await trimSessions(userId);
-  await auditLogin({ actor: { type: "user", id: userId }, action: "auth.login.succeeded" });
+  await auditLogin({ actor: { type: "user", id: userId }, action: "auth.login.succeeded" }, attempt.ip);
   return { ok: true, headers: out, twoFactorRedirect: false };
 }
 
-async function credentialFailed(err: unknown, identifierRef: string, attempts: number): Promise<LoginResult> {
+async function credentialFailed(err: unknown, identifierRef: string, attempts: number, ip: string | null): Promise<LoginResult> {
   if (!(err instanceof APIError) || !CREDENTIAL_ERRORS.has(String(err.status))) throw err;
-  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts } });
+  await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", data: { identifierRef, attempts } }, ip);
   if (crossesTier(attempts)) {
-    await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "account", identifierRef } });
+    await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "account", identifierRef } }, ip);
   }
   return { ok: false, status: 401, message: GENERIC };
 }
@@ -163,6 +168,6 @@ async function credentialFailed(err: unknown, identifierRef: string, attempts: n
 export async function logout(headers: Headers): Promise<Headers> {
   const current = await resolveSession(headers);
   const { headers: out } = await auth.api.signOut({ headers, returnHeaders: true });
-  if (current) await auditLogin({ actor: { type: "user", id: current.user.id }, action: "auth.logout" });
+  if (current) await auditLogin({ actor: { type: "user", id: current.user.id }, action: "auth.logout" }, clientIp(headers));
   return out;
 }

@@ -91,7 +91,7 @@ async function withPasswordCheck<T>(userId: string, step: string, run: () => Pro
 async function ipOverLimit(ip: string | null): Promise<boolean> {
   if (!ip) return false;
   const attempts = await hitIp(throttleKey("2fa-ip", ip));
-  if (attempts === 51) await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "2fa-ip" } });
+  if (attempts === 51) await auditLogin({ actor: { type: "system" }, action: "auth.rate_limited", data: { scope: "2fa-ip" } }, ip);
   return ipBlocked(attempts, "2fa");
 }
 
@@ -117,12 +117,13 @@ async function dropSession(userId: string, token: unknown): Promise<void> {
  * Confirmação do setup. O código fica registrado (barra o reuso no login), mas repetido aqui não desfaz nada:
  * o plugin já ligou o 2FA e trocou a sessão. As outras sessões, que só passaram pela senha, caem (ASVS 7.4.3).
  */
-async function setupConfirmed(userId: string, code: string, out: Headers, setupKey: string): Promise<VerifyResult> {
+async function setupConfirmed(userId: string, code: string, out: Headers, at: { setupKey: string; ip: string | null }): Promise<VerifyResult> {
+  const { setupKey, ip } = at;
   await markTotpUsed(userId, code);
   await reset(setupKey);
   const newest = await db.session.findFirst({ where: { userId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true } });
   await db.session.deleteMany({ where: { userId, id: { not: newest?.id } } });
-  await auditLogin({ actor: { type: "user", id: userId }, action: "auth.2fa.enrolled" });
+  await auditLogin({ actor: { type: "user", id: userId }, action: "auth.2fa.enrolled" }, ip);
   return { ok: true, headers: out };
 }
 
@@ -135,6 +136,7 @@ interface Verified {
   replacing?: string;
   /** Cookies da requisição (o desafio), para conferir a versão da credencial. */
   headers: Headers;
+  ip: string | null;
 }
 
 /** Motivo para não deixar a sessão nascer: senha temporária vencida ou credencial trocada depois do desafio. */
@@ -143,36 +145,36 @@ async function blockedReason(userId: string, headers: Headers): Promise<string |
   return (await challengeStillValid(userId, headers)) ? null : "credentials_reset";
 }
 
-async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out, replacing, headers }: Verified): Promise<VerifyResult> {
+async function loginConfirmed(kind: SecondFactor, code: string, { userId, token, out, replacing, headers, ip }: Verified): Promise<VerifyResult> {
   const actor = { type: "user", id: userId } as const;
   if (kind === "totp" && !(await markTotpUsed(userId, code))) {
     await dropSession(userId, token);
     await db.twoFactor.updateMany({ where: { userId }, data: { failedVerificationCount: { increment: 1 } } });
-    await auditLogin({ actor, action: "auth.2fa.replayed" });
+    await auditLogin({ actor, action: "auth.2fa.replayed" }, ip);
     return INVALID_CODE;
   }
   const reason = await blockedReason(userId, headers);
   if (reason) {
     await dropSession(userId, token);
-    await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", targetType: "user", targetId: userId, data: { reason } });
+    await auditLogin({ actor: { type: "system" }, action: "auth.login.failed", targetType: "user", targetId: userId, data: { reason } }, ip);
     return INVALID_CODE;
   }
   if (replacing) await db.session.deleteMany({ where: { id: replacing, userId } });
   await trimSessions(userId);
-  await auditLogin({ actor, action: kind === "totp" ? "auth.2fa.succeeded" : "auth.recovery_code.used" });
-  await auditLogin({ actor, action: "auth.login.succeeded" });
+  await auditLogin({ actor, action: kind === "totp" ? "auth.2fa.succeeded" : "auth.recovery_code.used" }, ip);
+  await auditLogin({ actor, action: "auth.login.succeeded" }, ip);
   return { ok: true, headers: out };
 }
 
-async function pluginFailed(err: unknown, userId: string | undefined): Promise<Failure> {
+async function pluginFailed(err: unknown, userId: string | undefined, ip: string | null): Promise<Failure> {
   if (!(err instanceof APIError)) throw err;
   const actor = userId ? ({ type: "user", id: userId } as const) : ({ type: "system" } as const);
   if (err.status === "TOO_MANY_REQUESTS") {
-    await auditLogin({ actor, action: "auth.rate_limited", data: { scope: "2fa-account" } });
+    await auditLogin({ actor, action: "auth.rate_limited", data: { scope: "2fa-account" } }, ip);
     return tooMany;
   }
   if (!CODE_ERRORS.has(String(err.status))) throw err;
-  await auditLogin({ actor, action: "auth.2fa.failed" });
+  await auditLogin({ actor, action: "auth.2fa.failed" }, ip);
   return INVALID_CODE;
 }
 
@@ -192,14 +194,14 @@ export async function verifySecondFactor(kind: SecondFactor, input: unknown, hea
   if (setupKey && (await reserveAccountAttempt(setupKey)).blocked) return tooMany;
   try {
     const { headers: out, response } = await callPlugin(kind, code, forAuth(headers, ip));
-    if (setupKey) return await setupConfirmed(response.user.id, code, out, setupKey);
-    const verified = { userId: response.user.id, token: response.token, out, replacing, headers };
+    if (setupKey) return await setupConfirmed(response.user.id, code, out, { setupKey, ip });
+    const verified = { userId: response.user.id, token: response.token, out, replacing, headers, ip };
     // Falha depois de o plugin criar a sessão (banco caindo, cookie estranho): a sessão não fica órfã.
     return await loginConfirmed(kind, code, verified).catch(async (err: unknown) => {
       await dropSession(verified.userId, verified.token).catch(() => undefined);
       throw err;
     });
   } catch (err) {
-    return pluginFailed(err, current?.user.id);
+    return pluginFailed(err, current?.user.id, ip);
   }
 }

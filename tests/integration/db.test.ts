@@ -53,3 +53,10 @@ describe("schema do identity (Postgres real, banco bosun_test)", () => {
     expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
   });
 });
+
+describe("versão do PostgreSQL", () => {
+  it("o banco de teste é 18 ou mais novo (o throttle usa RETURNING old/new)", async () => {
+    const { requireSupportedPostgres } = await import("@/lib/postgres.ts");
+    await expect(requireSupportedPostgres()).resolves.toBeUndefined();
+  });
+});

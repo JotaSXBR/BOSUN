@@ -24,13 +24,19 @@ export function isDbUnavailable(err: unknown): boolean {
   return err instanceof Error && err.cause !== undefined && err.cause !== err && isDbUnavailable(err.cause);
 }
 
-/** Rota nossa: banco fora do ar vira 503 genérico (sem detalhe do erro); o resto segue para o 500 do Next. */
+/**
+ * Rota nossa: banco fora do ar vira 503 genérico; qualquer outro erro vira 500 genérico. Os dois passam pelo
+ * logger (corta a mensagem, sem stack nem argumentos do Prisma), nunca pelo log cru do Next.
+ */
 export function guarded<A extends unknown[]>(handler: (...args: A) => Promise<Response>): (...args: A) => Promise<Response> {
   return async (...args) => {
     try {
       return await handler(...args);
     } catch (err) {
-      if (!isDbUnavailable(err)) throw err;
+      if (!isDbUnavailable(err)) {
+        logger.error("http", "falha na rota", err);
+        return NextResponse.json({ error: "Algo deu errado. Tente de novo." }, { status: 500 });
+      }
       logger.error("http", "banco indisponível", err);
       return NextResponse.json({ error: "Serviço indisponível. Tente de novo em instantes." }, { status: 503, headers: { "retry-after": "5" } });
     }

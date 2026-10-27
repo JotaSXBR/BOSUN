@@ -18,10 +18,14 @@ describe("guarded (banco fora do ar)", () => {
     expect(body).not.toContain("database");
   });
 
-  it("reconhece a causa embrulhada e deixa passar os outros erros", async () => {
+  it("reconhece a causa embrulhada; outro erro vira 500 genérico pelo logger", async () => {
     expect(isDbUnavailable(new Error("auth", { cause: unreachable() }))).toBe(true);
     expect(isDbUnavailable(new Prisma.PrismaClientKnownRequestError("dup", { code: "P2002", clientVersion: "7" }))).toBe(false);
-    await expect(guarded(async () => Promise.reject(new Error("bug")))()).rejects.toThrow("bug");
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const res = await guarded(async () => Promise.reject(new Error("bug com senha=segredo123")))();
+    expect(res.status).toBe(500);
+    expect(JSON.stringify(await res.json())).not.toContain("segredo123");
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("[http] falha na rota"));
   });
 
   it("sem erro, devolve a resposta da rota", async () => {
