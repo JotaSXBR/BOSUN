@@ -9,7 +9,7 @@ import { type PasswordPolicyError, checkNewPassword, generateTempPassword, hashP
 /** Mesma regra na criação e no login (plugin username). */
 export const USERNAME_RE = /^[a-z0-9][a-z0-9._-]{2,31}$/;
 
-const TEMP_PASSWORD_TTL_MS = 72 * 60 * 60 * 1000;
+export const TEMP_PASSWORD_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** Erro com mensagem segura para mostrar a quem chamou. */
 export class AccountError extends Error {

@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { postJson } from "./post-json.ts";
+import { useHydrated } from "./use-hydrated.ts";
 
 /**
  * Estado de um formulário que posta JSON numa rota nossa. `build` monta o corpo a partir do form,
@@ -14,6 +15,7 @@ export function useJsonForm(
 ) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const hydrated = useHydrated();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,5 +36,6 @@ export function useJsonForm(
     setError(result.error);
   }
 
-  return { error, pending, onSubmit: (event: FormEvent<HTMLFormElement>) => void submit(event) };
+  // Botão desligado até a hidratação; o <form> usa method="post" para o envio nativo nunca pôr a senha na URL.
+  return { error, pending: pending || !hydrated, onSubmit: (event: FormEvent<HTMLFormElement>) => void submit(event) };
 }

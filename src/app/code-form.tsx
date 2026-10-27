@@ -15,7 +15,7 @@ interface Props {
 export function CodeForm({ url, label, button, autoComplete, onOk }: Props) {
   const { error, pending, onSubmit } = useJsonForm(url, (form) => ({ data: { code: form.get("code") } }), onOk);
   return (
-    <form onSubmit={onSubmit}>
+    <form method="post" onSubmit={onSubmit}>
       <label>
         {label}
         <input name="code" autoComplete={autoComplete} spellCheck={false} required />

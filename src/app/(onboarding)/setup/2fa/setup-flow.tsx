@@ -25,7 +25,7 @@ function PasswordStep({ onDone }: { onDone: (e: Enrollment) => void }) {
     },
   );
   return (
-    <form onSubmit={onSubmit}>
+    <form method="post" onSubmit={onSubmit}>
       <label>
         Sua senha
         <input name="password" type="password" autoComplete="current-password" required />

@@ -16,7 +16,7 @@ export function LoginForm() {
   );
 
   return (
-    <form onSubmit={onSubmit}>
+    <form method="post" onSubmit={onSubmit}>
       <label>
         Usuário ou e-mail
         <input name="identifier" autoComplete="username" required />

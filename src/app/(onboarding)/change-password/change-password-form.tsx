@@ -18,7 +18,7 @@ export function ChangePasswordForm() {
   );
 
   return (
-    <form onSubmit={onSubmit}>
+    <form method="post" onSubmit={onSubmit}>
       <label>
         Senha atual
         <input name="current" type="password" autoComplete="current-password" required />

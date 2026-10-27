@@ -319,7 +319,7 @@ Feito com `/agent-skills:plan` em 2026-10-26. Grafo: I1 → I2 → I3 → I4 →
   - Aceite: `/security` lista sessões, revoga as outras, sair de todos (inclui a atual) e gera códigos novos com senha + sessão fresca; `readFresh()` devolve `SESSION_NOT_FRESH`; `POST /api/auth/step-up` cria sessão nova e apaga a antiga.
   - Verificar: integração dos critérios 3 e 4.
   - Arquivos: `src/modules/identity/session.ts`, `src/app/api/auth/step-up/route.ts`, `src/app/(app)/security/`.
-- [ ] **I7 — Pedido de reset, senha temporária e `bosun admin unlock`**
+- [x] **I7 — Pedido de reset, senha temporária e `bosun admin unlock`**
   - Aceite: `POST /api/auth/password-reset-request` sempre 202 e um pendente por usuário; serviço de senha temporária para o Admin (a UI fica no `workspace`); `unlock` zera senha e `TwoFactor`, revoga sessões, resolve pedidos e audita com ator `operator`.
   - Verificar: integração do pedido (conta existente e inexistente) e do unlock (critério 6).
   - Arquivos: `src/modules/identity/accounts.ts`, `src/app/api/auth/password-reset-request/route.ts`, `src/app/(auth)/login/`, `scripts/bosun.ts`.

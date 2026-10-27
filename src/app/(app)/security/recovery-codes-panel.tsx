@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { CodesList } from "@/app/codes-list.tsx";
 import { postJson } from "@/lib/post-json.ts";
+import { useHydrated } from "@/lib/use-hydrated.ts";
 
 function codesOf(body: unknown): string[] {
   return typeof body === "object" && body !== null && "codes" in body && Array.isArray(body.codes) ? body.codes.map(String) : [];
@@ -19,6 +20,7 @@ export function RecoveryCodesPanel() {
   const [needsCode, setNeedsCode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const hydrated = useHydrated();
 
   async function regenerate(password: FormDataEntryValue | null, code: FormDataEntryValue | null) {
     if (needsCode) {
@@ -51,7 +53,7 @@ export function RecoveryCodesPanel() {
     );
   }
   return (
-    <form onSubmit={(e) => void submit(e)}>
+    <form method="post" onSubmit={(e) => void submit(e)}>
       <p>Gerar códigos novos invalida os que você guardou antes.</p>
       <label>
         Senha
@@ -65,7 +67,7 @@ export function RecoveryCodesPanel() {
       )}
       {error && <p role="alert">{error}</p>}
       {needsCode && <p>Por segurança, confirme também um código.</p>}
-      <button type="submit" disabled={pending}>
+      <button type="submit" disabled={pending || !hydrated}>
         Gerar códigos novos
       </button>
     </form>

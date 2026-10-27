@@ -9,7 +9,8 @@ test("sem sessão, a página inicial leva ao login", async ({ page }) => {
 
 test("login errado mostra a mensagem genérica", async ({ page }) => {
   await page.goto("/login");
-  await page.getByLabel("Usuário ou e-mail").fill("ninguem@example.com");
+  // Endereço novo a cada execução: o throttle da conta persiste no banco e bloquearia na sexta rodada.
+  await page.getByLabel("Usuário ou e-mail").fill(`ninguem-${Date.now()}@example.com`);
   await page.getByLabel("Senha").fill("senha errada bem longa");
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page.locator("form").getByRole("alert")).toHaveText("Usuário ou senha inválidos");
@@ -34,4 +35,14 @@ test("rotas nativas do Better Auth não existem (sem catch-all)", async ({ reque
   const paths = ["/api/auth/sign-up/email", "/api/auth/sign-in/email", "/api/auth/change-password", "/api/auth/get-session"];
   const statuses = await Promise.all(paths.map(async (path) => [path, (await request.post(path, { data: {} })).status()]));
   expect(statuses).toEqual(paths.map((path) => [path, 404]));
+});
+
+test("esqueci a senha registra o pedido com a mesma resposta para qualquer conta", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("link", { name: "Esqueci a senha" })).toHaveAttribute("href", "/login/forgot");
+  // Espera a hidratação: um clique antes dela faz o envio nativo do <form>, que só recarrega a página.
+  await page.goto("/login/forgot", { waitUntil: "networkidle" });
+  await page.getByLabel("Usuário ou e-mail").fill("ninguem@test.local");
+  await page.getByRole("button", { name: "Pedir uma senha nova" }).click();
+  await expect(page.getByRole("status")).toHaveText(/Se a conta existir, o pedido foi registrado/);
 });
