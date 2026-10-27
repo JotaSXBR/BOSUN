@@ -14,7 +14,11 @@ const nextConfig: NextConfig = {
   // agentRules: o AGENTS.md é do projeto; o next dev não deve reescrevê-lo.
   agentRules: false,
   poweredByHeader: false,
-  headers: async () => [{ source: "/(.*)", headers: securityHeaders }],
+  headers: async () => [
+    { source: "/(.*)", headers: securityHeaders },
+    // API devolve JSON (e o 404 em HTML): nada a carregar nem a emoldurar.
+    { source: "/api/:path*", headers: [{ key: "Content-Security-Policy", value: "default-src 'none'; frame-ancestors 'none'" }] },
+  ],
 };
 
 export default nextConfig;

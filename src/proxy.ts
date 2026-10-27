@@ -34,14 +34,7 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: [
-    {
-      // Páginas; API, estáticos e prefetch do <Link> não precisam de CSP.
-      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
-  ],
+  // Toda página, inclusive prefetch (o layout já é dinâmico, e o HTML de prefetch não pode sair sem CSP).
+  // Fora: /api/ (CSP mínima no next.config.ts) e estáticos. Barra e ponto escapados: /api-keys teria CSP.
+  matcher: ["/((?!api/|_next/static/|_next/image|favicon\\.ico$).*)"],
 };

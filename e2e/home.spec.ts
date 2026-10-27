@@ -77,6 +77,10 @@ test("CSP com nonce: cabeçalho de produção, scripts rodam e nenhuma violaçã
   expect(csp).not.toMatch(/unsafe-/);
   // Botão liga = o React hidratou sob a CSP (um erro na política deixaria todos os formulários mortos).
   await expect(page.getByRole("button", { name: "Entrar" })).toBeEnabled();
+  const api = await page.request.get("/api/nada");
+  expect(api.headers()["content-security-policy"]).toBe("default-src 'none'; frame-ancestors 'none'");
+  const prefetch = await page.request.get("/login", { headers: { "next-router-prefetch": "1", purpose: "prefetch" } });
+  expect(prefetch.headers()["content-security-policy"]).toMatch(/nonce-/);
   const other = await page.request.get("/login");
   expect(other.headers()["content-security-policy"]).not.toBe(csp);
   expect(violations).toEqual([]);

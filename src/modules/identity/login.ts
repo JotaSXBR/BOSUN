@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "../../lib/db.ts";
 import { logger } from "../../lib/logger.ts";
 import { type AuditEvent, writeAudit } from "./audit.ts";
-import { credentialsResetSince, findUserId } from "./accounts.ts";
+import { credentialsVersion } from "./accounts.ts";
 import { auth, trimSessions } from "./auth.ts";
 import { resolveSession } from "./session.ts";
 import { hmac } from "./secret.ts";
@@ -86,11 +86,11 @@ export async function login(input: unknown, headers: Headers): Promise<LoginResu
   const { attempts, blocked } = await reserveAccountAttempt(accountKey);
   if (blocked) return tooMany;
 
-  // Antes de conferir a senha: se uma senha temporária for emitida durante o login, ele não vira sessão.
-  const startedAt = new Date();
+  // Antes de conferir a senha: se a credencial trocar durante o login, ele não vira sessão nem desafio.
+  const version = await credentialsVersion(identifier);
   try {
     const { headers: out, response } = await signIn(identifier, parsed.data.password, forAuth(headers, ip));
-    const attempt = { identifier, identifierRef, attempts, accountKey, startedAt };
+    const attempt = { identifier, identifierRef, attempts, accountKey, version };
     // Com 2FA o plugin já apagou a sessão e devolve só o cookie de desafio (sem `user`); a sessão nasce no totp.ts.
     if ("twoFactorRedirect" in response && response.twoFactorRedirect === true) return challengeIssued(out, attempt);
     return sessionCreated(response.user.id, response.token, out, attempt);
@@ -104,7 +104,12 @@ interface Attempt {
   identifierRef: string;
   attempts: number;
   accountKey: string;
-  startedAt: Date;
+  version: number | null;
+}
+
+/** A senha conferida ainda é a atual? Conta que não existia na primeira leitura falha fechado. */
+async function credentialsUnchanged(attempt: Attempt): Promise<boolean> {
+  return attempt.version !== null && (await credentialsVersion(attempt.identifier)) === attempt.version;
 }
 
 const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> => {
@@ -115,8 +120,8 @@ const refused = async (attempt: Attempt, reason: string): Promise<LoginResult> =
 
 /** Senha certa numa conta com 2FA. Reset no meio do caminho: o cookie de desafio não sai. */
 async function challengeIssued(out: Headers, attempt: Attempt): Promise<LoginResult> {
-  const user = await findUserId(attempt.identifier);
-  if (user && (await credentialsResetSince(user.id, attempt.startedAt))) return refused(attempt, "credentials_reset");
+  // Recusado: o cookie de desafio fica em `out` e não sai.
+  if (!(await credentialsUnchanged(attempt))) return refused(attempt, "credentials_reset");
   await reset(attempt.accountKey);
   await auditLogin({ actor: { type: "system" }, action: "auth.2fa.challenge", data: { identifierRef: attempt.identifierRef } });
   return { ok: true, headers: out, twoFactorRedirect: true };
@@ -127,7 +132,7 @@ async function sessionCreated(userId: string, token: unknown, out: Headers, atte
     await dropExpiredLogin(userId, token);
     return refused(attempt, "temp_expired");
   }
-  if (await credentialsResetSince(userId, attempt.startedAt)) {
+  if (!(await credentialsUnchanged(attempt))) {
     await dropExpiredLogin(userId, token);
     return refused(attempt, "credentials_reset");
   }

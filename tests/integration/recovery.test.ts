@@ -1,7 +1,8 @@
 import { spawnSync } from "node:child_process";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as resetPost } from "@/app/api/auth/password-reset-request/route.ts";
 import { db } from "@/lib/db.ts";
+import { auth } from "@/modules/identity/auth.ts";
 import { login } from "@/modules/identity/login.ts";
 import { issueTempPassword, requestPasswordReset, unlockAccount } from "@/modules/identity/recovery.ts";
 import { hmac } from "@/modules/identity/secret.ts";
@@ -140,25 +141,41 @@ describe("senha temporária pela Admin (Postgres real)", () => {
 });
 
 describe("corrida login × senha temporária (Postgres real)", () => {
-  // Simula o reset caindo durante o login: o marco fica depois do início da tentativa.
-  const resetDuringLogin = (userId: string) => db.user.update({ where: { id: userId }, data: { credentialsResetAt: new Date(Date.now() + 5000) } });
+  afterEach(() => vi.restoreAllMocks());
 
-  it("login que começou antes do reset não vira sessão", async () => {
+  /** Simula a troca de credencial caindo no meio do login: sobe a versão logo depois de o Better Auth conferir a senha. */
+  function resetDuringSignIn(userId: string) {
+    const original = auth.api.signInEmail.bind(auth.api);
+    vi.spyOn(auth.api, "signInEmail").mockImplementation(async (...args: Parameters<typeof auth.api.signInEmail>) => {
+      const result = await original(...args);
+      await db.user.update({ where: { id: userId }, data: { credentialsVersion: { increment: 1 } } });
+      return result;
+    });
+  }
+
+  it("login sem 2FA que conferiu a senha antes da troca não vira sessão", async () => {
     const { user, password } = await account();
-    await resetDuringLogin(user.id);
-    expect(await login({ identifier: user.email, password }, req())).toMatchObject({ ok: false, status: 401 });
+    resetDuringSignIn(user.id);
+    const res = await login({ identifier: user.email, password }, req());
+    expect(res).toMatchObject({ ok: false, status: 401 });
     expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
   });
 
-  it("com 2FA, o desafio não sai; e um desafio pendente para de valer quando a Admin emite a senha", async () => {
+  it("com 2FA, o desafio não sai se a credencial trocar no meio do login", async () => {
+    const { user, password } = await enrolled();
+    resetDuringSignIn(user.id);
+    const res = await login({ identifier: user.email, password }, req());
+    expect(res).toMatchObject({ ok: false, status: 401 });
+  });
+
+  it("um desafio de 2FA pendente para de valer quando a Admin emite a senha", async () => {
     const { user: admin } = await account();
     const { user, password, secret } = await enrolled();
     const pendingChallenge = await challenge(user.email, password);
     await issueTempPassword(user.id, { type: "user", id: admin.id });
     expect(await verifySecondFactor("totp", { code: nextCode(secret) }, pendingChallenge)).toMatchObject({ status: 401 });
     expect(await db.session.count({ where: { userId: user.id } })).toBe(0);
-    await resetDuringLogin(user.id);
-    expect(await login({ identifier: user.email, password }, req())).toMatchObject({ ok: false, status: 401 });
+    expect((await db.user.findUnique({ where: { id: user.id } }))?.twoFactorResetAt).toBeNull();
   });
 
   it("unlock marca a data para o aviso no setup do 2FA", async () => {

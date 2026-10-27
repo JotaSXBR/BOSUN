@@ -25,7 +25,7 @@ export async function requestPasswordReset(input: unknown, headers: Headers): Pr
   if ((await hitIp(throttleKey("reset-acct", parsed.data.identifier))) > RESET_PER_IDENTIFIER) return true;
   const user = await findUserId(parsed.data.identifier);
   if (!user) {
-    // Mesmo trabalho da conta existente (uma escrita a mais): o tempo de resposta não separa as duas.
+    // Uma escrita, como a conta existente: reduz a diferença de tempo entre as duas.
     await hitIp(throttleKey("reset-unknown", parsed.data.identifier));
     await auditLogin({ actor: { type: "system" }, action: "auth.password.reset_requested", data: { identifierRef: hmac(parsed.data.identifier), known: false } });
     return true;
@@ -77,7 +77,7 @@ export async function issueTempPassword(userId: string, actor: AuditActor, optio
       data: {
         mustChangePassword: true,
         tempPasswordExpiresAt: new Date(Date.now() + TEMP_PASSWORD_TTL_MS),
-        credentialsResetAt: new Date(),
+        credentialsVersion: { increment: 1 },
         ...(options.resetTwoFactor ? { twoFactorEnabled: false, twoFactorResetAt: new Date() } : {}),
       },
     });

@@ -53,6 +53,8 @@ Decisões em [ADR-102](../decisions/adr-102-identity.md).
 
 Login e logout, falhas relevantes, convites e remoções, mudança de papel, troca e reset de senha, revogação de sessão e ações sensíveis listadas no [ADR-111](../decisions/adr-111-architecture.md).
 
+- **CSP:** `src/proxy.ts` gera o nonce de toda página (inclusive prefetch); `/api/*` recebe `default-src 'none'; frame-ancestors 'none'`. Nunca liberar `'unsafe-inline'` em `style-src` em produção: componente que renderize `style=""` no servidor (shadcn, Radix, `next/image`) precisa do nonce ou de classe CSS.
+
 ## Relations
 
 - governed_by: [ADR-102 — Identidade, acesso e papéis](../decisions/adr-102-identity.md)

@@ -1,6 +1,8 @@
-import { afterAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { EXAMPLE_QUEUE, getQueue } from "@/lib/queue.ts";
 import { startWorker } from "@/lib/worker.ts";
+
+afterEach(() => vi.restoreAllMocks());
 
 afterAll(async () => {
   await (await getQueue("worker")).stop();
