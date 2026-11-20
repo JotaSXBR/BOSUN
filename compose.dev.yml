@@ -14,7 +14,7 @@ services:
       interval: 2s
       retries: 30
   rustfs:
-    image: rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b
+    image: rustfs/rustfs:1.0.6@sha256:ee717072290bec9b11abfc0365f8310b00df1cd9b3639943edae47bdef05044a
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:?defina no .env.local}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:?defina no .env.local}
